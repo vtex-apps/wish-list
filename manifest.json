@@ -1,0 +1,59 @@
+{
+  "name": "wist-list",
+  "vendor": "vtex",
+  "version": "0.0.1",
+  "title": "Wish List",
+  "description": "An app for storing a shopper wish list",
+  "categories": [],
+  "settingsSchema": {},
+  "builders": {
+    "dotnet": "2.x",
+	"graphql": "1.x"
+  },
+  "mustUpdateAt": "2018-09-05",
+  "scripts": {
+    "postreleasy": "vtex publish --verbose"
+  },
+  "policies": [
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "bnb.data.bl.uk"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "nuget.org"
+      }
+    },
+    {
+      "name": "ADMIN_DS"
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/dataentities/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "",
+        "path": ""
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "",
+        "path": ""
+      }
+    },
+    {
+      "name": "vbase-read-write"
+    }
+  ],
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
+}

@@ -1,0 +1,40 @@
+type WishList {
+  data: [ListItem]
+  public: Boolean
+  name: String
+  range: Range
+}
+
+type ListItem {
+  id: ID
+  productId: String!
+  sku: String
+  title: String
+}
+
+type Range {
+  total: Int
+  from: Int
+  to: Int
+}
+
+input ListItemInput {
+  id: ID
+  productId: String!
+  sku: String
+  title: String
+  shopperId: String!
+}
+
+type Query {
+  viewList(
+    shopperId: String!
+    from: Int
+    to: Int
+  ): WishList
+}
+
+type Mutation {
+  addToList(listItem: ListItemInput!): Boolean
+  removeFromList(ids: [ID!]): Boolean
+}
