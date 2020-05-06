@@ -29,12 +29,13 @@ input ListItemInput {
 type Query {
   viewList(
     shopperId: String!
+	name: String
     from: Int
     to: Int
   ): WishList
 }
 
 type Mutation {
-  addToList(listItem: ListItemInput!): Boolean
-  removeFromList(ids: [ID!]): Boolean
+  addToList(listItem: ListItemInput!, shopperId: String!, name: String, public: Boolean): Boolean
+  removeFromList(id: ID!, shopperId: String!, name: String): Boolean
 }

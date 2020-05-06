@@ -8,7 +8,7 @@ namespace WishList.Models
     {
         public string Id { get; set; }
         public IList<ListItem> ListItems { get; set; }
-        public bool IsPublic { get; set; }
-        public string Name { get; set; }
+        public bool? IsPublic { get; set; }
+        public string? Name { get; set; }
     }
 }
