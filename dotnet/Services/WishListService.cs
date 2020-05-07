@@ -32,14 +32,32 @@ namespace WishList.Services
 
         public async Task<ListItemsWrapper> GetList(string shopperId, string listName)
         {
-            return await _wishListRepository.GetWishList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = new ListItemsWrapper();
+            WishListWrapper wishListWrapper = await _wishListRepository.GetWishList(shopperId);
+            if (wishListWrapper != null)
+            {
+                Console.WriteLine($"wishListWrapper Count = {wishListWrapper.ListItemsWrapper.Count}");
+                listItemsWrapper = wishListWrapper.ListItemsWrapper.Where(n => n.Name.Equals(listName)).FirstOrDefault();
+                Console.WriteLine($"listItemsWrapper Count = {listItemsWrapper.ListItems.Count}");
+            }
+            else
+            {
+                Console.WriteLine("GetList Null/Empty");
+            }
+
+            return listItemsWrapper;
+        }
+
+        public async Task<WishListWrapper> GetLists(string shopperId)
+        {
+            return await _wishListRepository.GetWishList(shopperId);
         }
 
         public async Task<bool> SaveList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic)
         {
             IList<ListItem> listItemsToSave = null;
 
-            ListItemsWrapper listItemsWrapper = await _wishListRepository.GetWishList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = await this.GetList(shopperId, listName);
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
@@ -60,7 +78,7 @@ namespace WishList.Services
         {
             IList<ListItem> listItemsToSave = null;
 
-            ListItemsWrapper listItemsWrapper = await _wishListRepository.GetWishList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = await this.GetList(shopperId, listName);
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
@@ -83,6 +101,7 @@ namespace WishList.Services
             }
             else
             {
+                listItem.Id = listItem.Id ?? 0;
                 listItemsToSave = new List<ListItem> { listItem };
             }
 
@@ -93,7 +112,7 @@ namespace WishList.Services
         {
             bool wasRemoved = false;
             IList<ListItem> listItemsToSave = null;
-            ListItemsWrapper listItemsWrapper = await _wishListRepository.GetWishList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = await this.GetList(shopperId, listName);
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;

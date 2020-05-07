@@ -15,7 +15,6 @@ namespace WishList.GraphQL.Types
 
             Field(x => x.Id, nullable: true);
             Field(x => x.ProductId, nullable: false);
-            Field(x => x.ShopperId, nullable: false);
             Field(x => x.Sku, nullable: true);
             Field(x => x.Title, nullable: true);
         }

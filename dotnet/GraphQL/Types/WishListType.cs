@@ -15,7 +15,7 @@ namespace WishList.GraphQL.Types
         {
             Name = "WishListType";
 
-            Field(b => b.Id).Description("Shopper Id.");
+            //Field(b => b.Id).Description("Shopper Id.");
             Field(b => b.ListItems, type: typeof(ListGraphType<ListItemsType>)).Description("List of Items.");
             Field(b => b.IsPublic, nullable: true).Description("The list is public.");
             Field(b => b.Name, nullable: true).Description("The name of the list.");

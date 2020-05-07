@@ -50,17 +50,22 @@
 
             ListItemsWrapper listItemsWrapper = new ListItemsWrapper
             {
-                Id = shopperId,
                 ListItems = listItems,
                 IsPublic = isPublic,
                 Name = listName
             };
 
-            var jsonSerializedListItems = JsonConvert.SerializeObject(listItemsWrapper);
+            WishListWrapper wishListWrapper = new WishListWrapper
+            {
+                Id = shopperId,
+                ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper }
+            };
+
+            var jsonSerializedListItems = JsonConvert.SerializeObject(wishListWrapper);
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Patch,
-                RequestUri = new Uri($"https://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{listName}_{WishListConstants.DATA_ENTITY}/documents"),
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents"),
                 Content = new StringContent(jsonSerializedListItems, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
             };
 
@@ -72,18 +77,21 @@
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            //Console.WriteLine($"Save:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}' {jsonSerializedListItems}");
+            Console.WriteLine($"Save:{response.StatusCode}");
 
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<ListItemsWrapper> GetWishList(string shopperId, string listName)
+        public async Task<WishListWrapper> GetWishList(string shopperId)
         {
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{listName}_{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=_all")
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=_all")
                 // RequestUri = new Uri($"https://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_schema={WishListConstants.SCHEMA}&_fields=_all")
             };
 
@@ -95,11 +103,11 @@
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
-
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Response = {responseContent}");
+            //Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
+            Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
 
-            return JsonConvert.DeserializeObject<ListItemsWrapper>(responseContent);
+            return JsonConvert.DeserializeObject<WishListWrapper>(responseContent);
         }
     }
 }

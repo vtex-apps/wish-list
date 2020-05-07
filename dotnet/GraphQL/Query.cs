@@ -1,6 +1,8 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using WishList.GraphQL.Types;
 using WishList.Models;
 using WishList.Services;
@@ -46,6 +48,39 @@ namespace WishList.GraphQL
                     };
 
                     return listResponse;
+                }
+            );
+
+            FieldAsync<CheckListType>(
+                "checkList",
+                arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<StringGraphType> { Name = "productId", Description = "Product Id" },
+                    new QueryArgument<StringGraphType> { Name = "sku", Description = "Product Sku" }
+                ),
+                resolve: async context =>
+                {
+                    Console.WriteLine("[-] CheckList [-]");
+                    string shopperId = context.GetArgument<string>("shopperId");
+                    string productId = context.GetArgument<string>("productId");
+                    string sku = context.GetArgument<string>("sku");
+                    var resultListWrapper = await wishListService.GetLists(shopperId);
+                    List<string> namesList = new List<string>();
+                    foreach(ListItemsWrapper listItemsWrapper in resultListWrapper.ListItemsWrapper)
+                    {
+                        if (listItemsWrapper.ListItems.Select(l => l.ProductId.Equals(productId)).FirstOrDefault())
+                        {
+                            namesList.Add(listItemsWrapper.Name);
+                        }
+                    }
+
+                    CheckListResponse checkListResponse = new CheckListResponse
+                    {
+                        InList = namesList.Count > 0,
+                        ListNames = namesList.ToArray()
+                    };
+
+                    return checkListResponse;
                 }
             );
         }

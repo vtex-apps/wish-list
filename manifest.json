@@ -38,20 +38,6 @@
       }
     },
     {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "",
-        "path": ""
-      }
-    },
-    {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "",
-        "path": ""
-      }
-    },
-    {
       "name": "vbase-read-write"
     }
   ],
