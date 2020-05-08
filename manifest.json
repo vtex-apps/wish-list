@@ -1,6 +1,6 @@
 {
-  "name": "wist-list",
-  "vendor": "vtex",
+  "name": "wish-list",
+  "vendor": "sandboxusdev",
   "version": "0.0.1",
   "title": "Wish List",
   "description": "An app for storing a shopper wish list",
@@ -8,11 +8,23 @@
   "settingsSchema": {},
   "builders": {
     "dotnet": "2.x",
-	"graphql": "1.x"
+    "graphql": "1.x",
+    "messages": "1.x",
+    "store": "0.x",
+    "react": "3.x",
+    "docs": "0.x"
   },
   "mustUpdateAt": "2018-09-05",
   "scripts": {
     "postreleasy": "vtex publish --verbose"
+  },
+  "dependencies": {
+    "vtex.store": "2.x",
+    "vtex.product-context": "0.x",
+    "vtex.product-summary": "2.x",
+    "vtex.styleguide": "9.x",
+    "vtex.store-icons": "0.x",
+    "vtex.store-graphql": "2.x"
   },
   "policies": [
     {

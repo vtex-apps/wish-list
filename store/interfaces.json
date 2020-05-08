@@ -1,0 +1,15 @@
+{
+  "add-to-list-btn": {
+    "component": "AddProductBtn",
+    "required": ["wishlist", "product-summary"]
+  },
+  "wishlist": {
+    "component": "Wishlist",
+    "required": ["product-summary"]
+  },
+  "store.wishlist": {
+    "required": [
+      "wishlist"
+    ]
+  }
+}
