@@ -8,7 +8,7 @@
   "settingsSchema": {},
   "builders": {
     "dotnet": "2.x",
-	"graphql": "1.x"
+    "graphql": "1.x"
   },
   "mustUpdateAt": "2018-09-05",
   "scripts": {
@@ -35,20 +35,6 @@
       "attrs": {
         "host": "{{account}}.vtexcommercestable.com.br",
         "path": "/api/dataentities/*"
-      }
-    },
-    {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "",
-        "path": ""
-      }
-    },
-    {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "",
-        "path": ""
       }
     },
     {
