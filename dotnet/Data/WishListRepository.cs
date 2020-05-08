@@ -73,6 +73,7 @@
             if (authToken != null)
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
             }
 
             var client = _clientFactory.CreateClient();
@@ -99,13 +100,14 @@
             if (authToken != null)
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
             }
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            //Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
-            Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
+            Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
+            //Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
 
             return JsonConvert.DeserializeObject<WishListWrapper>(responseContent);
         }

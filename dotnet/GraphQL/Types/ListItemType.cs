@@ -8,7 +8,7 @@ using WishList.Models;
 namespace WishList.GraphQL.Types
 {
     [GraphQLMetadata("ListItem")]
-    public class ListItemType : InputObjectGraphType<ListItem>
+    public class ListItemType : ObjectGraphType<ListItem>
     {
         public ListItemType()
         {

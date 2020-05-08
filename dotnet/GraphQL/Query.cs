@@ -66,19 +66,23 @@ namespace WishList.GraphQL
                     string sku = context.GetArgument<string>("sku");
                     var resultListWrapper = await wishListService.GetLists(shopperId);
                     List<string> namesList = new List<string>();
-                    foreach(ListItemsWrapper listItemsWrapper in resultListWrapper.ListItemsWrapper)
+                    CheckListResponse checkListResponse = null;
+                    if (resultListWrapper != null && resultListWrapper.ListItemsWrapper != null)
                     {
-                        if (listItemsWrapper.ListItems.Select(l => l.ProductId.Equals(productId)).FirstOrDefault())
+                        foreach (ListItemsWrapper listItemsWrapper in resultListWrapper.ListItemsWrapper)
                         {
-                            namesList.Add(listItemsWrapper.Name);
+                            if (listItemsWrapper.ListItems.Select(l => l.ProductId.Equals(productId)).FirstOrDefault())
+                            {
+                                namesList.Add(listItemsWrapper.Name);
+                            }
                         }
-                    }
 
-                    CheckListResponse checkListResponse = new CheckListResponse
-                    {
-                        InList = namesList.Count > 0,
-                        ListNames = namesList.ToArray()
-                    };
+                        checkListResponse = new CheckListResponse
+                        {
+                            InList = namesList.Count > 0,
+                            ListNames = namesList.ToArray()
+                        };
+                    }
 
                     return checkListResponse;
                 }
