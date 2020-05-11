@@ -14,7 +14,7 @@ namespace WishList.GraphQL
         {
             Name = "Mutation";
 
-            Field<BooleanGraphType>(
+            Field<IntGraphType>(
                 "addToList",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<ListItemInputType>> { Name = "listItem" },

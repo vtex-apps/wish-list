@@ -50,7 +50,7 @@ type Mutation {
 	shopperId: String!
 	name: String!
 	public: Boolean
-	): Boolean
+	): ID
   removeFromList(
     id: ID!
 	shopperId: String!

@@ -74,7 +74,7 @@ namespace WishList.Services
             return await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic);
         }
 
-        public async Task<bool> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
+        public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
         {
             IList<ListItem> listItemsToSave = null;
 
@@ -105,7 +105,12 @@ namespace WishList.Services
                 listItemsToSave = new List<ListItem> { listItem };
             }
 
-            return await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic);
+            if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic))
+            {
+
+            }
+
+            return listItem.Id;
         }
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
