@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import React, { FC, useState, useContext } from 'react'
+import React, { FC, useState, useContext, useEffect } from 'react'
 import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
-import { compose, graphql, useApolloClient } from 'react-apollo'
+import { compose, graphql, useApolloClient, useLazyQuery } from 'react-apollo'
 import { injectIntl, WrappedComponentProps, defineMessages } from 'react-intl'
 import userProfile from './queries/userProfile.gql'
 import checkItem from './queries/checkItem.gql'
@@ -56,7 +56,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     isLoading: false,
     isWishlisted: false,
   })
-  
+
   const { navigate, history } = useRuntime()
   const client = useApolloClient()
 
@@ -91,30 +91,44 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
 
   // console.log('PRODUCT =>', product)
 
-  const handleCheck = async variables => {
-    const { data } = await client.query({
-      query: checkItem,
-      variables,
-    })
-    if (data?.checkList?.inList) {
-      setState({
-        ...state,
-        isWishlisted: data.checkList.inList,
-      })
+  const [handleCheck, { called, loading, data }] = useLazyQuery(checkItem, {
+    variables: {
+      shopperId: String(getSession?.profile?.id || ''),
+      productId: String(product.productId),
+    },
+    onCompleted: (res: any) => {
+      console.log('useLazyQuery onCompleted', res)
+      // setState({
+      //   ...state,
+      //   isWishlisted: data.checkList.inList,
+      // })
     }
-    console.log('Check item ===>', data, variables)
-  }
+  })
 
-  if (isAuthenticated && product && !productCheck[product.productId]) {
-    console.log(`Check if user has the product ${product.productId} wishlisted`)
-    productCheck[product.productId] = product
-    handleCheck({
-      shopperId: getSession.profile.id,
-      productId: product.productId,
+  if(called && loading) {
+    console.log('VARIABLES =>', {
+      shopperId: String(getSession?.profile?.id || ''),
+      productId: String(product.productId),
     })
   }
 
-  console.log('Hello Add to Wishlist Button!', state)
+  if(called && !loading) {
+    console.log('useLazyQuery data', data)
+  }
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (product && !productCheck[product.productId]) {
+        console.log(
+          `Check if user has the product ${product.productId} wishlisted`
+        )
+        productCheck[product.productId] = product
+        handleCheck()
+      }
+    }
+  })
+
   const handleAddProductClick = e => {
     e.preventDefault()
     e.stopPropagation()
