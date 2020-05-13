@@ -85,7 +85,7 @@
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<WishListWrapper> GetWishList(string shopperId)
+        public async Task<ResponseListWrapper> GetWishList(string shopperId)
         {
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
 
@@ -109,8 +109,13 @@
             string responseContent = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
             //Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
+            ResponseListWrapper responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(responseContent);
+            if (!response.IsSuccessStatusCode)
+            {
+                responseListWrapper.message = $"Get:{response.StatusCode}: Rsp = [{responseContent}] Token? {authToken != null}";
+            }
 
-            return JsonConvert.DeserializeObject<WishListWrapper>(responseContent);
+            return responseListWrapper;
         }
     }
 }

@@ -80,7 +80,17 @@ namespace WishList.GraphQL
                         checkListResponse = new CheckListResponse
                         {
                             InList = namesList.Count > 0,
-                            ListNames = namesList.ToArray()
+                            ListNames = namesList.ToArray(),
+                            message = resultListWrapper.message
+                        };
+                    }
+                    else
+                    {
+                        checkListResponse = new CheckListResponse
+                        {
+                            InList = false,
+                            ListNames = new string[0],
+                            message = "No records returned."
                         };
                     }
 

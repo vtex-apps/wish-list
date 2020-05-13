@@ -7,6 +7,6 @@
     public interface IWishListRepository
     {
         Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic);
-        Task<WishListWrapper> GetWishList(string shopperId);
+        Task<ResponseListWrapper> GetWishList(string shopperId);
     }
 }

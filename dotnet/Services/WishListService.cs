@@ -48,7 +48,7 @@ namespace WishList.Services
             return listItemsWrapper;
         }
 
-        public async Task<WishListWrapper> GetLists(string shopperId)
+        public async Task<ResponseListWrapper> GetLists(string shopperId)
         {
             return await _wishListRepository.GetWishList(shopperId);
         }

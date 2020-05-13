@@ -4,10 +4,8 @@ using System.Text;
 
 namespace WishList.Models
 {
-    public class CheckListResponse
+    public class ResponseListWrapper : WishListWrapper
     {
-        public bool InList { get; set; }
-        public string[] ListNames { get; set; }
         public string message { get; set; }
     }
 }

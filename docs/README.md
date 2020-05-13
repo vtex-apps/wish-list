@@ -2,3 +2,50 @@
 # Wish List
 
 An app to store and retrieve a wish list of products
+
+Schema
+{
+    "properties": {
+        "ListItemsWrapper": {
+            "$id": "#/properties/ListItemsWrapper",
+            "type": "array",
+            "title": "The ListItemsWrapper schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "ListItems": [
+                            {
+                                "Id": 2,
+                                "ProductId": "testprodid",
+                                "Sku": "testsku",
+                                "Title": "prodtitle"
+                            },
+                            {
+                                "Id": 4,
+                                "ProductId": "testprodid",
+                                "Sku": null,
+                                "Title": null
+                            },
+                            {
+                                "Id": 5,
+                                "ProductId": "testprodid",
+                                "Sku": null,
+                                "Title": null
+                            },
+                            {
+                                "Id": 6,
+                                "ProductId": "testprodid",
+                                "Sku": null,
+                                "Title": null
+                            }
+                        ],
+                        "IsPublic": false,
+                        "Name": "default"
+                    }
+                ]
+            ]
+        }
+    }
+}
