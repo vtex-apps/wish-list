@@ -90,7 +90,7 @@ namespace WishList.GraphQL
                         {
                             InList = false,
                             ListNames = new string[0],
-                            message = "No records returned."
+                            message = resultListWrapper.message ?? "No records returned."
                         };
                     }
 
