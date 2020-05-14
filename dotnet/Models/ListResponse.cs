@@ -14,6 +14,12 @@ namespace WishList.Models
 
         [DataMember(Name = "range")]
         public ResultRange Range { get; set; }
+
+        [DataMember(Name = "public")]
+        public bool Public { get; set; }
+
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
     }
 
     public class ResultRange

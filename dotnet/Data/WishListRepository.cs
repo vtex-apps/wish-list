@@ -108,9 +108,9 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
+            //Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
             //Console.WriteLine($"Get authToken:{authToken}'");
-            //Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
+            Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
             ResponseListWrapper responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(responseContent);
             if (!response.IsSuccessStatusCode)
             {

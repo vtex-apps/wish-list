@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,9 @@ namespace WishList.GraphQL
                     ListResponse listResponse = new ListResponse
                     {
                         Data = new DataElement { data = resultList },
-                        Range = new ResultRange { From = from, To = to, Total = totalCount }
+                        Range = new ResultRange { From = from, To = to, Total = totalCount },
+                        Public = resultListWrapper.IsPublic ?? false,
+                        Name = resultListWrapper.Name
                     };
 
                     return listResponse;
@@ -105,6 +108,8 @@ namespace WishList.GraphQL
                             message = resultListWrapper != null ? resultListWrapper.message : "No records returned."
                         };
                     }
+
+                    //Console.WriteLine($"[-] CheckList Response {JsonConvert.SerializeObject(checkListResponse)} [-]");
 
                     return checkListResponse;
                 }
