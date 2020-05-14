@@ -30,11 +30,11 @@ namespace WishList.Services
                                   throw new ArgumentNullException(nameof(clientFactory));
         }
 
-        public async Task<ListItemsWrapper> GetList(string shopperId, string listName)
+        public async Task<WishListWrapper> GetList(string shopperId, string listName)
         {
             ListItemsWrapper listItemsWrapper = new ListItemsWrapper();
             WishListWrapper wishListWrapper = await _wishListRepository.GetWishList(shopperId);
-            if (wishListWrapper != null)
+            if (wishListWrapper != null && wishListWrapper.ListItemsWrapper != null)
             {
                 //Console.WriteLine($"wishListWrapper Count = {wishListWrapper.ListItemsWrapper.Count}");
                 listItemsWrapper = wishListWrapper.ListItemsWrapper.Where(n => n.Name.Equals(listName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
@@ -57,7 +57,9 @@ namespace WishList.Services
                 Console.WriteLine("GetList Null/Empty");
             }
 
-            return listItemsWrapper;
+            wishListWrapper.ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper };
+
+            return wishListWrapper;
         }
 
         public async Task<ResponseListWrapper> GetLists(string shopperId)
@@ -65,11 +67,12 @@ namespace WishList.Services
             return await _wishListRepository.GetWishList(shopperId);
         }
 
-        public async Task<bool> SaveList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic)
+        public async Task<bool> SaveList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId)
         {
             IList<ListItem> listItemsToSave = null;
 
-            ListItemsWrapper listItemsWrapper = await this.GetList(shopperId, listName);
+            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
@@ -83,14 +86,15 @@ namespace WishList.Services
                 listItemsToSave = listItems;
             }
 
-            return await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic);
+            return await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, documentId);
         }
 
         public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
         {
             IList<ListItem> listItemsToSave = null;
 
-            ListItemsWrapper listItemsWrapper = await this.GetList(shopperId, listName);
+            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
@@ -117,7 +121,7 @@ namespace WishList.Services
                 listItemsToSave = new List<ListItem> { listItem };
             }
 
-            if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic))
+            if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
             {
 
             }
@@ -129,14 +133,15 @@ namespace WishList.Services
         {
             bool wasRemoved = false;
             IList<ListItem> listItemsToSave = null;
-            ListItemsWrapper listItemsWrapper = await this.GetList(shopperId, listName);
+            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
                 ListItem itemToRemove = listItemsToSave.Where(r => r.Id == itemId).FirstOrDefault();
                 if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
                 {
-                    wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic);
+                    wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
                 }
             }
 

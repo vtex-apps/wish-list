@@ -12,6 +12,7 @@
     using WishList.Data;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Concrete implementation of <see cref="IWishListRepository"/> for persisting data to/from Masterdata v2.
@@ -39,7 +40,7 @@
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
         }
 
-        public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic)
+        public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId)
         {
             // PATCH https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents
 
@@ -57,7 +58,7 @@
 
             WishListWrapper wishListWrapper = new WishListWrapper
             {
-                Id = shopperId,
+                Id = documentId,
                 Email = shopperId,
                 ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper }
             };
@@ -89,11 +90,13 @@
         public async Task<ResponseListWrapper> GetWishList(string shopperId)
         {
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
+            // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/search
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}")
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}&email={shopperId}")
+                //RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}")
                 // RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=_all")
                 // RequestUri = new Uri($"https://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_schema={WishListConstants.SCHEMA}&_fields=_all")
             };
@@ -110,11 +113,25 @@
             string responseContent = await response.Content.ReadAsStringAsync();
             //Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
             //Console.WriteLine($"Get authToken:{authToken}'");
-            Console.WriteLine($"Get:{response.StatusCode} Found?{!string.IsNullOrEmpty(responseContent)}");
-            ResponseListWrapper responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(responseContent);
+            Console.WriteLine($"Get:{response.StatusCode} ");
+            ResponseListWrapper responseListWrapper = new ResponseListWrapper();
+            try
+            {
+                //dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(responseContent);
+                //searchResult = (WishListsWrapper)searchResult;
+                //responseListWrapper = (ResponseListWrapper)searchResult.WishLists.FirstOrDefault();
+                var searchResult = JArray.Parse(responseContent);
+                responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(searchResult.FirstOrDefault().ToString());
+            }
+            catch(Exception ex)
+            {
+                responseListWrapper.message = $"Error:{ex.Message}: Rsp = {responseContent} ";
+                Console.WriteLine($"Error:{ex.Message}: Rsp = {responseContent} ");
+            }
+
             if (!response.IsSuccessStatusCode)
             {
-                responseListWrapper.message = $"Get:{response.StatusCode}: Rsp = [{responseContent}] Token? {authToken != null}";
+                responseListWrapper.message = $"Get:{response.StatusCode}: Rsp = {responseContent}";
             }
 
             return responseListWrapper;

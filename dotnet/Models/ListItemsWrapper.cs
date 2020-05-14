@@ -5,6 +5,11 @@ using System.Text;
 
 namespace WishList.Models
 {
+    public class WishListsWrapper
+    {
+        public List<WishListWrapper> WishLists { get; set; }
+    }
+
     public class WishListWrapper
     {
         [JsonProperty("id")]

@@ -34,7 +34,8 @@ namespace WishList.GraphQL
                     int to = context.GetArgument<int>("to");
                     IList<ListItem> resultList = new List<ListItem>();
                     int totalCount = 0;
-                    var resultListWrapper = await wishListService.GetList(shopperId, name);
+                    var resultListsWrapper = await wishListService.GetList(shopperId, name);
+                    var resultListWrapper = resultListsWrapper.ListItemsWrapper.FirstOrDefault();
                     if (resultListWrapper != null)
                     {
                         resultList = resultListWrapper.ListItems;
