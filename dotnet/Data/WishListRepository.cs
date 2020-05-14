@@ -82,7 +82,7 @@
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
             //Console.WriteLine($"Save:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}' {jsonSerializedListItems}");
-            Console.WriteLine($"Save:{response.StatusCode}");
+            Console.WriteLine($"Save:{response.StatusCode} Id:{documentId}");
 
             return response.IsSuccessStatusCode;
         }
@@ -95,7 +95,7 @@
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}&email={shopperId}")
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=id,email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}&email={shopperId}")
                 //RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}")
                 // RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=_all")
                 // RequestUri = new Uri($"https://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_schema={WishListConstants.SCHEMA}&_fields=_all")
@@ -121,7 +121,10 @@
                 //searchResult = (WishListsWrapper)searchResult;
                 //responseListWrapper = (ResponseListWrapper)searchResult.WishLists.FirstOrDefault();
                 var searchResult = JArray.Parse(responseContent);
-                responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(searchResult.FirstOrDefault().ToString());
+                var listWrapper = searchResult.FirstOrDefault();
+                //Console.WriteLine($"listWrapper = '{listWrapper.ToString()}'");
+                responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(listWrapper.ToString());
+                //Console.WriteLine($"responseListWrapper = '{JsonConvert.SerializeObject(responseListWrapper)}'");
             }
             catch(Exception ex)
             {
