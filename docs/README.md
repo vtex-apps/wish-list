@@ -5,47 +5,31 @@ An app to store and retrieve a wish list of products
 
 Schema
 {
+    "name": "wishlist",
     "properties": {
+        "email": {
+            "type": "string",
+            "title": "Shopper ID",
+            "description": ""
+        },
         "ListItemsWrapper": {
-            "$id": "#/properties/ListItemsWrapper",
             "type": "array",
             "title": "The ListItemsWrapper schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                [
-                    {
-                        "ListItems": [
-                            {
-                                "Id": 2,
-                                "ProductId": "testprodid",
-                                "Sku": "testsku",
-                                "Title": "prodtitle"
-                            },
-                            {
-                                "Id": 4,
-                                "ProductId": "testprodid",
-                                "Sku": null,
-                                "Title": null
-                            },
-                            {
-                                "Id": 5,
-                                "ProductId": "testprodid",
-                                "Sku": null,
-                                "Title": null
-                            },
-                            {
-                                "Id": 6,
-                                "ProductId": "testprodid",
-                                "Sku": null,
-                                "Title": null
-                            }
-                        ],
-                        "IsPublic": false,
-                        "Name": "default"
-                    }
-                ]
-            ]
+            "description": "An explanation about the purpose of this instance."
         }
-    }
+    },
+    "v-indexed": [
+        "email"
+    ],
+    "v-default-fields": [
+        "email",
+        "ListItemsWrapper"
+    ],
+    "v-cache": false,
+    "v-security": {
+    "allowGetAll": false,
+    "publicRead": [ "email", "ListItemsWrapper" ],
+    "publicWrite": [ "email", "ListItemsWrapper" ],
+    "publicFilter": [ "email", "ListItemsWrapper" ]
+  }
 }

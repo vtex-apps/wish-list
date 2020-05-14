@@ -31,14 +31,26 @@ namespace WishList.GraphQL
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
+                    IList<ListItem> resultList = new List<ListItem>();
+                    int totalCount = 0;
                     var resultListWrapper = await wishListService.GetList(shopperId, name);
-                    var resultList = resultListWrapper.ListItems;
-                    int totalCount = resultList.Count;
-
-                    if (from > 0 && to > 0)
+                    if (resultListWrapper != null)
                     {
-                        resultList = await wishListService.LimitList(resultList, from, to);
-                        Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                        resultList = resultListWrapper.ListItems;
+                        if (resultListWrapper.ListItems != null)
+                        {
+                            totalCount = resultList.Count;
+
+                            if (from > 0 && to > 0)
+                            {
+                                resultList = await wishListService.LimitList(resultList, from, to);
+                                Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                            }
+                        }
+                        else
+                        {
+                            resultList = new List<ListItem>();
+                        }
                     }
 
                     ListResponse listResponse = new ListResponse
@@ -64,7 +76,7 @@ namespace WishList.GraphQL
                     string shopperId = context.GetArgument<string>("shopperId");
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
-                    var resultListWrapper = await wishListService.GetLists(shopperId);
+                    ResponseListWrapper resultListWrapper = await wishListService.GetLists(shopperId);
                     List<string> namesList = new List<string>();
                     CheckListResponse checkListResponse = null;
                     if (resultListWrapper != null && resultListWrapper.ListItemsWrapper != null)
@@ -90,7 +102,7 @@ namespace WishList.GraphQL
                         {
                             InList = false,
                             ListNames = new string[0],
-                            message = resultListWrapper.message ?? "No records returned."
+                            message = resultListWrapper != null ? resultListWrapper.message : "No records returned."
                         };
                     }
 
