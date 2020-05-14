@@ -2,5 +2,6 @@ query CheckItem($shopperId: String!, $productId: String!){
   checkList(shopperId: $shopperId, productId: $productId) {
     inList
     listNames
+    message
   }
 }

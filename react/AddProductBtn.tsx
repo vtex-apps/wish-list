@@ -2,7 +2,7 @@
 import React, { FC, useState, useContext, useEffect } from 'react'
 import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
-import { compose, graphql, useApolloClient, useLazyQuery } from 'react-apollo'
+import { compose, graphql, useApolloClient, useMutation } from 'react-apollo'
 import { injectIntl, WrappedComponentProps, defineMessages } from 'react-intl'
 import userProfile from './queries/userProfile.gql'
 import checkItem from './queries/checkItem.gql'
@@ -91,41 +91,57 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
 
   // console.log('PRODUCT =>', product)
 
-  const [handleCheck, { called, loading, data }] = useLazyQuery(checkItem, {
-    variables: {
-      shopperId: String(getSession?.profile?.id || ''),
-      productId: String(product.productId),
-    },
-    onCompleted: (res: any) => {
-      console.log('useLazyQuery onCompleted', res)
-      // setState({
-      //   ...state,
-      //   isWishlisted: data.checkList.inList,
-      // })
+  const handleCheck = async variables => {
+    console.log('/* handleCheck started')
+    const { data } = await client.query({
+      query: checkItem,
+      variables,
+    })
+    if (data?.checkList?.inList) {
+      setState({
+        ...state,
+        isWishlisted: data.checkList.inList,
+      })
+    }
+    console.log('Check item ===>', { response: data }, { variables })
+    console.log('handleCheck ended */')
+  }
+
+  useEffect(() => {
+    if (isAuthenticated && product && !productCheck[product.productId]) {
+      console.log(
+        `Check if user has the product ${product.productId} wishlisted`
+      )
+      productCheck[product.productId] = product
+
+      if (product) {
+        handleCheck({
+          shopperId: String(getSession.profile.email),
+          productId: String(product.productId),
+        })
+      }
     }
   })
 
-  if(called && loading) {
-    console.log('VARIABLES =>', {
-      shopperId: String(getSession?.profile?.id || ''),
-      productId: String(product.productId),
-    })
-  }
+  console.log('Hello Add to Wishlist Button!', state)
 
-  if(called && !loading) {
-    console.log('useLazyQuery data', data)
-  }
+  const [addProduct] = useMutation(addToList, {
+    onCompleted: () => {
+      setState({
+        ...state,
+        isLoading: false,
+        isWishlisted: true,
+      })
+    }
+  })
 
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (product && !productCheck[product.productId]) {
-        console.log(
-          `Check if user has the product ${product.productId} wishlisted`
-        )
-        productCheck[product.productId] = product
-        handleCheck()
-      }
+  const [removeProduct] = useMutation(removeFromList, {
+    onCompleted: () => {
+      setState({
+        ...state,
+        isLoading: false,
+        isWishlisted: false,
+      })
     }
   })
 
@@ -139,55 +155,37 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         isLoading: true,
       })
       if (!isWishlisted) {
-        console.log('VARIABLES =>', {
+        console.log('VARIABLES =>', JSON.stringify({
           listItem: {
             productId: product.productId,
             title: product.productName,
           },
-          shopperId: getSession.profile.id,
+          shopperId: getSession.profile.email,
           name: defaultValues.LIST_NAME,
-        })
-        client
-          .mutate({
-            mutation: addToList,
-            variables: {
-              listItem: {
-                productId: product.productId,
-                title: product.productName,
-              },
-              shopperId: getSession.profile.id,
-              name: defaultValues.LIST_NAME,
+        }))
+        addProduct({
+          variables: {
+            listItem: {
+              productId: product.productId,
+              title: product.productName,
             },
-          })
-          .then((data: any) => {
-            setState({
-              ...state,
-              isLoading: false,
-              isWishlisted: data.addToList,
-            })
-          })
+            shopperId: getSession.profile.email,
+            name: defaultValues.LIST_NAME,
+          },
+        })
       } else {
         console.log('VARIABLES =>', {
           id: isWishlisted,
-          shopperId: getSession.profile.id,
+          shopperId: getSession.profile.email,
           name: defaultValues.LIST_NAME,
         })
-        client
-          .mutate({
-            mutation: removeFromList,
-            variables: {
-              id: isWishlisted,
-              shopperId: getSession.profile.id,
-              name: defaultValues.LIST_NAME,
-            },
-          })
-          .then(() => {
-            setState({
-              ...state,
-              isLoading: false,
-              isWishlisted: false,
-            })
-          })
+        removeProduct({
+          variables: {
+            id: isWishlisted,
+            shopperId: getSession.profile.email,
+            name: defaultValues.LIST_NAME,
+          },
+        })
       }
     } else {
       toastMessage('notLogged')
