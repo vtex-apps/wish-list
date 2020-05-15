@@ -93,7 +93,7 @@ namespace WishList.GraphQL
                             //    Console.WriteLine($"[{item.Id}] '{item.ProductId}' = {productId}? {item.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)}");
                             //}
 
-                            if (listItemsWrapper.ListItems.Select(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)).Any())
+                            if (listItemsWrapper.ListItems.Any(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)))
                             {
                                 namesList.Add(listItemsWrapper.Name);
                             }
