@@ -82,6 +82,7 @@ namespace WishList.GraphQL
                     string sku = context.GetArgument<string>("sku");
                     ResponseListWrapper resultListWrapper = await wishListService.GetLists(shopperId);
                     List<string> namesList = new List<string>();
+                    List<int> idsList = new List<int>();
                     CheckListResponse checkListResponse = null;
                     if (resultListWrapper != null && resultListWrapper.ListItemsWrapper != null)
                     {
@@ -93,9 +94,16 @@ namespace WishList.GraphQL
                             //    Console.WriteLine($"[{item.Id}] '{item.ProductId}' = {productId}? {item.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)}");
                             //}
 
-                            if (listItemsWrapper.ListItems.Any(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)))
+                            //if (listItemsWrapper.ListItems.Any(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)))
+                            //{
+                            //    namesList.Add(listItemsWrapper.Name);
+                            //}
+
+                            ListItem listItem = listItemsWrapper.ListItems.FirstOrDefault(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase));
+                            if(listItem != null)
                             {
                                 namesList.Add(listItemsWrapper.Name);
+                                idsList.Add(listItem.Id ?? -1);
                             }
                         }
 
@@ -103,6 +111,7 @@ namespace WishList.GraphQL
                         {
                             InList = namesList.Count > 0,
                             ListNames = namesList.ToArray(),
+                            ListIds = idsList.ToArray(),
                             message = resultListWrapper.message
                         };
                     }
@@ -112,6 +121,7 @@ namespace WishList.GraphQL
                         {
                             InList = false,
                             ListNames = new string[0],
+                            ListIds = new int[0],
                             message = resultListWrapper != null ? resultListWrapper.message : "No records returned."
                         };
                     }

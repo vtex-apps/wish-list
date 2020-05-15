@@ -18,6 +18,7 @@ namespace WishList.GraphQL.Types
             Field(b => b.InList).Description("The procuvt is in a list");
             Field(b => b.ListNames).Description("The name of the lists that have the product.");
             Field(b => b.message, nullable: true).Description("Message returned from data layer.");
+            Field(b => b.ListIds).Description("The id of the product in the list.");
         }
     }
 }

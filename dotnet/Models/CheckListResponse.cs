@@ -8,6 +8,7 @@ namespace WishList.Models
     {
         public bool InList { get; set; }
         public string[] ListNames { get; set; }
+        public int[] ListIds { get; set; }
         public string message { get; set; }
     }
 }

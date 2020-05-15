@@ -21,6 +21,7 @@ type Range {
 type CheckListType {
   inList: Boolean
   listNames: [String]
+  listIds: [ID]
   message: String
 }
 
