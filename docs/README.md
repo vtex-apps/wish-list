@@ -28,7 +28,7 @@ Schema
     "v-cache": false,
     "v-security": {
     "allowGetAll": false,
-    "publicRead": [ "email", "ListItemsWrapper" ],
+    "publicRead": [ "email", "ListItemsWrapper", "id" ],
     "publicWrite": [ "email", "ListItemsWrapper" ],
     "publicFilter": [ "email", "ListItemsWrapper" ]
   }
