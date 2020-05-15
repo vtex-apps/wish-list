@@ -87,7 +87,13 @@ namespace WishList.GraphQL
                     {
                         foreach (ListItemsWrapper listItemsWrapper in resultListWrapper.ListItemsWrapper)
                         {
-                            if (listItemsWrapper.ListItems.Select(l => l.ProductId.Equals(productId)).FirstOrDefault())
+                            //Console.WriteLine($"[{resultListWrapper.ListItemsWrapper.Count}] Name = {listItemsWrapper.Name} [{listItemsWrapper.ListItems.Count}]");
+                            //foreach(ListItem item in listItemsWrapper.ListItems)
+                            //{
+                            //    Console.WriteLine($"[{item.Id}] '{item.ProductId}' = {productId}? {item.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)}");
+                            //}
+
+                            if (listItemsWrapper.ListItems.Select(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)).Any())
                             {
                                 namesList.Add(listItemsWrapper.Name);
                             }
