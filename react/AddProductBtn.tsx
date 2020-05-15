@@ -174,13 +174,13 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         })
       } else {
         console.log('VARIABLES =>', {
-          id: isWishlisted,
+          id: product.productId,
           shopperId: getSession.profile.email,
           name: defaultValues.LIST_NAME,
         })
         removeProduct({
           variables: {
-            id: isWishlisted,
+            id: product.productId,
             shopperId: getSession.profile.email,
             name: defaultValues.LIST_NAME,
           },
