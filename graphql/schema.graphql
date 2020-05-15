@@ -37,12 +37,12 @@ type Query {
 	name: String
     from: Int
     to: Int
-    ): WishList
+    ): WishList @cacheControl(scope: PRIVATE)
   checkList(
     shopperId: String!
     productId: String!
     sku: String
-    ) : CheckListType
+    ) : CheckListType @cacheControl(scope: PRIVATE)
 }
 
 type Mutation {

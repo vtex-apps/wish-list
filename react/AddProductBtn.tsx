@@ -92,10 +92,10 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   // console.log('PRODUCT =>', product)
 
   const handleCheck = async variables => {
-    console.log('/* handleCheck started')
     const { data } = await client.query({
       query: checkItem,
       variables,
+      fetchPolicy: "no-cache"
     })
     if (data?.checkList?.inList) {
       setState({
@@ -104,7 +104,6 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       })
     }
     console.log('Check item ===>', { response: data }, { variables })
-    console.log('handleCheck ended */')
   }
 
   useEffect(() => {
