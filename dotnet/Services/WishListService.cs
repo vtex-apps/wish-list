@@ -131,14 +131,18 @@ namespace WishList.Services
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
+            Console.WriteLine(" REMOVE");
             bool wasRemoved = false;
             IList<ListItem> listItemsToSave = null;
             WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+            //Console.WriteLine($"->{wishListWrapper.ListItemsWrapper.Count}");
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
+            //Console.WriteLine($"->{listItemsWrapper.ListItems.Count}");
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
-                ListItem itemToRemove = listItemsToSave.Where(r => r.Id == itemId).FirstOrDefault();
+                ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
+                //Console.WriteLine($"->{itemToRemove != null}");
                 if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
                 {
                     wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
