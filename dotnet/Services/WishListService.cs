@@ -100,7 +100,12 @@ namespace WishList.Services
                 listItemsToSave = listItemsWrapper.ListItems;
                 if(listItem.Id == null)
                 {
-                    int maxId = listItemsToSave.Max(t => t.Id ?? 0);
+                    int maxId = 0;
+                    if (listItemsToSave.Count == 0)
+                    {
+                        maxId = listItemsToSave.Max(t => t.Id ?? 0);
+                    }
+
                     listItem.Id = ++maxId;
                 }
                 else
