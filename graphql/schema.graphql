@@ -35,15 +35,23 @@ input ListItemInputType {
 type Query {
   viewList(
     shopperId: String!
-	name: String
+	name: String!
     from: Int
     to: Int
     ): WishList @cacheControl(scope: PRIVATE)
+  viewLists(
+    shopperId: String!
+    from: Int
+    to: Int
+    ): [WishList] @cacheControl(scope: PRIVATE)
   checkList(
     shopperId: String!
     productId: String!
     sku: String
     ) : CheckListType @cacheControl(scope: PRIVATE)
+  listNames(
+    shopperId: String!
+	): [String]
 }
 
 type Mutation {

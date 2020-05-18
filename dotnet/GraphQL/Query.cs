@@ -38,9 +38,9 @@ namespace WishList.GraphQL
                     var resultListWrapper = resultListsWrapper.ListItemsWrapper.FirstOrDefault();
                     if (resultListWrapper != null)
                     {
-                        resultList = resultListWrapper.ListItems;
                         if (resultListWrapper.ListItems != null)
                         {
+                            resultList = resultListWrapper.ListItems;
                             totalCount = resultList.Count;
 
                             if (from > 0 && to > 0)
@@ -64,6 +64,59 @@ namespace WishList.GraphQL
                     };
 
                     return listResponse;
+                }
+            );
+
+            FieldAsync<ListGraphType<ListResponseType>>(
+                "viewLists",
+                arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
+                    new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
+                ),
+                resolve: async context =>
+                {
+                    Console.WriteLine("[-] ViewLists [-]");
+                    string shopperId = context.GetArgument<string>("shopperId");
+                    int from = context.GetArgument<int>("from");
+                    int to = context.GetArgument<int>("to");
+                    IList<ListItem> resultList = new List<ListItem>();
+                    IList<ListResponse> resultLists = new List<ListResponse>();
+                    int totalCount = 0;
+                    var resultListsWrapper = await wishListService.GetLists(shopperId);
+                    foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
+                    {
+                        if (listItemsWrapper != null)
+                        {
+                            if (listItemsWrapper.ListItems != null)
+                            {
+                                resultList = listItemsWrapper.ListItems;
+                                totalCount = resultList.Count;
+
+                                if (from > 0 && to > 0)
+                                {
+                                    resultList = await wishListService.LimitList(resultList, from, to);
+                                    Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                                }
+                            }
+                            else
+                            {
+                                resultList = new List<ListItem>();
+                            }
+                        }
+
+                        ListResponse listResponse = new ListResponse
+                        {
+                            Data = new DataElement { data = resultList },
+                            Range = new ResultRange { From = from, To = to, Total = totalCount },
+                            Public = listItemsWrapper.IsPublic ?? false,
+                            Name = listItemsWrapper.Name
+                        };
+
+                        resultLists.Add(listResponse);
+                    }
+
+                    return resultLists;
                 }
             );
 
@@ -99,7 +152,16 @@ namespace WishList.GraphQL
                             //    namesList.Add(listItemsWrapper.Name);
                             //}
 
-                            ListItem listItem = listItemsWrapper.ListItems.FirstOrDefault(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase));
+                            ListItem listItem = new ListItem();
+                            if (!string.IsNullOrEmpty(sku))
+                            {
+                                listItem = listItemsWrapper.ListItems.FirstOrDefault(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase) && l.Sku.Equals(sku, StringComparison.OrdinalIgnoreCase));
+                            }
+                            else
+                            {
+                                listItem = listItemsWrapper.ListItems.FirstOrDefault(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase));
+                            }
+
                             if(listItem != null)
                             {
                                 namesList.Add(listItemsWrapper.Name);
@@ -129,6 +191,24 @@ namespace WishList.GraphQL
                     //Console.WriteLine($"[-] CheckList Response {JsonConvert.SerializeObject(checkListResponse)} [-]");
 
                     return checkListResponse;
+                }
+            );
+
+            FieldAsync<StringGraphType>(
+                "listNames",
+                arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" }
+                ),
+                resolve: async context =>
+                {
+                    Console.WriteLine("[-] ListNames [-]");
+                    string shopperId = context.GetArgument<string>("shopperId");
+                    ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
+                    IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;
+                    var distinctListNames = listItemsWrappers.GroupBy(elem => elem.Name).Select(group => group.First());
+                    var listName = distinctListNames.Select(n => n.Name);
+
+                    return listName.ToArray();
                 }
             );
         }
