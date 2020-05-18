@@ -55,6 +55,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   const [state, setState] = useState<any>({
     isLoading: false,
     isWishlisted: false,
+    wishListId: null,
   })
 
   const { navigate, history } = useRuntime()
@@ -81,7 +82,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   }
   const { showToast } = useContext(ToastContext)
 
-  const { isLoading, isWishlisted } = state
+  const { isLoading, isWishlisted, wishListId } = state
 
   if (!!getSession?.profile && !isAuthenticated) {
     isAuthenticated = true
@@ -90,6 +91,14 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   const { product } = useContext(ProductContext) as any
 
   // console.log('PRODUCT =>', product)
+
+  const getIdFromList = (list: string, item: any) => {
+    console.log('getIdFromList', item)
+    const pos = item.listNames.findIndex((listName: string) => {
+      return list === listName
+    })
+    return item.listIds[pos]
+  }
 
   const handleCheck = async variables => {
     const { data } = await client.query({
@@ -101,6 +110,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       setState({
         ...state,
         isWishlisted: data.checkList.inList,
+        wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList)
       })
     }
     console.log('Check item ===>', { response: data }, { variables })
@@ -125,21 +135,27 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   console.log('Hello Add to Wishlist Button!', state)
 
   const [addProduct] = useMutation(addToList, {
-    onCompleted: () => {
+    onCompleted: (res: any) => {
+      console.log('addProduct =>', res, !!res.addToList, res.addToList)
+
       setState({
         ...state,
         isLoading: false,
-        isWishlisted: true,
+        isWishlisted: !!res.addToList,
+        wishListId: res.addToList
       })
     }
   })
 
   const [removeProduct] = useMutation(removeFromList, {
-    onCompleted: () => {
+    onCompleted: (res: any) => {
+
+      console.log('removeProduct =>', res, !res.removeFromList, res.removeFromList?null:wishListId)
       setState({
         ...state,
         isLoading: false,
-        isWishlisted: false,
+        isWishlisted: !res.removeFromList,
+        wishListId: res.removeFromList?null:wishListId
       })
     }
   })
@@ -174,13 +190,13 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         })
       } else {
         console.log('VARIABLES =>', {
-          id: product.productId,
+          id: wishListId,
           shopperId: getSession.profile.email,
           name: defaultValues.LIST_NAME,
         })
         removeProduct({
           variables: {
-            id: product.productId,
+            id: wishListId,
             shopperId: getSession.profile.email,
             name: defaultValues.LIST_NAME,
           },
