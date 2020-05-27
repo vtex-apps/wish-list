@@ -16,7 +16,7 @@ namespace WishList.GraphQL.Types
 
             Field(b => b.Id, nullable: true).Description("Item Id.");
             Field(b => b.ProductId).Description("Product Id");
-            Field(b => b.Sku).Description("Item sku");
+            Field(b => b.Sku, nullable: true).Description("Item sku");
             Field(b => b.Title).Description("Item title");
         }
     }

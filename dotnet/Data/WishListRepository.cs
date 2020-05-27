@@ -3,13 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
     using WishList.Models;
     using WishList.Services;
-    using WishList.Data;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -38,6 +36,8 @@
 
             this._applicationName =
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
+
+            this.VerifySchema();
         }
 
         public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId)
@@ -81,7 +81,6 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            //Console.WriteLine($"Save:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}' {jsonSerializedListItems}");
             Console.WriteLine($"Save:{response.StatusCode} Id:{documentId}");
 
             return response.IsSuccessStatusCode;
@@ -96,9 +95,6 @@
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=id,email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}&email={shopperId}")
-                //RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}")
-                // RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_fields=_all")
-                // RequestUri = new Uri($"https://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{shopperId}?_schema={WishListConstants.SCHEMA}&_fields=_all")
             };
 
             string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
@@ -111,20 +107,13 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            //Console.WriteLine($"Get:{response.StatusCode}: Rsp = [{responseContent}] from '{request.RequestUri}'");
-            //Console.WriteLine($"Get authToken:{authToken}'");
             Console.WriteLine($"Get:{response.StatusCode} ");
             ResponseListWrapper responseListWrapper = new ResponseListWrapper();
             try
             {
-                //dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                //searchResult = (WishListsWrapper)searchResult;
-                //responseListWrapper = (ResponseListWrapper)searchResult.WishLists.FirstOrDefault();
                 var searchResult = JArray.Parse(responseContent);
                 var listWrapper = searchResult.FirstOrDefault();
-                //Console.WriteLine($"listWrapper = '{listWrapper.ToString()}'");
                 responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(listWrapper.ToString());
-                //Console.WriteLine($"responseListWrapper = '{JsonConvert.SerializeObject(responseListWrapper)}'");
             }
             catch(Exception ex)
             {
@@ -138,6 +127,43 @@
             }
 
             return responseListWrapper;
+        }
+
+        public async Task VerifySchema()
+        {
+            //Console.WriteLine("Verifing Schema");
+            // https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/schemas/{{schema_name}}
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}")
+            };
+
+            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            if (authToken != null)
+            {
+                request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+            }
+
+            var client = _clientFactory.CreateClient();
+            var response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            if(!responseContent.Equals(WishListConstants.SCHEMA_JSON))
+            {
+                Console.WriteLine("--------------- Applying Schema ---------------");
+                request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}"),
+                    Content = new StringContent(WishListConstants.SCHEMA_JSON, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
+                };
+
+                response = await client.SendAsync(request);
+            }
+
+            Console.WriteLine($"Schema Response: {response.StatusCode}");
         }
     }
 }
