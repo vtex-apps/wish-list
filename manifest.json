@@ -21,10 +21,12 @@
   "dependencies": {
     "vtex.store": "2.x",
     "vtex.product-context": "0.x",
+    "vtex.list-context": "0.x",
     "vtex.product-summary": "2.x",
     "vtex.styleguide": "9.x",
     "vtex.store-icons": "0.x",
     "vtex.store-graphql": "2.x",
+    "vtex.search-graphql": "0.x",
     "vtex.render-runtime": "7.x"
   },
   "policies": [

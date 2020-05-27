@@ -1,0 +1,12 @@
+query ViewLists($shopperId: String!) {
+  viewLists(shopperId: $shopperId) {
+    data {
+      productId
+      sku
+      title
+      id
+    }
+    name
+    public
+  }
+}

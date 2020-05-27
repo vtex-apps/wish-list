@@ -1,0 +1,13 @@
+query productsByIdentifier($ids: [ID!]) {
+  productsByIdentifier(field: id, values: $ids)
+    @context(provider: "vtex.search-graphql") {
+    productName
+    description
+    link
+    items(filter: FIRST_AVAILABLE) {
+      images {
+        imageUrl
+      }
+    }
+  }
+}
