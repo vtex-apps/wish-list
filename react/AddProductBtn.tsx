@@ -13,6 +13,7 @@ import { useRuntime } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 
 let isAuthenticated = false
+
 const productCheck = {}
 const defaultValues = {
   LIST_NAME: 'Wishlist',
@@ -139,6 +140,13 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         handleCheck({
           shopperId: String(getSession.profile.email),
           productId: String(product.productId),
+        })
+      }
+    } else {
+      if(!isAuthenticated) {
+        setState({
+          ...state,
+          isLoading: false,
         })
       }
     }
