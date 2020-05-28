@@ -76,6 +76,7 @@
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
 
             var client = _clientFactory.CreateClient();
@@ -102,6 +103,7 @@
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
 
             var client = _clientFactory.CreateClient();
@@ -111,9 +113,20 @@
             ResponseListWrapper responseListWrapper = new ResponseListWrapper();
             try
             {
-                var searchResult = JArray.Parse(responseContent);
-                var listWrapper = searchResult.FirstOrDefault();
-                responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(listWrapper.ToString());
+                JArray searchResult = JArray.Parse(responseContent);
+                for(int l = 0; l < searchResult.Count; l++)
+                {
+                    JToken listWrapper = searchResult[l];
+                    if(l == 0)
+                    {
+                        responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(listWrapper.ToString());
+                    }
+                    else
+                    {
+                        ResponseListWrapper listToRemove = JsonConvert.DeserializeObject<ResponseListWrapper>(listWrapper.ToString());
+                        bool removed = await this.DeleteWishList(listToRemove.Id);
+                    }
+                }
             }
             catch(Exception ex)
             {
@@ -127,6 +140,32 @@
             }
 
             return responseListWrapper;
+        }
+
+        public async Task<bool> DeleteWishList(string documentId)
+        {
+            // DEL https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{documentId}")
+            };
+
+            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            if (authToken != null)
+            {
+                request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
+            }
+
+            var client = _clientFactory.CreateClient();
+            var response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Delete:{response.StatusCode} Id:{documentId}");
+
+            return response.IsSuccessStatusCode;
         }
 
         public async Task VerifySchema()
@@ -144,13 +183,14 @@
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
 
-            if(!responseContent.Equals(WishListConstants.SCHEMA_JSON))
+            if(response.IsSuccessStatusCode && !responseContent.Equals(WishListConstants.SCHEMA_JSON))
             {
                 Console.WriteLine("--------------- Applying Schema ---------------");
                 request = new HttpRequestMessage
@@ -159,6 +199,13 @@
                     RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}"),
                     Content = new StringContent(WishListConstants.SCHEMA_JSON, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
                 };
+
+                if (authToken != null)
+                {
+                    request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                    request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                    request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
+                }
 
                 response = await client.SendAsync(request);
             }
