@@ -8,6 +8,12 @@
 
 The Wishlist app is designed for **B2C**. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at `/wishlist`. This is the version `0` for the new VTEX IO platform, which means we'll add many other features and improvements in the further versions.
 
+![Shelf](./image/shelf.png)
+
+![Product Page](./image/pdp.png)
+
+![Wishlist](./image/wishlist.png)
+
 ## Configuration
 
 1. Add the `vtex.wish-list` app to your theme's dependencies in `manifest.json`. For example:
