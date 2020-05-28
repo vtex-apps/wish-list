@@ -11,5 +11,14 @@
     "required": [
       "wishlist"
     ]
+  },
+  "list-context.wishlist": {
+    "allowed": ["product-summary"],
+    "composition": "children",
+    "component": "ProductSummaryList",
+    "preview": {
+      "type": "grid",
+      "height": 550
+    }
   }
 }

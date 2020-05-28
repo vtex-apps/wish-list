@@ -10,6 +10,7 @@ import addToList from './queries/addToList.gql'
 import removeFromList from './queries/removeFromList.gql'
 import styles from './styles.css'
 import { useRuntime } from 'vtex.render-runtime'
+import { useCssHandles } from 'vtex.css-handles'
 
 let isAuthenticated = false
 const productCheck = {}
@@ -58,6 +59,9 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     wishListId: null,
   })
 
+  const CSS_HANDLES = ['wishlistIconContainer','wishlistIcon'] as const
+  const handles = useCssHandles(CSS_HANDLES)
+
   const { navigate, history } = useRuntime()
   const client = useApolloClient()
 
@@ -90,10 +94,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
 
   const { product } = useContext(ProductContext) as any
 
-  // console.log('PRODUCT =>', product)
-
   const getIdFromList = (list: string, item: any) => {
-    console.log('getIdFromList', item)
     const pos = item.listNames.findIndex((listName: string) => {
       return list === listName
     })
@@ -104,23 +105,19 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     const { data } = await client.query({
       query: checkItem,
       variables,
-      fetchPolicy: "no-cache"
+      fetchPolicy: 'no-cache',
     })
     if (data?.checkList?.inList) {
       setState({
         ...state,
         isWishlisted: data.checkList.inList,
-        wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList)
+        wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList),
       })
     }
-    console.log('Check item ===>', { response: data }, { variables })
   }
 
   useEffect(() => {
     if (isAuthenticated && product && !productCheck[product.productId]) {
-      console.log(
-        `Check if user has the product ${product.productId} wishlisted`
-      )
       productCheck[product.productId] = product
 
       if (product) {
@@ -132,52 +129,37 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     }
   })
 
-  console.log('Hello Add to Wishlist Button!', state)
-
   const [addProduct] = useMutation(addToList, {
     onCompleted: (res: any) => {
-      console.log('addProduct =>', res, !!res.addToList, res.addToList)
-
       setState({
         ...state,
         isLoading: false,
         isWishlisted: !!res.addToList,
-        wishListId: res.addToList
+        wishListId: res.addToList,
       })
-    }
+    },
   })
 
   const [removeProduct] = useMutation(removeFromList, {
     onCompleted: (res: any) => {
-
-      console.log('removeProduct =>', res, !res.removeFromList, res.removeFromList?null:wishListId)
       setState({
         ...state,
         isLoading: false,
         isWishlisted: !res.removeFromList,
-        wishListId: res.removeFromList?null:wishListId
+        wishListId: res.removeFromList ? null : wishListId,
       })
-    }
+    },
   })
 
   const handleAddProductClick = e => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('Clicked')
     if (isAuthenticated) {
       setState({
         ...state,
         isLoading: true,
       })
       if (!isWishlisted) {
-        console.log('VARIABLES =>', JSON.stringify({
-          listItem: {
-            productId: product.productId,
-            title: product.productName,
-          },
-          shopperId: getSession.profile.email,
-          name: defaultValues.LIST_NAME,
-        }))
         addProduct({
           variables: {
             listItem: {
@@ -189,11 +171,6 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
           },
         })
       } else {
-        console.log('VARIABLES =>', {
-          id: wishListId,
-          shopperId: getSession.profile.email,
-          name: defaultValues.LIST_NAME,
-        })
         removeProduct({
           variables: {
             id: wishListId,
@@ -207,14 +184,14 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     }
   }
   return (
-    <div>
+    <div className={handles.wishlistIconContainer}>
       <Button
         variation="tertiary"
         onClick={handleAddProductClick}
         isLoading={isLoading}
       >
         <span
-          className={`${isWishlisted ? styles.fill : styles.outline} ${
+          className={`${handles.wishlistIcon} ${isWishlisted ? styles.fill : styles.outline} ${
             styles.iconSize
           }`}
         ></span>

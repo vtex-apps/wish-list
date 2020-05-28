@@ -6,11 +6,13 @@ import { compose, graphql, useApolloClient } from 'react-apollo'
 import userProfile from './queries/userProfile.gql'
 import viewLists from './queries/viewLists.gql'
 import ProductItem from './ProductItem'
+import { useCssHandles } from 'vtex.css-handles'
+import { useRuntime } from 'vtex.render-runtime'
 
 let initialLoad = false
 
 const Wishlist: FC<WrappedComponentProps & any> = ({
-  data: { called, loading, getSession },
+  data: { loading, getSession },
 }) => {
   const [state, setState] = useState<any>({
     wishLists: null,
@@ -18,13 +20,9 @@ const Wishlist: FC<WrappedComponentProps & any> = ({
   })
   const { wishLists, listsLoading } = state
   const client = useApolloClient()
-  console.log('Called', called)
-  console.log('loading', loading)
-  console.log('getSession', getSession)
-  // console.log('SESSION =>', getSession)
+  const { navigate, history } = useRuntime()
 
   const loadProductsList = async variables => {
-    console.log('loadProductsList', variables)
     const { data, loading: listsLoading } = await client.query({
       query: viewLists,
       variables,
@@ -39,13 +37,19 @@ const Wishlist: FC<WrappedComponentProps & any> = ({
     }
 
     if (data?.viewLists) {
-      console.log('wishLists => ', data.viewLists)
       setState({
         ...state,
         listsLoading: false,
         wishLists: data.viewLists,
       })
     }
+  }
+
+  if(!loading && !getSession?.profile) {
+    navigate({
+      page: 'store.login',
+      query: `returnUrl=${encodeURIComponent(history.location.pathname)}`,
+    })
   }
 
   if (getSession?.profile && !initialLoad) {
@@ -55,8 +59,11 @@ const Wishlist: FC<WrappedComponentProps & any> = ({
     })
   }
 
+  const CSS_HANDLES = ['wishlistContainer','listTab', 'listName', 'listItemsContainer'] as const
+  const handles = useCssHandles(CSS_HANDLES)
+
   return (
-    <div className="h4 w-80 center pt5 mt5">
+    <div className={`h4 w-80 center pt5 mt5 ${handles.wishlistContainer}`}>
       {loading ||
         (listsLoading && (
           <div>
@@ -66,11 +73,10 @@ const Wishlist: FC<WrappedComponentProps & any> = ({
       {!loading && !listsLoading && wishLists && (
         <div>
           {wishLists.map((element: any, tabIndex: number) => {
-            console.log('Tab index', tabIndex)
             return (
-              <div key={`tab_${tabIndex}`} className="flex-row">
-                <h2>{element.name}</h2>
-                <div className="pv5">
+              <div key={`tab_${tabIndex}`} className={`flex-row ${handles.listTab}`}>
+                <h2 className={`${handles.listName}`}>{element.name}</h2>
+                <div className={`pv5 ${handles.listItemsContainer}`}>
                   {element.data.map((product: any, itemIndex: number) => {
                     return (
                       <ProductItem
