@@ -54,7 +54,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   intl,
 }: any) => {
   const [state, setState] = useState<any>({
-    isLoading: false,
+    isLoading: true,
     isWishlisted: false,
     wishListId: null,
   })
@@ -75,6 +75,15 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
           navigate({
             page: 'store.login',
             query: `returnUrl=${encodeURIComponent(history.location.pathname)}`,
+          }),
+      }
+    }
+    if (messsageKey === 'productAddedToList') {
+      action = {
+        label: intl.formatMessage(messages.seeLists),
+        onClick: () =>
+          navigate({
+            page: 'store.wishlist',
           }),
       }
     }
@@ -111,7 +120,13 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       setState({
         ...state,
         isWishlisted: data.checkList.inList,
+        isLoading: false,
         wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList),
+      })
+    } else {
+      setState({
+        ...state,
+        isLoading: false,
       })
     }
   }
@@ -137,6 +152,11 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         isWishlisted: !!res.addToList,
         wishListId: res.addToList,
       })
+      if(!!res.addToList) {
+        toastMessage('productAddedToList')
+      } else {
+        toastMessage('addProductFail')
+      }
     },
   })
 
