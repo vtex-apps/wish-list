@@ -51,7 +51,7 @@ const messages = defineMessages({
 })
 
 const AddBtn: FC<any & WrappedComponentProps> = ({
-  data: { getSession },
+  data: { loading: sessionLoading, getSession },
   intl,
 }: any) => {
   const [state, setState] = useState<any>({
@@ -98,8 +98,8 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
 
   const { isLoading, isWishlisted, wishListId } = state
 
-  if (!!getSession?.profile && !isAuthenticated) {
-    isAuthenticated = true
+  if (getSession?.profile && !isAuthenticated) {
+    isAuthenticated = getSession.profile.email
   }
 
   const { product } = useContext(ProductContext) as any
@@ -133,12 +133,12 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   }
 
   useEffect(() => {
-    if (isAuthenticated && product && !productCheck[product.productId]) {
+    if (!sessionLoading && isAuthenticated && product && !productCheck[product.productId]) {
       productCheck[product.productId] = product
 
       if (product) {
         handleCheck({
-          shopperId: String(getSession.profile.email),
+          shopperId: String(isAuthenticated),
           productId: String(product.productId),
         })
       }
@@ -216,7 +216,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       <Button
         variation="tertiary"
         onClick={handleAddProductClick}
-        isLoading={isLoading}
+        isLoading={sessionLoading || isLoading}
       >
         <span
           className={`${handles.wishlistIcon} ${isWishlisted ? styles.fill : styles.outline} ${
