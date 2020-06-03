@@ -14,7 +14,7 @@ const ProductSummaryList = async ({ children }) => {
 
   console.log('ProductSummaryList');
 
-  const { loading: loadingProfile, data: profileData } = useQuery(userProfile)
+  const { loading: loadingProfile, data: profileData } = await useQuery(userProfile)
 
   console.log('getSession', loadingProfile, profileData)
   const email = profileData.getSession.profile.email
@@ -32,13 +32,13 @@ const ProductSummaryList = async ({ children }) => {
     return item.productId
   })
 
-  const { data, loading, error } = useQuery(productsQuery, {
+  const { data, loading, error } = await useQuery(productsQuery, {
     variables: {
       ids,
     },
   })
 
-  const { list } = useListContext()
+  const { list } = useListContext() || []
   const { treePath } = useTreePath()
 
   const { products } = data || {}
