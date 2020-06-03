@@ -1,7 +1,23 @@
 {
   "store.wishlist": {
     "blocks": [
-      "wishlist"
+      "list-context.wishlist"
     ]
+  },
+  "list-context.wishlist": {
+    "blocks": ["product-summary.shelf"],
+    "children": ["slider-layout#wishlist"]
+  },
+  "slider-layout#wishlist": {
+    "props": {
+      "itemsPerPage": {
+        "desktop": 5,
+        "tablet": 3,
+        "phone": 1
+      },
+      "infinite": true,
+      "fullWidth": false,
+      "blockClass": "shelf"
+    }
   }
 }

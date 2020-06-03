@@ -6,9 +6,6 @@
     "component": "Wishlist"
   },
   "store.wishlist": {
-    "required": [
-      "wishlist"
-    ]
   },
   "list-context.wishlist": {
     "allowed": ["product-summary"],

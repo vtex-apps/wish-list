@@ -30,7 +30,8 @@
     "vtex.search-graphql": "0.x",
     "vtex.render-runtime": "7.x",
     "vtex.css-handles": "0.x",
-    "vtex.product-list-context": "0.x"
+    "vtex.product-list-context": "0.x",
+    "vtex.slider-layout": "0.x"
   },
   "policies": [
     {
