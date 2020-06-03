@@ -1,11 +1,9 @@
 {
   "add-to-list-btn": {
-    "component": "AddProductBtn",
-    "required": ["wishlist", "product-summary"]
+    "component": "AddProductBtn"
   },
   "wishlist": {
-    "component": "Wishlist",
-    "required": ["product-summary"]
+    "component": "Wishlist"
   },
   "store.wishlist": {
     "required": [
@@ -15,7 +13,7 @@
   "list-context.wishlist": {
     "allowed": ["product-summary"],
     "composition": "children",
-    "component": "ProductSummaryList",
+    "component": "ProductSummaryWishlist",
     "preview": {
       "type": "grid",
       "height": 550

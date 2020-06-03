@@ -37,6 +37,7 @@ const Wishlist: FC<WrappedComponentProps & any> = ({
     }
 
     if (data?.viewLists) {
+      console.log('viewLists', data.viewLists)
       setState({
         ...state,
         listsLoading: false,
