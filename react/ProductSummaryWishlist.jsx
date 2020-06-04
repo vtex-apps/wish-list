@@ -10,45 +10,62 @@ import userProfile from './queries/userProfile.gql'
 import ViewLists from './queries/viewLists.gql'
 
 
-const ProductSummaryList = async ({ children }) => {
+const ProductSummaryList = ({ children }) => {
 
   console.log('ProductSummaryList');
 
-  const { loading: loadingProfile, data: profileData } = await useQuery(userProfile)
+  const { loading: loadingProfile, data: profileData } = useQuery(userProfile, {
+      ssr: false
+  })
 
+  console.log('loadingProfile', loadingProfile, profileData)
+
+  if (loadingProfile || !profileData || !profileData.getSession || !profileData.getSession.profile ) {
+      return null
+  }
   console.log('getSession', loadingProfile, profileData)
   const email = profileData.getSession.profile.email
   console.log('email', email)
 
-  const { loading: loadingLists, data: dataLists } = await useQuery(ViewLists, {
+  // const email = "wender.lima@gmail.com"
+
+  const { loading: loadingLists, data: dataLists } = useQuery(ViewLists, {
     variables: {
       shopperId: email,
     },
+      ssr: false
   })
 
-  console.log('loadingLists', loadingLists)
+    console.log('loadingLists', loadingLists)
+
+  
+  if (loadingLists ) {
+      return null
+  }
   console.log('viewLists', dataLists.viewLists)
   const ids = dataLists.viewLists[0].data.map((item) => {
     return item.productId
   })
+  // const ids = ["1","6"]
 
-  const { data, loading, error } = await useQuery(productsQuery, {
+  const { data, loading, error } = useQuery(productsQuery, {
     variables: {
       ids,
     },
+      ssr: false
   })
-
+console.log('Query result =>', data)
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
 
-  const { products } = data || {}
+  const { productsByIdentifier: products } = data || {}
 
   const newListContextValue = useMemo(() => {
     const componentList =
       products &&
       products.map(product => {
         const normalizedProduct = mapCatalogProductToProductSummary(product)
-
+        console.log('Product =>', product)
         return (
           <ExtensionPoint
             id="product-summary"
@@ -72,12 +89,12 @@ const ProductSummaryList = async ({ children }) => {
   )
 }
 
-const EnhancedProductList = ({ children, ...props }) => {
+const EnhancedProductList = ({ children }) => {
   const { ProductListProvider } = ProductListContext
-console.log('EnhancedProductList =>', children)
+console.log('EnhancedProductList')
   return (
     <ProductListProvider>
-      <ProductSummaryList {...props}>{children}</ProductSummaryList>
+      <ProductSummaryList>{children}</ProductSummaryList>
       <ProductListEventCaller />
     </ProductListProvider>
   )
