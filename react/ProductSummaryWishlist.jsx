@@ -1,60 +1,81 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import { ExtensionPoint, useTreePath } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
 import { ProductListContext } from 'vtex.product-list-context'
 import { mapCatalogProductToProductSummary } from './utils/normalize'
 import ProductListEventCaller from './components/ProductListEventCaller'
-import { useQuery } from 'react-apollo'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import productsQuery from './queries/productById.gql'
 import userProfile from './queries/userProfile.gql'
 import ViewLists from './queries/viewLists.gql'
 
-
 const ProductSummaryList = ({ children }) => {
-
-  console.log('ProductSummaryList');
+  console.log('ProductSummaryList')
 
   const { loading: loadingProfile, data: profileData } = useQuery(userProfile, {
-      ssr: false
+    ssr: false,
   })
+  const [qWishlist, { data: dataLists, loading: loadingLists }] = useLazyQuery(
+    ViewLists
+  )
+  const [qProducts, { data, loading, error }] = useLazyQuery(productsQuery)
 
   console.log('loadingProfile', loadingProfile, profileData)
 
-  if (loadingProfile || !profileData || !profileData.getSession || !profileData.getSession.profile ) {
-      return null
+  if (
+    loadingProfile ||
+    !profileData ||
+    !profileData.getSession ||
+    !profileData.getSession.profile
+  ) {
+    return null
   }
-  console.log('getSession', loadingProfile, profileData)
+
   const email = profileData.getSession.profile.email
-  console.log('email', email)
-
-  // const email = "wender.lima@gmail.com"
-
-  const { loading: loadingLists, data: dataLists } = useQuery(ViewLists, {
+  console.log('qWishlist', {
     variables: {
       shopperId: email,
     },
-      ssr: false
   })
 
-    console.log('loadingLists', loadingLists)
+  qWishlist({
+    variables: {
+      shopperId: email,
+    },
+  })
 
-  
-  if (loadingLists ) {
-      return null
+  console.log('loadingLists', loadingLists, dataLists)
+
+  if (loadingLists || !dataLists) {
+    return null
   }
   console.log('viewLists', dataLists.viewLists)
-  const ids = dataLists.viewLists[0].data.map((item) => {
+  const ids = dataLists.viewLists[0].data.map(item => {
     return item.productId
   })
-  // const ids = ["1","6"]
 
-  const { data, loading, error } = useQuery(productsQuery, {
+  qProducts({
     variables: {
       ids,
     },
-      ssr: false
   })
-console.log('Query result =>', data)
+
+  if (loading || error) {
+    return null
+  }
+  // console.log('viewLists', dataLists.viewLists)
+  // const ids = dataLists.viewLists[0].data.map((item) => {
+  //   return item.productId
+  // })
+  // const ids = ["1","6"]
+
+  // const { data, loading, error } = useQuery(productsQuery, {
+  //   variables: {
+  //     ids,
+  //   },
+  //     ssr: false
+  // })
+  console.log('Query result =>', data)
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
 
@@ -91,7 +112,7 @@ console.log('Query result =>', data)
 
 const EnhancedProductList = ({ children }) => {
   const { ProductListProvider } = ProductListContext
-console.log('EnhancedProductList')
+  console.log('EnhancedProductList')
   return (
     <ProductListProvider>
       <ProductSummaryList>{children}</ProductSummaryList>
