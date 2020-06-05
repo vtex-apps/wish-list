@@ -31,7 +31,7 @@ Once Wishlist is added as a dependency, a new route called `/wishlist` will be a
 - `"add-to-list-btn"`: This block can be added to the product page (`store.product`) and shelf (`product-summary.shelf`). It renders a heart icon to the block.
 - `"list-context.wishlist"`: This block provides a product list context that can be used to build a list of products.
 
-If you want to make any changes to the `/wishlist` layout, feel free to change its blocks, here is our default blocks implementation for the wishlist page
+If you want to make any changes to the `/wishlist` layout, feel free to change its blocks by creating a `wishlist.jsonc` file under `store/blocks` of your own theme, here is our default blocks implementation for the wishlist page
 
 ```json
 {
@@ -57,7 +57,7 @@ If you want to make any changes to the `/wishlist` layout, feel free to change i
   },
   "rich-text#title":{
     "props": {
-      "text": "## Wishlist "
+      "text": "### Wishlist"
     }
   },
   "list-context.wishlist": {
