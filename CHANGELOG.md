@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Now the `/wishlist` route uses the `blocks` structure
+
+### Updated
+
+- Documentation with new blocks info
+
 ## [0.1.4] - 2020-06-05
 
 ## [0.1.3] - 2020-06-01

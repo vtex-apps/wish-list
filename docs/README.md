@@ -12,7 +12,7 @@ The Wishlist app is designed for **B2C**. It adds a heart icon to the Shelfs and
 
 ![Product Page](./image/pdp.png)
 
-![Wishlist](./image/wishlist.png)
+![Wishlist](./image/wishlist-context.png)
 
 ## Configuration
 
@@ -29,7 +29,67 @@ Once Wishlist is added as a dependency, a new route called `/wishlist` will be a
 :warning: This app increment the standard VTEX shelf and product blocks with content using abstract interfaces from `vtex.wish-list` . The **VTEX wishlist block** is:
 
 - `"add-to-list-btn"`: This block can be added to the product page (`store.product`) and shelf (`product-summary.shelf`). It renders a heart icon to the block.
+- `"list-context.wishlist"`: This block provides a product list context that can be used to build a list of products.
 
+If you want to make any changes to the `/wishlist` layout, feel free to change its blocks, here is our default blocks implementation for the wishlist page
+
+```json
+{
+  "store.wishlist": {
+    "blocks": [
+      "flex-layout.row#top",
+      "list-context.wishlist"
+    ]
+  },
+  "flex-layout.row#top": {
+    "children": [
+      "flex-layout.col#title"
+    ]
+  },
+  "flex-layout.col#title": {
+    "children": [
+      "rich-text#title"
+    ],
+    "props": {
+      "blockClass": "titleWishlist",
+      "preventVerticalStretch": true
+    }
+  },
+  "rich-text#title":{
+    "props": {
+      "text": "## Wishlist "
+    }
+  },
+  "list-context.wishlist": {
+    "blocks": ["product-summary.shelf#wishlist"],
+    "children": ["slider-layout#wishlist"]
+  },
+  "product-summary.shelf#wishlist": {
+    "children": [
+      "add-to-list-btn",
+      "product-summary-image",
+      "product-summary-name",
+      "product-summary-space",
+      "product-summary-price",
+      "add-to-cart-button"
+    ]
+  },
+  "slider-layout#wishlist": {
+    "props": {
+      "itemsPerPage": {
+        "desktop": 5,
+        "tablet": 3,
+        "phone": 1
+      },
+      "showNavigationArrows": "desktopOnly",
+      "showPaginationDots":"always",
+      "infinite": false,
+      "fullWidth": true,
+      "blockClass": "shelf"
+    }
+  }
+}
+```
 
 ## Modus Operandi
 
@@ -65,7 +125,8 @@ In order to apply CSS customizations to this and other blocks, follow the instru
 - Share your list
 - Choose  your wishlist icon
 - Wishlist page with lists management
-- Wishlist page with products using the default shelf format -->
+
+-->
 
 
   
