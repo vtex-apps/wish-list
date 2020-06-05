@@ -8,18 +8,21 @@ import { useQuery } from 'react-apollo'
 import productsQuery from './queries/productById.gql'
 import userProfile from './queries/userProfile.gql'
 import ViewLists from './queries/viewLists.gql'
+import { useRuntime } from 'vtex.render-runtime'
 
 const ProductSummaryList = ({ children }) => {
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
+  const { navigate, history } = useRuntime()
 
-  const { data: profileData } = useQuery(userProfile, {
+  const { data: profileData, loading: profileLoading } = useQuery(userProfile, {
     ssr: false,
   })
 
   const { data: dataLists } = useQuery(ViewLists, {
     ssr: false,
     skip: !profileData || !profileData.getSession,
+    fetchPolicy: 'no-cache',
     variables: {
       shopperId: profileData && profileData.getSession.profile.email,
     },
@@ -55,6 +58,13 @@ const ProductSummaryList = ({ children }) => {
       })
     return list.concat(componentList)
   }, [products, treePath, list])
+
+  if( !profileLoading && (!profileData || !profileData.getSession) ) {
+    navigate({
+      page: 'store.login',
+      query: `returnUrl=${encodeURIComponent(history.location.pathname)}`,
+    })
+  }
 
   if (!data || loading || error) {
     return null

@@ -2,6 +2,7 @@ query productsByIdentifier($ids: [ID!]) {
   productsByIdentifier(field: id, values: $ids)
     @context(provider: "vtex.search-graphql") {
       productName
+      productId
     description
     link
     items {
