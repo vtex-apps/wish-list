@@ -7,28 +7,36 @@
   "categories": [],
   "settingsSchema": {},
   "builders": {
+    "docs": "0.x",
     "dotnet": "2.x",
     "graphql": "1.x",
     "messages": "1.x",
-    "store": "0.x",
     "react": "3.x",
-    "docs": "0.x"
+    "store": "0.x"
   },
   "mustUpdateAt": "2018-09-05",
   "scripts": {
     "postreleasy": "vtex publish --verbose"
   },
   "dependencies": {
-    "vtex.store": "2.x",
-    "vtex.product-context": "0.x",
+    "vtex.add-to-cart-button": "0.x",
+    "vtex.css-handles": "0.x",
+    "vtex.flex-layout": "0.x",
     "vtex.list-context": "0.x",
+    "vtex.product-context": "0.x",
+    "vtex.product-list-context": "0.x",
+    "vtex.product-quantity": "1.x",
+    "vtex.product-specification-badges": "0.x",
     "vtex.product-summary": "2.x",
-    "vtex.styleguide": "9.x",
-    "vtex.store-icons": "0.x",
-    "vtex.store-graphql": "2.x",
-    "vtex.search-graphql": "0.x",
     "vtex.render-runtime": "7.x",
-    "vtex.css-handles": "0.x"
+    "vtex.rich-text": "0.x",
+    "vtex.search-graphql": "0.x",
+    "vtex.slider-layout": "0.x",
+    "vtex.store": "2.x",
+    "vtex.store-graphql": "2.x",
+    "vtex.store-icons": "0.x",
+    "vtex.store-resources": "0.x",
+    "vtex.styleguide": "9.x"
   },
   "policies": [
     {

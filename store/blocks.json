@@ -1,7 +1,55 @@
 {
   "store.wishlist": {
     "blocks": [
-      "wishlist"
+      "flex-layout.row#top",
+      "list-context.wishlist"
     ]
+  },
+  "flex-layout.row#top": {
+    "children": [
+      "flex-layout.col#title"
+    ]
+  },
+  "flex-layout.col#title": {
+    "children": [
+      "rich-text#title"
+    ],
+    "props": {
+      "blockClass": "titleWishlist",
+      "preventVerticalStretch": true
+    }
+  },
+  "rich-text#title":{
+    "props": {
+      "text": "## Wishlist "
+    }
+  },
+  "list-context.wishlist": {
+    "blocks": ["product-summary.shelf#wishlist"],
+    "children": ["slider-layout#wishlist"]
+  },
+  "product-summary.shelf#wishlist": {
+    "children": [
+      "add-to-list-btn",
+      "product-summary-image",
+      "product-summary-name",
+      "product-summary-space",
+      "product-summary-price",
+      "add-to-cart-button"
+    ]
+  },
+  "slider-layout#wishlist": {
+    "props": {
+      "itemsPerPage": {
+        "desktop": 5,
+        "tablet": 3,
+        "phone": 1
+      },
+      "showNavigationArrows": "desktopOnly",
+      "showPaginationDots":"always",
+      "infinite": false,
+      "fullWidth": true,
+      "blockClass": "shelf"
+    }
   }
 }
