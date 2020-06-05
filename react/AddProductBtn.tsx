@@ -135,7 +135,6 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   useEffect(() => {
     if (!sessionLoading && isAuthenticated && product && !productCheck[product.productId]) {
       productCheck[product.productId] = product
-
       if (product) {
         handleCheck({
           shopperId: String(isAuthenticated),

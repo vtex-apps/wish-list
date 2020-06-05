@@ -2,9 +2,6 @@
   "add-to-list-btn": {
     "component": "AddProductBtn"
   },
-  "wishlist": {
-    "component": "Wishlist"
-  },
   "store.wishlist": {
   },
   "list-context.wishlist": {
