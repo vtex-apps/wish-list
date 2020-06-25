@@ -24,7 +24,7 @@ const ProductSummaryList = ({ children }) => {
     skip: !profileData || !profileData.getSession,
     fetchPolicy: 'no-cache',
     variables: {
-      shopperId: profileData && profileData.getSession.profile.email,
+      shopperId: profileData && profileData.getSession && profileData.getSession.profile && profileData.getSession.profile.email,
     },
   })
 
@@ -59,7 +59,7 @@ const ProductSummaryList = ({ children }) => {
     return list.concat(componentList)
   }, [products, treePath, list])
 
-  if( !profileLoading && (!profileData || !profileData.getSession) ) {
+  if( !profileLoading && (!profileData || !profileData.getSession.profile) ) {
     navigate({
       page: 'store.login',
       query: `returnUrl=${encodeURIComponent(history.location.pathname)}`,
@@ -79,7 +79,6 @@ const ProductSummaryList = ({ children }) => {
 
 const EnhancedProductList = ({ children }) => {
   const { ProductListProvider } = ProductListContext
-  console.log('EnhancedProductList')
   return (
     <ProductListProvider>
       <ProductSummaryList>{children}</ProductSummaryList>
