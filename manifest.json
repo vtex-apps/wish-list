@@ -1,7 +1,7 @@
 {
   "name": "wish-list",
   "vendor": "vtex",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "title": "Wish List",
   "description": "An app for storing a shopper wish list",
   "categories": [],
