@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Removed
+
+- Old file from the listing page that now is a context
+
+### Fixed
+
+- CSS Handles definition moved out of the main component
+
 ## [0.2.1] - 2020-06-25
 
 ### Fixed
