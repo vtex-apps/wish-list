@@ -56,6 +56,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   data: { loading: sessionLoading, getSession },
   intl,
 }: any) => {
+
   const [state, setState] = useState<any>({
     isLoading: true,
     isWishlisted: false,
@@ -65,6 +66,10 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   const { navigate, history } = useRuntime()
   const client = useApolloClient()
   const handles = useCssHandles(CSS_HANDLES)
+  const { showToast } = useContext(ToastContext)
+  const { product } = useContext(ProductContext) as any
+
+  if(!product) return null
   
   const toastMessage = (messsageKey: string) => {
     let action: any = undefined
@@ -94,7 +99,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       action,
     })
   }
-  const { showToast } = useContext(ToastContext)
+  
 
   const { isLoading, isWishlisted, wishListId } = state
 
@@ -102,7 +107,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     isAuthenticated = getSession.profile.email
   }
 
-  const { product } = useContext(ProductContext) as any
+  
 
   const getIdFromList = (list: string, item: any) => {
     const pos = item.listNames.findIndex((listName: string) => {
@@ -142,7 +147,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         })
       }
     } else {
-      if(!isAuthenticated) {
+      if(!isAuthenticated && state.isLoading) {
         setState({
           ...state,
           isLoading: false,
