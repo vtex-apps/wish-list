@@ -12,6 +12,8 @@ import styles from './styles.css'
 import { useRuntime } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 
+const CSS_HANDLES = ['wishlistIconContainer','wishlistIcon'] as const
+
 let isAuthenticated = false
 
 const productCheck = {}
@@ -60,12 +62,10 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     wishListId: null,
   })
 
-  const CSS_HANDLES = ['wishlistIconContainer','wishlistIcon'] as const
-  const handles = useCssHandles(CSS_HANDLES)
-
   const { navigate, history } = useRuntime()
   const client = useApolloClient()
-
+  const handles = useCssHandles(CSS_HANDLES)
+  
   const toastMessage = (messsageKey: string) => {
     let action: any = undefined
 
