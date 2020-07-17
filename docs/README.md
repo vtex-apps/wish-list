@@ -16,12 +16,16 @@ The Wishlist app is designed for **B2C**. It adds a heart icon to the Shelfs and
 
 ## Configuration
 
-1. Add the `vtex.wish-list` app to your theme's dependencies in `manifest.json`. For example:
+### Store Theme: Dependencies
+
+1. Install the app by running `vtex install vtex.wish-list` on the [vtex toolbelt](https://vtex.io/docs/concepts/toolbelt/)
+
+2. After installing the app in your account, add it as a `peerDependency` in your `store-theme`:
 
 ```diff
-  dependencies: {
-+   "vtex.wish-list": "0.x"
-  }
++"peerDependencies": {
++  "vtex.wish-list": "1.x"
++}
 ```
 
 Once Wishlist is added as a dependency, a new route called `/wishlist` will be automatically created for your store, allowing the user to list all the "Wishlisted" products. 
