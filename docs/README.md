@@ -9,6 +9,7 @@
 The Wishlist app is designed for **B2C** stores. It adds a heart icon to shelves and product detail pages, so users can add the desired products to a Wishlist. In addition to that, a brand new route called `/wishlist` is generated, creating a page responsible for listing all wishlisted items for your users. 
 
 ![Shelf](./image/shelf.png)
+
 *Heart icon on a shelf*
 
 ![Product Page](./image/pdp.png)
