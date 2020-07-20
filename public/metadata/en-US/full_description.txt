@@ -15,4 +15,4 @@ When the app is installed, a new route called `/wishlist` will be automatically 
 
 If you want to make any changes to the `/wishlist` layout, feel free to change its blocks by creating a `wishlist.jsonc` file under `store/blocks` of your own theme.
 
-For more details on how to implement and customiza, please head over to the [Advanced Configuration](https://github.com/vtex-apps/wish-list#configuration) section
+For more details on how to implement and customize, please head over to the [Advanced Configuration](https://github.com/vtex-apps/wish-list#configuration) section.
