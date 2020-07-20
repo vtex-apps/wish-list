@@ -6,7 +6,7 @@ The Wishlist app is designed for **B2C**. It adds a heart icon to the Shelfs and
 
 Install this app from the VTEX APP Store
 
-Once Wishlist is added as a dependency, a new route called `/wishlist` will be automatically created for your store, allowing the user to list all the "Wishlisted" products.
+When the app is installed, a new route called `/wishlist` will be automatically created for your store, allowing the user to list all of their "Wishlisted" products.
 
 :warning: This app increment the standard VTEX shelf and product blocks with content using abstract interfaces from `vtex.wish-list` . The **VTEX wishlist block** is:
 
