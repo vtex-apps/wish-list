@@ -10,13 +10,13 @@ The Wishlist app is designed for **B2C** stores. It adds a heart icon to shelves
 
 ![Shelf](./image/shelf.png)
 
-*Heart icon on a shelf*
+*Example of heart icons on a shelf.*
 
 ![Product Page](./image/pdp.png)
-*Heart icon on a product details page*
+*Example of a heart icon on a product details page.*
 
 ![Wishlist](./image/wishlist-context.png)
-*Wishlist page*
+*Example of a wishlist page.*
 
 ## Configuration
 
