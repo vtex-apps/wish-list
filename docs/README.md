@@ -35,7 +35,7 @@ The Wishlist app is designed for **B2C** stores. It adds a heart icon to shelves
 :information_source: *The app also exports two theme blocks: `add-to-list-btn` and `list-context.wishlist`. They are responsible, respectively, for adding the heart icon to other theme blocks and for providing product data to build the `/wishlist` page.* 
 
 3. Add the `add-to-list-btn` block into the `store.product` template (product page). 
-4. Declare the `add-to-list-btn` block as a child of the [`product-summary.shelf` block(s)](https://vtex.io/docs/components/all/vtex.product-summary/). 
+4. Declare the `add-to-list-btn` block as a child of the [`product-summary.shelf` block](https://vtex.io/docs/components/all/vtex.product-summary/). 
 
 ## Advanced configurations
 
