@@ -8,7 +8,7 @@ Install this app from the VTEX APP Store
 
 When the app is installed, a new route called `/wishlist` will be automatically created for your store, allowing the user to list all of their "Wishlisted" products.
 
-:warning: This app increment the standard VTEX shelf and product blocks with content using abstract interfaces from `vtex.wish-list` . The **VTEX wishlist block** is:
+:warning: This app provides the following blocks for use in the `store-theme`:
 
 - `"add-to-list-btn"`: This block can be added to the product page (`store.product`) and shelf (`product-summary.shelf`). It renders a heart icon to the block.
 - `"list-context.wishlist"`: This block provides a product list context that can be used to build a list of products.
