@@ -15,4 +15,12 @@ When the app is installed, a new route called `/wishlist` will be automatically 
 
 If you want to make any changes to the `/wishlist` layout, feel free to change its blocks by creating a `wishlist.jsonc` file under `store/blocks` of your own theme.
 
+Make sure to add the Wishlist app as a `peerDependency` in the `manifest.json` file:
+
+```diff
+ "peerDependencies": {
++  "vtex.wish-list": "1.x"
+ }
+```
+
 For more details on how to implement and customize, please head over to the [Advanced Configuration](https://github.com/vtex-apps/wish-list#configuration) section.

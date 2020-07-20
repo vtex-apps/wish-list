@@ -22,13 +22,6 @@ The Wishlist app is designed for **B2C** stores. It adds a heart icon to shelves
 
 1. [Install](https://vtex.io/docs/recipes/development/installing-an-app/) the Wishlist app by running `vtex install vtex.wish-list@0.x`.
 2. Open your store's Store Theme app directory in your code editor.
-3. Add the Wishlist app as a `peerDependency` in the `manifest.json` file:
-
-```diff
- "peerDependencies": {
-+  "vtex.wish-list": "0.x"
- }
-```
 
 :information_source: *Once installed, the app will generate a new route called `/wishlist` for your store, creating the Wishlist custom page that displays wishlisted product items. The new page already contains a default template, meaning that the Wishlist page is ready to be rendered and no further actions are required. However, you can **customize the Wishlist page overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
 
@@ -106,6 +99,13 @@ Therefore, in order to customize the `/wishlist` page configuration, you should:
 
 1. Create a `wishlist.jsonc` file under `store/blocks`. 
 2. Copy the code above, paste it in the new file and change it as you wish. 
+3. Add the Wishlist app as a `peerDependency` in the `manifest.json` file:
+
+```diff
+ "peerDependencies": {
++  "vtex.wish-list": "1.x"
+ }
+```
 
 ## Customization
 
