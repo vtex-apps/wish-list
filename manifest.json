@@ -3,7 +3,7 @@
   "vendor": "vtex",
   "version": "0.2.3",
   "title": "Wish List",
-  "description": "An app for storing a shopper wish list",
+  "description": "The Wishlist app is designed for B2C. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at /wishlist",
   "categories": [],
   "settingsSchema": {},
   "builders": {
@@ -65,5 +65,12 @@
       "name": "vbase-read-write"
     }
   ],
+  "billingOptions": {
+    "termsURL": "https://compliance.vtex.com/gdpr/policies/vtex-privacy-policy",
+    "support": {
+      "url": "https://support.vtex.com/hc/requests"
+    },
+    "free": true
+  },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
