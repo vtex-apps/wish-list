@@ -1,1 +1,1 @@
-With Wishlist APP, you can add a heart icon to the Shelfs and Product Page, so users can click on it to add it to the Wishlist
+Allow customers to create and manage a wishlist of products.

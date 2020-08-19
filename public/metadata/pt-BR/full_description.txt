@@ -1,18 +1,6 @@
 ## Sobre
+Este aplicativo melhora a experiência de compra, permitindo que os clientes criem uma lista de desejos. Para selecionar produtos para a lista de desejos, os compradores podem clicar no ícone de coração acima do produto desejado. O aplicativo também cria uma página para a lista de desejos, onde os compradores podem ver os produtos que salvaram, adicioná-los ao carrinho ou removê-los.
 
-O APP **Lista de Desejos** foi desenvolvido para o segmento **B2C**. Ele possibilita a adição de um ícone nas prateleiras e página de produto, assim o usuário pode adicionar produtos em uma lista de desejos, e posteriormente listar estes produtos na página `/wishlist`. 
-
-## Configuração
-
-Instale esse app à partir da **VTEX APP Store**
-
-Uma vez instalado, uma nova página será criada `/wishlist`, permitindo que os usuários visualizem seus produtos salvos.
-
-:warning: Este APP incrementa a prateleira e página de produtos padrão da VTEX usando uma interface de blocos abstrata provida pelo `vtex.wish-list` . Os blocos são:
-
-- `"add-to-list-btn"`: Este bloco pode ser adicionado tanto na página de produto (`store.product`) quanto na prateleira (`product-summary.shelf`). Ele vai renderizar um ícone de coração na área designada.
-- `"list-context.wishlist"`: Este bloco provê uma lista com cotexto de produtos que pode ser usada para construir sua própria página de listagem de produtos da Lista de Desejos, por padrão já proporcionamos uma página que atende a maioria dos casos
-
-Se você desejar fazer alterações no layout da página `/wishlist`, altere seus blocos criando um arquivo `wishlist.jsonc` dentro de `store/blocks` em seu próprio tema.
-
-Para maiores detalhes em como implementar e customizar, acesse nossa seção de [Configurações Avançadas](https://github.com/vtex-apps/wish-list#configuration)
+## Funcionalidades
+- Adiciona botões de ícone de coração às prateleiras de produtos e às páginas de detalhes dos produtos
+- Adiciona a página da lista de desejos, onde o comprador pode ver os itens que salvou

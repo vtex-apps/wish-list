@@ -1,1 +1,1 @@
-Com esse APP, você pode adicionar um icone de coração nas prateleiras e página de produto, para que usuários salvem os produtos desejados
+Permitir que os clientes criem e gerenciem uma lista de desejos de produtos.

@@ -1,26 +1,6 @@
-## About
+## Overview
+This app enhances the shopping experience by allowing customers to create a wishlist. To select products for the wishlist, the shoppers can click in the heart icon above the desired product. The app also creates a wishlist page where the shoppers can see the products that they’ve wished for, add them to the cart, or remove them.
 
-The Wishlist app is designed for **B2C**. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at `/wishlist`. 
-
-## Configuration
-
-Install this app from the VTEX APP Store
-
-When the app is installed, a new route called `/wishlist` will be automatically created for your store, allowing the user to list all of their "Wishlisted" products.
-
-:warning: This app provides the following blocks for use in the `store-theme`:
-
-- `"add-to-list-btn"`: This block can be added to the product page (`store.product`) and shelf (`product-summary.shelf`). It renders a heart icon to the block.
-- `"list-context.wishlist"`: This block provides a product list context that can be used to build a list of products.
-
-If you want to make any changes to the `/wishlist` layout, feel free to change its blocks by creating a `wishlist.jsonc` file under `store/blocks` of your own theme.
-
-Make sure to add the Wishlist app as a `peerDependency` in the `manifest.json` file:
-
-```diff
- "peerDependencies": {
-+  "vtex.wish-list": "1.x"
- }
-```
-
-For more details on how to implement and customize, please head over to the [Advanced Configuration](https://github.com/vtex-apps/wish-list#configuration) section.
+## Features
+- Adds heart icon buttons to product shelves and PDP
+- Adds wishlist page where shopper can view their wishlisted items

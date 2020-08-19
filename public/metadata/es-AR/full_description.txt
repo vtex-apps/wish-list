@@ -1,0 +1,7 @@
+## Sobre
+
+Esta aplicación mejora la experiencia de compra permitiendo que los clientes creen una lista de deseos. Para seleccionar los productos para la lista de deseos, los consumidores pueden hacer clic en el ícono del corazón situado encima del producto deseado. La aplicación también crea una página de lista de deseos en la que los consumidores pueden ver los productos que desean, añadirlos al carrito o eliminarlos.
+
+## Características
+- Añade botones de íconos de corazón a los estantes de productos y a la página de detalles del producto.
+- Añade la página de la lista de deseos donde el consumidor puede ver los ítems que ha agregado.
