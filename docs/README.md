@@ -26,9 +26,9 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
 3. Add the Wishlist app to your theme's dependencies in the `manifest.json` file as shown below:
 
 ```diff
- "dependencies": {
+ "peerDependencies": {
 +  "vtex.wish-list": "1.x"
-}
+ }
 ```
 
 :information_source: *The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. They are responsible, respectively, for adding the heart icon to other theme blocks and for providing product data to build the `/wishlist` page.* 
