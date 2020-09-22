@@ -1,0 +1,14 @@
+{
+  "name": "Wishlist",
+  "headline": "Allow customers to create and manage a wishlist of products.",
+  "overview": "This app enhances the shopping experience by allowing customers to create a wishlist. To select products for the wishlist, the shoppers can click in the heart icon above the desired product. The app also creates a wishlist page where the shoppers can see the products that they’ve wished for, add them to the cart, or remove them.",
+  "features": [
+    "Adds heart icon buttons to product shelves and PDP",
+    "Adds wishlist page where shopper can view their wishlisted items"
+  ],
+  "additionalInformation": "",
+  "websiteURL": "https://vtex.com/",
+  "support": {
+    "url": "https://support.vtex.com/hc/requests"
+  }
+}
