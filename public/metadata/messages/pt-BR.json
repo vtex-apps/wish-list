@@ -1,0 +1,13 @@
+{
+  "name": "Wishlist",
+  "headline": "Permitir que os clientes criem e gerenciem uma lista de desejos de produtos.",
+  "overview": "Este aplicativo melhora a experiência de compra, permitindo que os clientes criem uma lista de desejos. Para selecionar produtos para a lista de desejos, os compradores podem clicar no ícone de coração acima do produto desejado. O aplicativo também cria uma página para a lista de desejos, onde os compradores podem ver os produtos que salvaram, adicioná-los ao carrinho ou removê-los.",
+  "features": [
+    "Adiciona botões de ícone de coração às prateleiras de produtos e às páginas de detalhes dos produtos",
+    "Adiciona a página da lista de desejos, onde o comprador pode ver os itens que salvou"
+  ],
+  "websiteURL": "https://vtex.com/",
+  "support": {
+    "url": "https://support.vtex.com/hc/requests"
+  }
+}
