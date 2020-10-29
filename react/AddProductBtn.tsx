@@ -4,15 +4,16 @@ import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
 import { compose, graphql, useApolloClient, useMutation } from 'react-apollo'
 import { injectIntl, WrappedComponentProps, defineMessages } from 'react-intl'
+import { useRuntime } from 'vtex.render-runtime'
+import { useCssHandles } from 'vtex.css-handles'
+
 import userProfile from './queries/userProfile.gql'
 import checkItem from './queries/checkItem.gql'
 import addToList from './queries/addToList.gql'
 import removeFromList from './queries/removeFromList.gql'
 import styles from './styles.css'
-import { useRuntime } from 'vtex.render-runtime'
-import { useCssHandles } from 'vtex.css-handles'
 
-const CSS_HANDLES = ['wishlistIconContainer','wishlistIcon'] as const
+const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
 let isAuthenticated = false
 
@@ -56,11 +57,11 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   data: { loading: sessionLoading, getSession },
   intl,
 }: any) => {
-
   const [state, setState] = useState<any>({
     isLoading: true,
     isWishlisted: false,
     wishListId: null,
+    isChecked: false,
   })
 
   const { navigate, history } = useRuntime()
@@ -69,10 +70,10 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   const { showToast } = useContext(ToastContext)
   const { product } = useContext(ProductContext) as any
 
-  if(!product) return null
-  
+  if (!product) return null
+
   const toastMessage = (messsageKey: string) => {
-    let action: any = undefined
+    let action: any
 
     if (messsageKey === 'notLogged') {
       action = {
@@ -99,15 +100,12 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       action,
     })
   }
-  
 
   const { isLoading, isWishlisted, wishListId } = state
 
   if (getSession?.profile && !isAuthenticated) {
     isAuthenticated = getSession.profile.email
   }
-
-  
 
   const getIdFromList = (list: string, item: any) => {
     const pos = item.listNames.findIndex((listName: string) => {
@@ -117,28 +115,37 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   }
 
   const handleCheck = async variables => {
-    const { data } = await client.query({
-      query: checkItem,
-      variables,
-      fetchPolicy: 'no-cache',
-    })
-    if (data?.checkList?.inList) {
-      setState({
-        ...state,
-        isWishlisted: data.checkList.inList,
-        isLoading: false,
-        wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList),
+    if (!state.isChecked) {
+      const { data } = await client.query({
+        query: checkItem,
+        variables,
+        fetchPolicy: 'no-cache',
       })
-    } else {
-      setState({
-        ...state,
-        isLoading: false,
-      })
+      if (data?.checkList?.inList) {
+        setState({
+          ...state,
+          isWishlisted: data.checkList.inList,
+          isLoading: false,
+          isChecked: true,
+          wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList),
+        })
+      } else {
+        setState({
+          ...state,
+          isLoading: false,
+          isChecked: true,
+        })
+      }
     }
   }
 
   useEffect(() => {
-    if (!sessionLoading && isAuthenticated && product && !productCheck[product.productId]) {
+    if (
+      !sessionLoading &&
+      isAuthenticated &&
+      product &&
+      !productCheck[product.productId]
+    ) {
       productCheck[product.productId] = product
       if (product) {
         handleCheck({
@@ -146,11 +153,17 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
           productId: String(product.productId),
         })
       }
-    } else {
-      if(!isAuthenticated && state.isLoading) {
-        setState({
-          ...state,
-          isLoading: false,
+    } else if (!isAuthenticated && state.isLoading) {
+      setState({
+        ...state,
+        isLoading: false,
+      })
+    } else if (isAuthenticated && state.isLoading) {
+      productCheck[product.productId] = product
+      if (product) {
+        handleCheck({
+          shopperId: String(isAuthenticated),
+          productId: String(product.productId),
         })
       }
     }
@@ -164,7 +177,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         isWishlisted: !!res.addToList,
         wishListId: res.addToList,
       })
-      if(!!res.addToList) {
+      if (res.addToList) {
         toastMessage('productAddedToList')
       } else {
         toastMessage('addProductFail')
@@ -223,10 +236,10 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         isLoading={sessionLoading || isLoading}
       >
         <span
-          className={`${handles.wishlistIcon} ${isWishlisted ? styles.fill : styles.outline} ${
-            styles.iconSize
-          }`}
-        ></span>
+          className={`${handles.wishlistIcon} ${
+            isWishlisted ? styles.fill : styles.outline
+          } ${styles.iconSize}`}
+        />
       </Button>
     </div>
   )
