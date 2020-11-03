@@ -47,7 +47,7 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
       "product-questions-and-answers",
       "wish-list"
     ]
-  },
+  }
 ```
 
 5. Declare the `add-to-list-btn` block as a child of the [`product-summary.shelf` blocks](https://vtex.io/docs/components/all/vtex.product-summary/) in your theme. 
