@@ -23,7 +23,7 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
 
 1. [Install](https://vtex.io/docs/recipes/development/installing-an-app/) the Wishlist app in the desired VTEX account by running `vtex install vtex.wish-list` in your terminal.
 2. Open your store's Store Theme app directory in your code editor.
-3. Add the Wishlist app to your theme's dependencies in the `manifest.json` file as shown below:
+3. Add the Wishlist app to your theme's `manifest.json` file inside **peerDependencies** as shown below:
 
 ```diff
  "peerDependencies": {
@@ -35,22 +35,30 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
 
 4. Add the `add-to-list-btn` block into the `store.product` template's children block list. For example:
 
-```json
+```diff
 {
   "store.product": {
     "children": [
-      "flex-layout.row#product-breadcrumb",
-      "flex-layout.row#product-main",
-      "flex-layout.row#description",
-      "shelf.relatedProducts",
+      "product-name",
       "product-reviews",
-      "product-questions-and-answers",
-      "wish-list"
++      "add-to-list-btn"
     ]
   },
 ```
 
-5. Declare the `add-to-list-btn` block as a child of the [`product-summary.shelf` blocks](https://vtex.io/docs/components/all/vtex.product-summary/) in your theme. 
+5. Declare the `add-to-list-btn` block as a child of the [`product-summary.shelf` blocks](https://vtex.io/docs/components/all/vtex.product-summary/) in your theme. For example:
+
+```diff
+  "product-summary.shelf": {
+    "children": [
++     "add-to-list-btn",
+      "product-summary-name",
+      "product-rating-inline",
+      "product-summary-price",
+      "add-to-cart-button"
+    ]
+  }
+```
 
 :information_source: *The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, meaning it is ready to be rendered and no further actions are required. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
 

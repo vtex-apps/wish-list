@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - New terms of use
 
+## [1.0.9] - 2020-11-06
+### Updated
+- Doc update
+
+## [1.0.8] - 2020-11-06
+### Fixed
+- `/wishlist` products link not working
+
 ## [1.0.7] - 2020-10-14
 ### Fixed
 - Doc review and update
