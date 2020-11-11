@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { pathOr } from 'ramda'
 
 export const DEFAULT_WIDTH = 'auto'
@@ -68,7 +69,7 @@ const defaultReference = { Value: '' }
 const defaultSeller = { commertialOffer: { Price: 0, ListPrice: 0 } }
 
 const getPath = url => {
-  return url.replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+/, '')
+  return url.replace(/^[a-zA-Z]{3,5}:\/{2}[a-zA-Z0-9_.:-]+/, '')
 }
 
 const getSlug = url => {
