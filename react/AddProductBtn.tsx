@@ -1,20 +1,25 @@
-/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { FC, useState, useContext, useEffect } from 'react'
+import { useMutation, useLazyQuery } from 'react-apollo'
+import { WrappedComponentProps, defineMessages, injectIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
-import { compose, graphql, useApolloClient, useMutation } from 'react-apollo'
-import { injectIntl, WrappedComponentProps, defineMessages } from 'react-intl'
-import userProfile from './queries/userProfile.gql'
+import { useRuntime } from 'vtex.render-runtime'
+import { useCssHandles } from 'vtex.css-handles'
+
+import { getSession } from './modules/session'
+import storageFactory from './utils/storage'
 import checkItem from './queries/checkItem.gql'
 import addToList from './queries/addToList.gql'
 import removeFromList from './queries/removeFromList.gql'
 import styles from './styles.css'
-import { useRuntime } from 'vtex.render-runtime'
-import { useCssHandles } from 'vtex.css-handles'
 
-const CSS_HANDLES = ['wishlistIconContainer','wishlistIcon'] as const
+const localStore = storageFactory(() => sessionStorage)
+const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
-let isAuthenticated = false
+let isAuthenticated =
+  JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
+let shopperId = localStore.getItem('wishlist_shopperId') ?? null
 
 const productCheck = {}
 const defaultValues = {
@@ -52,35 +57,90 @@ const messages = defineMessages({
   },
 })
 
-const AddBtn: FC<any & WrappedComponentProps> = ({
-  data: { loading: sessionLoading, getSession },
-  intl,
-}: any) => {
+const useSessionResponse = () => {
+  const [session, setSession] = useState()
+  const sessionPromise = getSession()
 
+  useEffect(() => {
+    if (!sessionPromise) {
+      return
+    }
+
+    sessionPromise.then(sessionResponse => {
+      const { response } = sessionResponse
+
+      setSession(response)
+    })
+  }, [sessionPromise])
+
+  return session
+}
+
+const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
   const [state, setState] = useState<any>({
     isLoading: true,
     isWishlisted: false,
+    isWishlistPage: null,
     wishListId: null,
   })
 
+  const [removeProduct, { loading: removeLoading }] = useMutation(
+    removeFromList,
+    {
+      onCompleted: (res: any) => {
+        setState({
+          ...state,
+          isWishlisted: !res.removeFromList,
+          isWishlistPage: false,
+          wishListId: res.removeFromList ? null : wishListId,
+        })
+      },
+    }
+  )
   const { navigate, history } = useRuntime()
-  const client = useApolloClient()
   const handles = useCssHandles(CSS_HANDLES)
   const { showToast } = useContext(ToastContext)
   const { product } = useContext(ProductContext) as any
+  const sessionResponse: any = useSessionResponse()
+  const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
+  const [addProduct, { loading: addLoading }] = useMutation(addToList, {
+    onCompleted: (res: any) => {
+      setState({
+        ...state,
+        isWishlisted: !!res.addToList,
+        wishListId: res.addToList,
+      })
+      if (res.addToList) {
+        toastMessage('productAddedToList')
+      } else {
+        toastMessage('addProductFail')
+      }
+    },
+  })
 
-  if(!product) return null
-  
+  if (sessionResponse) {
+    isAuthenticated =
+      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
+    shopperId = sessionResponse?.namespaces?.profile?.email?.value ?? null
+
+    localStore.setItem(
+      'wishlist_isAuthenticated',
+      JSON.stringify(isAuthenticated)
+    )
+    localStore.setItem('wishlist_shopperId', String(shopperId))
+  }
+
   const toastMessage = (messsageKey: string) => {
-    let action: any = undefined
-
+    let action: any
     if (messsageKey === 'notLogged') {
       action = {
         label: intl.formatMessage(messages.login),
         onClick: () =>
           navigate({
             page: 'store.login',
-            query: `returnUrl=${encodeURIComponent(history.location.pathname)}`,
+            query: `returnUrl=${encodeURIComponent(
+              history?.location?.pathname
+            )}`,
           }),
       }
     }
@@ -90,6 +150,7 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         onClick: () =>
           navigate({
             page: 'store.wishlist',
+            fetchPage: true,
           }),
       }
     }
@@ -99,15 +160,16 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
       action,
     })
   }
-  
+  const { isWishlisted, wishListId, isWishlistPage } = state
 
-  const { isLoading, isWishlisted, wishListId } = state
+  if (!product) return null
 
-  if (getSession?.profile && !isAuthenticated) {
-    isAuthenticated = getSession.profile.email
+  if (isWishlistPage === null && product?.wishlistPage) {
+    setState({
+      ...state,
+      isWishlistPage: true,
+    })
   }
-
-  
 
   const getIdFromList = (list: string, item: any) => {
     const pos = item.listNames.findIndex((listName: string) => {
@@ -116,89 +178,32 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
     return item.listIds[pos]
   }
 
-  const handleCheck = async variables => {
-    const { data } = await client.query({
-      query: checkItem,
-      variables,
-      fetchPolicy: 'no-cache',
+  if (
+    isAuthenticated &&
+    product &&
+    !called &&
+    !productCheck[product.productId]
+  ) {
+    handleCheck({
+      variables: {
+        shopperId: String(shopperId),
+        productId: String(product.productId),
+      },
     })
-    if (data?.checkList?.inList) {
-      setState({
-        ...state,
-        isWishlisted: data.checkList.inList,
-        isLoading: false,
-        wishListId: getIdFromList(defaultValues.LIST_NAME, data.checkList),
-      })
-    } else {
-      setState({
-        ...state,
-        isLoading: false,
-      })
-    }
   }
-
-  useEffect(() => {
-    if (!sessionLoading && isAuthenticated && product && !productCheck[product.productId]) {
-      productCheck[product.productId] = product
-      if (product) {
-        handleCheck({
-          shopperId: String(isAuthenticated),
-          productId: String(product.productId),
-        })
-      }
-    } else {
-      if(!isAuthenticated && state.isLoading) {
-        setState({
-          ...state,
-          isLoading: false,
-        })
-      }
-    }
-  })
-
-  const [addProduct] = useMutation(addToList, {
-    onCompleted: (res: any) => {
-      setState({
-        ...state,
-        isLoading: false,
-        isWishlisted: !!res.addToList,
-        wishListId: res.addToList,
-      })
-      if(!!res.addToList) {
-        toastMessage('productAddedToList')
-      } else {
-        toastMessage('addProductFail')
-      }
-    },
-  })
-
-  const [removeProduct] = useMutation(removeFromList, {
-    onCompleted: (res: any) => {
-      setState({
-        ...state,
-        isLoading: false,
-        isWishlisted: !res.removeFromList,
-        wishListId: res.removeFromList ? null : wishListId,
-      })
-    },
-  })
 
   const handleAddProductClick = e => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
-      setState({
-        ...state,
-        isLoading: true,
-      })
-      if (!isWishlisted) {
+      if (isWishlistPage !== true && !isWishlisted) {
         addProduct({
           variables: {
             listItem: {
               productId: product.productId,
               title: product.productName,
             },
-            shopperId: getSession.profile.email,
+            shopperId,
             name: defaultValues.LIST_NAME,
           },
         })
@@ -206,38 +211,59 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         removeProduct({
           variables: {
             id: wishListId,
-            shopperId: getSession.profile.email,
+            shopperId,
             name: defaultValues.LIST_NAME,
           },
         })
+        if (productCheck[product.productId]) {
+          productCheck[product.productId].isWishlisted = false
+        }
       }
     } else {
       toastMessage('notLogged')
     }
   }
+
+  if (
+    data?.checkList?.inList &&
+    !wishListId &&
+    (!productCheck[product.productId] ||
+      productCheck[product.productId].wishListId === null)
+  ) {
+    const itemWishListId = getIdFromList(
+      defaultValues.LIST_NAME,
+      data.checkList
+    )
+    setState({
+      ...state,
+      isWishlisted: data.checkList.inList,
+      wishListId: itemWishListId,
+    })
+    productCheck[product.productId] = {
+      isWishlisted: data.checkList.inList,
+      wishListId: itemWishListId,
+    }
+  }
+
+  const checkFill = () => {
+    return isWishlisted || (isWishlistPage && wishListId === null)
+  }
+
   return (
     <div className={handles.wishlistIconContainer}>
       <Button
         variation="tertiary"
         onClick={handleAddProductClick}
-        isLoading={sessionLoading || isLoading}
+        isLoading={loading || addLoading || removeLoading}
       >
         <span
-          className={`${handles.wishlistIcon} ${isWishlisted ? styles.fill : styles.outline} ${
-            styles.iconSize
-          }`}
-        ></span>
+          className={`${handles.wishlistIcon} ${
+            checkFill() ? styles.fill : styles.outline
+          } ${styles.iconSize}`}
+        />
       </Button>
     </div>
   )
 }
 
-export default injectIntl(
-  compose(
-    graphql(userProfile, {
-      options: {
-        ssr: false,
-      },
-    })
-  )(AddBtn)
-)
+export default injectIntl(AddBtn)
