@@ -1,8 +1,0 @@
-query {
-  getSession @context(provider: "vtex.store-graphql") {
-    profile {
-      id
-      email
-    }
-  }
-}
