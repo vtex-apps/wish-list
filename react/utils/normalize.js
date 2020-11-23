@@ -79,13 +79,14 @@ const getSlug = url => {
 const resizeImage = (url, imageSize) =>
   changeImageUrlSize(toHttps(url), imageSize)
 
-export function mapCatalogProductToProductSummary(product, imageSize = 500) {
+export function mapCatalogProductToProductSummary(product, wishlistId) {
   if (!product) return null
   const normalizedProduct = {
     ...product,
     link: getPath(product.link),
     linkText: getSlug(product.link),
     wishlistPage: true,
+    wishlistId,
   }
   const items = normalizedProduct.items || []
   const sku = items.find(findAvailableProduct) || items[0]
@@ -95,7 +96,7 @@ export function mapCatalogProductToProductSummary(product, imageSize = 500) {
     const catalogImages = pathOr([], ['images'], sku)
     const normalizedImages = catalogImages.map(image => ({
       ...image,
-      imageUrl: resizeImage(image.imageUrl, imageSize),
+      imageUrl: resizeImage(image.imageUrl, 500),
     }))
     const [image = defaultImage] = normalizedImages
     normalizedProduct.sku = {

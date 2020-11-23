@@ -1,5 +1,6 @@
 {
   "store.wishlist": {
+    "title": "Wishlist",
     "path": "/wishlist"
   }
 }

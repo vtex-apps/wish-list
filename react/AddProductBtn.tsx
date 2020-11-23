@@ -88,6 +88,12 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
     removeFromList,
     {
       onCompleted: (res: any) => {
+        if (productCheck[product.productId]) {
+          productCheck[product.productId] = {
+            isWishlisted: false,
+            wishListId: '',
+          }
+        }
         setState({
           ...state,
           isWishlisted: !res.removeFromList,
@@ -178,12 +184,7 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
     return item.listIds[pos]
   }
 
-  if (
-    isAuthenticated &&
-    product &&
-    !called &&
-    !productCheck[product.productId]
-  ) {
+  if (isAuthenticated && product && !called) {
     handleCheck({
       variables: {
         shopperId: String(shopperId),
@@ -210,14 +211,11 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
       } else {
         removeProduct({
           variables: {
-            id: wishListId,
+            id: product?.wishlistId ?? wishListId,
             shopperId,
             name: defaultValues.LIST_NAME,
           },
         })
-        if (productCheck[product.productId]) {
-          productCheck[product.productId].isWishlisted = false
-        }
       }
     } else {
       toastMessage('notLogged')
@@ -246,7 +244,11 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
   }
 
   const checkFill = () => {
-    return isWishlisted || (isWishlistPage && wishListId === null)
+    return (
+      isWishlisted ||
+      productCheck[product.productId]?.isWishlisted ||
+      (isWishlistPage && wishListId === null)
+    )
   }
 
   return (
