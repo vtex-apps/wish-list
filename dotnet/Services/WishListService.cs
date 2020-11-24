@@ -36,7 +36,6 @@ namespace WishList.Services
             WishListWrapper wishListWrapper = await _wishListRepository.GetWishList(shopperId);
             if (wishListWrapper != null && wishListWrapper.ListItemsWrapper != null)
             {
-                // TODO: Check for more than instance of a document for shopperid (email)
                 listItemsWrapper = wishListWrapper.ListItemsWrapper.Where(n => n.Name.Equals(listName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (listItemsWrapper == null)
@@ -46,7 +45,17 @@ namespace WishList.Services
             }
             else
             {
-                Console.WriteLine("GetList Null/Empty");
+                Console.WriteLine("GetList Null/Empty - Retrying");
+                wishListWrapper = await _wishListRepository.GetWishList(shopperId);
+                if (wishListWrapper != null && wishListWrapper.ListItemsWrapper != null)
+                {
+                    listItemsWrapper = wishListWrapper.ListItemsWrapper.Where(n => n.Name.Equals(listName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                    if (listItemsWrapper == null)
+                    {
+                        listItemsWrapper = new ListItemsWrapper();
+                    }
+                }
             }
 
             wishListWrapper.ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper };
