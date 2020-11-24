@@ -81,7 +81,7 @@ const ProductSummaryList = ({ children }) => {
     const getWishlistId = (productId: string) => {
       return dataLists?.viewLists[0].data.find(item => {
         return item.productId === productId
-      }).id
+      })?.id
     }
     const componentList = products?.map(product => {
       const normalizedProduct = mapCatalogProductToProductSummary(
