@@ -78,8 +78,16 @@ const ProductSummaryList = ({ children }) => {
   const { productsByIdentifier: products } = data || {}
 
   const newListContextValue = useMemo(() => {
+    const getWishlistId = (productId: string) => {
+      return dataLists?.viewLists[0].data.find(item => {
+        return item.productId === productId
+      })?.id
+    }
     const componentList = products?.map(product => {
-      const normalizedProduct = mapCatalogProductToProductSummary(product)
+      const normalizedProduct = mapCatalogProductToProductSummary(
+        product,
+        getWishlistId(product.productId)
+      )
       return (
         <ExtensionPoint
           id="product-summary"
@@ -90,7 +98,7 @@ const ProductSummaryList = ({ children }) => {
       )
     })
     return list.concat(componentList)
-  }, [products, treePath, list])
+  }, [products, treePath, list, dataLists])
 
   if (sessionResponse && !isAuthenticated) {
     navigate({

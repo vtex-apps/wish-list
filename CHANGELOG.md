@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- SSR loading old data at the listing page
+- Error removing recent added item on the listing page
+- Duplicated lists on the same email
+- Retry checking existent list
+
+### Added
+- Default title on the listing page route
+
 ## [1.1.0] - 2020-11-11
 
 ### Fixed

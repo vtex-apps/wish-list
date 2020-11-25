@@ -148,7 +148,7 @@
 
             var request = new HttpRequestMessage
             {
-                Method = HttpMethod.Patch,
+                Method = HttpMethod.Delete,
                 RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{documentId}")
             };
 

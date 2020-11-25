@@ -2,12 +2,12 @@
   "add-to-list-btn": {
     "component": "AddProductBtn"
   },
-  "store.wishlist": {
-  },
+  "store.wishlist": {},
   "list-context.wishlist": {
     "allowed": ["product-summary"],
     "composition": "children",
     "component": "ProductSummaryWishlist",
+    "render": "client",
     "preview": {
       "type": "grid",
       "height": 550
