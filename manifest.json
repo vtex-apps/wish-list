@@ -69,7 +69,7 @@
   "billingOptions": {
     "termsURL": "https://compliance.vtex.com/gdpr/policies/vtex-privacy-policy",
     "support": {
-      "url": "https://support.vtex.com/hc/requests"
+      "url": "https://help-tickets.vtex.com/en/support?app=vtex.wish-list"
     },
     "free": true,
     "type": "free",
