@@ -12,5 +12,9 @@
       "type": "grid",
       "height": 550
     }
+  },
+  "my-account-page.wishlist-page": {},
+  "my-account-link.wishlist-link": {
+    "component": "MyAccountWishlistLink"
   }
 }

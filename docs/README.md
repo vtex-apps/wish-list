@@ -61,6 +61,7 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
 ```
 
 :information_source: *The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, meaning it is ready to be rendered and no further actions are required. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
+The same route will be also available under My Account menu
 
 ## Advanced configurations
 
@@ -68,6 +69,12 @@ According to the Wishlist app composition, the `/wishlist` page can be highly cu
 
 ```json
 {
+  "my-account-page.wishlist-page": {
+    "blocks": [
+      "flex-layout.row#top",
+      "list-context.wishlist"
+    ]
+  },
   "store.wishlist": {
     "blocks": [
       "flex-layout.row#top",

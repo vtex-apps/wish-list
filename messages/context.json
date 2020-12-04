@@ -1,9 +1,10 @@
 {
-  "store/wishlist.addButton": "Add to the list",
-  "store/wishlist-see-lists": "See lists",
-  "store/wishlist-product-added-to-list": "Product added to the list",
-  "store/wishlist-add-product-fail": "Couln't add product to the list",
-  "store/wishlist-default-list-name": "Wishlist",
-  "store/wishlist-login": "Login",
-  "store/wishlist-not-logged": "You need to login before adding it to the list"
+  "store/wishlist.addButton": "store/wishlist.addButton",
+  "store/wishlist-see-lists": "store/wishlist-see-lists",
+  "store/wishlist-product-added-to-list": "store/wishlist-product-added-to-list",
+  "store/wishlist-add-product-fail": "store/wishlist-add-product-fail",
+  "store/wishlist-default-list-name": "store/wishlist-default-list-name",
+  "store/myaccount-menu": "store/myaccount-menu",
+  "store/wishlist-login": "store/wishlist-login",
+  "store/wishlist-not-logged": "store/wishlist-not-logged"
 }

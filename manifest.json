@@ -36,7 +36,8 @@
     "vtex.store-graphql": "2.x",
     "vtex.store-icons": "0.x",
     "vtex.store-resources": "0.x",
-    "vtex.styleguide": "9.x"
+    "vtex.styleguide": "9.x",
+    "vtex.my-account": "1.x"
   },
   "policies": [
     {
@@ -72,9 +73,7 @@
     },
     "free": true,
     "type": "free",
-    "availableCountries": [
-      "*"
-    ]
+    "availableCountries": ["*"]
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
