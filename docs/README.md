@@ -14,9 +14,9 @@ The Wishlist app, designed for **B2C** stores, adds a heart icon to shelves and 
 ![wish-list-pdp](https://user-images.githubusercontent.com/52087100/94687148-393c4080-0302-11eb-8ab4-e5bd44e642ec.png)
 *Example of a heart icon on a product details page.*
 
-In addition to that, a brand new route called `/wishlist` is generated, creating a page responsible for listing all wishlisted items for your users. 
+In addition to that, a brand new route called `/wishlist` is generated under the My Account menu, creating a page responsible for listing all wishlisted items for your users. 
 
-![wishlist-page](https://user-images.githubusercontent.com/52087100/94687176-448f6c00-0302-11eb-8dcf-11881cb6fa9b.png)
+![wishlist-my-account](https://user-images.githubusercontent.com/52087100/101348528-87257580-386a-11eb-84e3-0ffda3ce0fb5.png)
 *Example of a wishlist page.*
 
 ## Configuration
@@ -31,7 +31,7 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
  }
 ```
 
-:information_source: *The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. They are responsible, respectively, for adding the heart icon to other theme blocks and for providing product data to build the `/wishlist` page.* 
+> ℹ️ *The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. They are responsible, respectively, for adding the heart icon to other theme blocks and for providing product data to build the `/wishlist` page.* 
 
 4. Add the `add-to-list-btn` block into the `store.product` template's children block list. For example:
 
@@ -60,8 +60,7 @@ In addition to that, a brand new route called `/wishlist` is generated, creating
   }
 ```
 
-:information_source: *The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, meaning it is ready to be rendered and no further actions are required. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
-The same route will be also available under My Account menu
+> ℹ️ *The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, meaning it is ready to be rendered under the My Account menu and no further actions are required from you. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
 
 ## Advanced configurations
 
@@ -131,19 +130,13 @@ According to the Wishlist app composition, the `/wishlist` page can be highly cu
 }
 ```
 
-By default implementation we mean that by installing the Wishlist app in your store you're actually using the `json` above behind the scenes to build the new page template (`/wishlist`).
+By default implementation we mean that by installing the Wishlist app in your store you're actually using the `json` above behind the scenes to build the new page template (`/wishlist`), as shown in the third image displayed above.
 
 Therefore, in order to customize the `/wishlist` page configuration, you should:
 
 1. Create a `wishlist.jsonc` file under `store/blocks`. 
 2. Copy the code above, paste it in the new file and change it as you wish. 
-3. Add the Wishlist app as a `peerDependency` in the theme's `manifest.json` file:
-
-```diff
- "peerDependencies": {
-+  "vtex.wish-list": "1.x"
- }
-```
+3. Deploy your changes.
 
 ## Customization
 
