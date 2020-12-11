@@ -1,6 +1,6 @@
 {
   "my-account-page.wishlist-page": {
-    "blocks": ["flex-layout.row#top", "list-context.wishlist"]
+    "children": ["flex-layout.row#top", "list-context.wishlist"]
   },
   "store.wishlist": {
     "blocks": ["flex-layout.row#top", "list-context.wishlist"]

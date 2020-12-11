@@ -13,7 +13,10 @@
       "height": 550
     }
   },
-  "my-account-page.wishlist-page": {},
+  "my-account-page.wishlist-page": {
+    "component": "MyAcccountWishlistPage",
+    "composition": "children"
+  },
   "my-account-link.wishlist-link": {
     "component": "MyAccountWishlistLink"
   }
