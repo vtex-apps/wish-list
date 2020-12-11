@@ -37,7 +37,8 @@
     "vtex.store-icons": "0.x",
     "vtex.store-resources": "0.x",
     "vtex.styleguide": "9.x",
-    "vtex.my-account": "1.x"
+    "vtex.my-account": "1.x",
+    "vtex.my-account-commons": "1.x"
   },
   "policies": [
     {
