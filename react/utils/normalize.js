@@ -68,14 +68,6 @@ const defaultImage = { imageUrl: '', imageLabel: '' }
 const defaultReference = { Value: '' }
 const defaultSeller = { commertialOffer: { Price: 0, ListPrice: 0 } }
 
-const getPath = url => {
-  return url.replace(/^[a-zA-Z]{3,5}:\/{2}[a-zA-Z0-9_.:-]+/, '')
-}
-
-const getSlug = url => {
-  return getPath(url).split('/')[1]
-}
-
 const resizeImage = (url, imageSize) =>
   changeImageUrlSize(toHttps(url), imageSize)
 
@@ -83,8 +75,6 @@ export function mapCatalogProductToProductSummary(product, wishlistId) {
   if (!product) return null
   const normalizedProduct = {
     ...product,
-    link: getPath(product.link),
-    linkText: getSlug(product.link),
     wishlistPage: true,
     wishlistId,
   }

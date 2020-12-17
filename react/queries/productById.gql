@@ -1,17 +1,97 @@
 query productsByIdentifier($ids: [ID!]) {
   productsByIdentifier(field: id, values: $ids)
     @context(provider: "vtex.search-graphql") {
-      productName
-      productId
+    productName
+    productId
     description
     link
+    brand
+    brandId
+    categoryId
+    clusterHighlights {
+      id
+      name
+    }
+    productClusters {
+      id
+      name
+    }
+    description
+    skuSpecifications {
+      field {
+        originalName
+        name
+      }
+      values {
+        originalName
+        name
+      }
+    }
+    linkText
+    properties {
+      name
+      values
+    }
+    propertyGroups {
+      name
+      properties
+    }
+    productReference
+    titleTag
+    metaTagDescription
+    benefits {
+      featured
+      id
+      name
+      teaserType
+      items {
+        benefitProduct {
+          description
+          link
+          linkText
+          items {
+            name
+            referenceId {
+              Key
+              Value
+            }
+            images {
+              imageId
+              imageTag
+              imageLabel
+              imageUrl
+              imageText
+            }
+          }
+        }
+        benefitSKUIds
+        discount
+        minQuantity
+      }
+    }
+    priceRange {
+      sellingPrice {
+        highPrice
+        lowPrice
+      }
+      listPrice {
+        highPrice
+        lowPrice
+      }
+    }
     items {
       name
+      nameComplete
+      complementName
+      ean
       itemId
       measurementUnit
       unitMultiplier
       referenceId {
         Value
+      }
+      videos {
+        videoUrl
       }
       images {
         imageUrl
@@ -22,17 +102,48 @@ query productsByIdentifier($ids: [ID!]) {
         name
         values
       }
+      estimatedDateArrival
       sellers {
         sellerId
+        sellerName
+        sellerDefault
         commertialOffer {
+          Installments {
+            Value
+            InterestRate
+            TotalValuePlusInterestRate
+            NumberOfInstallments
+            PaymentSystemName
+            PaymentSystemGroupName
+            Name
+          }
           AvailableQuantity
           Price
           PriceWithoutDiscount
           ListPrice
           Tax
           taxPercentage
+          RewardValue
+          PriceValidUntil
+          discountHighlights {
+            name
+          }
+          giftSkuIds
           teasers {
             name
+            conditions {
+              minimumQuantity
+              parameters {
+                name
+                value
+              }
+            }
+            effects {
+              parameters {
+                name
+                value
+              }
+            }
           }
           discountHighlights {
             name
