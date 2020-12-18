@@ -31,7 +31,7 @@ In addition to that, a brand new route called `/wishlist` is generated under the
  }
 ```
 
-> ℹ️ *The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. They are responsible, respectively, for adding the heart icon to other theme blocks and for providing product data to build the `/wishlist` page.* 
+> ℹ️ *The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. They are responsible, respectively, for adding the heart icon to other theme blocks and for providing product data to build the `/wishlist` also shared with the My Account page.* 
 
 4. Add the `add-to-list-btn` block into the `store.product` template's children block list. For example:
 
@@ -60,11 +60,13 @@ In addition to that, a brand new route called `/wishlist` is generated under the
   }
 ```
 
-> ℹ️ *The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, meaning it is ready to be rendered under the My Account menu and no further actions are required from you. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
+> ℹ️ *The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, it is already rendered under the My Account menu and no further actions are required from you. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below.* 
 
 ## Advanced configurations
 
 According to the Wishlist app composition, the `/wishlist` page can be highly customizable using other blocks. Currently, its default implementation is as follows:
+
+`store.wishlist` interface for the route `/wishlist` and `my-account-page.wishlist-page` for the Wishlist under My Account
 
 ```json
 {
