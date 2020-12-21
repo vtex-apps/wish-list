@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.0] - 2020-12-21
+
 ### Updated
 - Message after adding to the wishlist now has a link to the `/account/#wishlist` page
 
