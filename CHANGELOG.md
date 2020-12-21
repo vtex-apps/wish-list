@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Updated
+- Message after adding to the wishlist now has a link to the `/account/#wishlist` page
+
+### Fixed
+- Missing seller's additional information from GraphQL search
+
 ## [1.2.1] - 2020-12-11
 ### Fixed
 

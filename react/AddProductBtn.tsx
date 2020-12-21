@@ -155,7 +155,7 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
         label: intl.formatMessage(messages.seeLists),
         onClick: () =>
           navigate({
-            page: 'store.wishlist',
+            to: '/account/#wishlist',
             fetchPage: true,
           }),
       }
