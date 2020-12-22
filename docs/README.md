@@ -71,7 +71,7 @@ According to the Wishlist app composition, the `/wishlist` page can be highly cu
 ```json
 {
   "my-account-page.wishlist-page": {
-    "blocks": [
+    "children": [
       "flex-layout.row#top",
       "list-context.wishlist"
     ]
