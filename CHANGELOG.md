@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Updated
+- Docs
+- Plugins dependency to the My Account page
+
 ## [1.3.3] - 2020-12-22
 ### Fixed
 - Docs.

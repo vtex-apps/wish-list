@@ -68,6 +68,7 @@ According to the Wishlist app composition, the `/wishlist` page can be highly cu
 
 `store.wishlist` interface for the route `/wishlist` and `my-account-page.wishlist-page` for the Wishlist under My Account
 
+**wishlist.jsonc**
 ```json
 {
   "my-account-page.wishlist-page": {
@@ -132,13 +133,24 @@ According to the Wishlist app composition, the `/wishlist` page can be highly cu
 }
 ```
 
-By default implementation we mean that by installing the Wishlist app in your store you're actually using the `json` above behind the scenes to build the new page template (`/wishlist`), as shown in the third image displayed above.
+Add the `plugins.json` file to your theme's `/store/` folder, this will add the Wishlist to the "My Account"
+
+**plugins.json**
+```json
+{
+  "my-account-pages > my-account-page": "my-account-page.wishlist-page",
+  "my-account-menu > my-account-link": "my-account-link.wishlist-link"
+}
+```
+
+By "default implementation" we mean that, by installing the Wishlist app in your store, you're actually using the `json` above behind the scenes to build the new page template (`/wishlist`), as shown in the third image displayed above.
 
 Therefore, in order to customize the `/wishlist` page configuration, you should:
 
 1. Create a `wishlist.jsonc` file under `store/blocks`. 
-2. Copy the code above, paste it in the new file and change it as you wish. 
-3. Deploy your changes.
+2. Create a `plugins.json` file under `store/`. 
+3. Copy the code above, paste it in the new file and change it as you wish. 
+4. Deploy your changes.
 
 ## Customization
 
