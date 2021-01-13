@@ -152,6 +152,7 @@ Therefore, in order to customize the `/wishlist` page configuration, you should:
 3. Copy the code above, paste it in the new file and change it as you wish. 
 4. Deploy your changes.
 
+If you want to configure the layout without the `slider-layout` dependency, you can use the `list-context-renderer` to wrap the `product-summary.shelf`, more information [here](https://github.com/vtex-apps/list-context#list-context-renderer)
 ## Customization
 
 In order to apply CSS customizations to this and other blocks, follow the instructions given in the recipe on [Using CSS Handles for store customization](https://vtex.io/docs/recipes/style/using-css-handles-for-store-customization).
