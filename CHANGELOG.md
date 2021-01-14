@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Docs
 - Plugins dependency to the My Account page
 
+### Added
+- Change menu label under My Account page
+
+### Removed
+- `plugins.json` from the app
+
 ## [1.3.3] - 2020-12-22
 ### Fixed
 - Docs.
