@@ -6,12 +6,7 @@
   "list-context.wishlist": {
     "allowed": ["product-summary"],
     "composition": "children",
-    "component": "ProductSummaryWishlist",
-    "render": "client",
-    "preview": {
-      "type": "grid",
-      "height": 550
-    }
+    "component": "ProductSummaryWishlist"
   },
   "my-account-page.wishlist-page": {
     "component": "MyAcccountWishlistPage",
