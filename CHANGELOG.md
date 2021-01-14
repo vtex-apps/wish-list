@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 - `plugins.json` from the app
 
+### Fixed
+- Blocks configuration not being overwritten by the theme's block
+
 ## [1.3.3] - 2020-12-22
 ### Fixed
 - Docs.
