@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Message when the Wishlist is empty
 - CSS handle `emptyMessage`
+## [1.4.2] - 2021-01-22
+
+### Fixed
+- Null object check
+
 ## [1.4.1] - 2021-01-21
 
 ### Fixed
