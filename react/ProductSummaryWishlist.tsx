@@ -100,7 +100,9 @@ const ProductSummaryList = ({ children }) => {
   console.group('### WiewLists')
   console.log('dataLists =>', dataLists)
   console.log('errorDataLists =>', errorDataLists)
-  console.log('!isAuthenticated =>', !isAuthenticated)
+  console.log('sessionResponse =>', sessionResponse)
+  console.log('isAuthenticated =>', isAuthenticated)
+  console.log('shopperId =>', shopperId)
   console.groupEnd()
 
   const { productsByIdentifier: products } = data || {}
@@ -138,6 +140,8 @@ const ProductSummaryList = ({ children }) => {
   if (loading) {
     return <Spinner />
   }
+
+  console.log('(!dataLists || !data || error)', !dataLists, !data, error)
 
   if (!dataLists || !data || error) {
     return null
