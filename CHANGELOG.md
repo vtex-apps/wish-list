@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- First product addition with error message
+- First `/account/#/wishlist` page load with empty list
+
+### Added
+- Message when the Wishlist is empty
+- CSS handle `emptyMessage`
 ## [1.4.0] - 2021-01-14
 
 ### Updated

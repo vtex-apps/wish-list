@@ -5,6 +5,7 @@
   "store/wishlist-add-product-fail": "No se pudo agregar producto a la lista",
   "store/wishlist-default-list-name": "Lista de deseos",
   "store/myaccount-menu": "Lista de deseos",
+  "store/myaccount-empty-list": "La tua wishlist è vuota",
   "store/wishlist-login": "Iniciar sesión",
   "store/wishlist-not-logged": "Debe iniciar sesión antes de agregarlo a la lista"
 }
