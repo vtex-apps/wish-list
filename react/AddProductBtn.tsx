@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { FC, useState, useContext, useEffect } from 'react'
 import { useMutation, useLazyQuery } from 'react-apollo'
@@ -144,7 +143,6 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
     addToList,
     {
       onCompleted: (res: any) => {
-        console.log('addProduct', res)
         setState({
           ...state,
           isWishlisted: !!res.addToList,
@@ -156,7 +154,6 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
   )
 
   if (addError) {
-    console.log('addError', addError)
     toastMessage('addProductFail')
   }
 

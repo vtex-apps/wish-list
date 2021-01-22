@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useMemo, useState, useEffect, FC } from 'react'
 import { useLazyQuery } from 'react-apollo'
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl'
@@ -97,14 +96,6 @@ const ProductSummaryList = ({ children }) => {
     loadProducts()
   }
 
-  console.group('### WiewLists')
-  console.log('dataLists =>', dataLists)
-  console.log('errorDataLists =>', errorDataLists)
-  console.log('sessionResponse =>', sessionResponse)
-  console.log('isAuthenticated =>', isAuthenticated)
-  console.log('shopperId =>', shopperId)
-  console.groupEnd()
-
   const { productsByIdentifier: products } = data || {}
 
   const newListContextValue = useMemo(() => {
@@ -140,8 +131,6 @@ const ProductSummaryList = ({ children }) => {
   if (loading) {
     return <Spinner />
   }
-
-  console.log('(!dataLists || !data || error)', !dataLists, !data, error)
 
   if (!dataLists || !data || error) {
     return null
