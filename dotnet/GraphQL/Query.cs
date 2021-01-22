@@ -84,36 +84,39 @@ namespace WishList.GraphQL
                     IList<ListResponse> resultLists = new List<ListResponse>();
                     int totalCount = 0;
                     var resultListsWrapper = await wishListService.GetLists(shopperId);
-                    foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
+                    if (resultListsWrapper != null && resultListsWrapper.ListItemsWrapper != null)
                     {
-                        if (listItemsWrapper != null)
+                        foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
                         {
-                            if (listItemsWrapper.ListItems != null)
+                            if (listItemsWrapper != null)
                             {
-                                resultList = listItemsWrapper.ListItems;
-                                totalCount = resultList.Count;
-
-                                if (from > 0 && to > 0)
+                                if (listItemsWrapper.ListItems != null)
                                 {
-                                    resultList = await wishListService.LimitList(resultList, from, to);
-                                    Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                                    resultList = listItemsWrapper.ListItems;
+                                    totalCount = resultList.Count;
+
+                                    if (from > 0 && to > 0)
+                                    {
+                                        resultList = await wishListService.LimitList(resultList, from, to);
+                                        Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                                    }
+                                }
+                                else
+                                {
+                                    resultList = new List<ListItem>();
                                 }
                             }
-                            else
+
+                            ListResponse listResponse = new ListResponse
                             {
-                                resultList = new List<ListItem>();
-                            }
+                                Data = new DataElement { data = resultList },
+                                Range = new ResultRange { From = from, To = to, Total = totalCount },
+                                Public = listItemsWrapper.IsPublic ?? false,
+                                Name = listItemsWrapper.Name
+                            };
+
+                            resultLists.Add(listResponse);
                         }
-
-                        ListResponse listResponse = new ListResponse
-                        {
-                            Data = new DataElement { data = resultList },
-                            Range = new ResultRange { From = from, To = to, Total = totalCount },
-                            Public = listItemsWrapper.IsPublic ?? false,
-                            Name = listItemsWrapper.Name
-                        };
-
-                        resultLists.Add(listResponse);
                     }
 
                     return resultLists;
