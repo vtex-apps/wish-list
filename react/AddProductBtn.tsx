@@ -109,33 +109,6 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
   const { product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
-  const [addProduct, { loading: addLoading }] = useMutation(addToList, {
-    onCompleted: (res: any) => {
-      setState({
-        ...state,
-        isWishlisted: !!res.addToList,
-        wishListId: res.addToList,
-      })
-      if (res.addToList) {
-        toastMessage('productAddedToList')
-      } else {
-        toastMessage('addProductFail')
-      }
-    },
-  })
-
-  if (sessionResponse) {
-    isAuthenticated =
-      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
-    shopperId = sessionResponse?.namespaces?.profile?.email?.value ?? null
-
-    localStore.setItem(
-      'wishlist_isAuthenticated',
-      JSON.stringify(isAuthenticated)
-    )
-    localStore.setItem('wishlist_shopperId', String(shopperId))
-  }
-
   const toastMessage = (messsageKey: string) => {
     let action: any
     if (messsageKey === 'notLogged') {
@@ -166,6 +139,36 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
       action,
     })
   }
+  const [addProduct, { loading: addLoading, error: addError }] = useMutation(
+    addToList,
+    {
+      onCompleted: (res: any) => {
+        setState({
+          ...state,
+          isWishlisted: !!res.addToList,
+          wishListId: res.addToList,
+        })
+        toastMessage('productAddedToList')
+      },
+    }
+  )
+
+  if (addError) {
+    toastMessage('addProductFail')
+  }
+
+  if (sessionResponse) {
+    isAuthenticated =
+      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
+    shopperId = sessionResponse?.namespaces?.profile?.email?.value ?? null
+
+    localStore.setItem(
+      'wishlist_isAuthenticated',
+      JSON.stringify(isAuthenticated)
+    )
+    localStore.setItem('wishlist_shopperId', String(shopperId))
+  }
+
   const { isWishlisted, wishListId, isWishlistPage } = state
 
   if (!product) return null

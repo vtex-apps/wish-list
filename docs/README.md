@@ -179,6 +179,7 @@ In order to apply CSS customizations to this and other blocks, follow the instru
 | `wishlistContainer`     |
 | `wishlistIcon`          |
 | `wishlistIconContainer` |
+| `emptyMessage`          |
 
 <!-- DOCS-IGNORE:start -->
 

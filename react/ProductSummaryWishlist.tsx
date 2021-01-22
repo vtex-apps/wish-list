@@ -1,9 +1,11 @@
-import React, { useMemo, useState, useEffect } from 'react'
-import { useQuery } from 'react-apollo'
+import React, { useMemo, useState, useEffect, FC } from 'react'
+import { useLazyQuery } from 'react-apollo'
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl'
 import { ExtensionPoint, useTreePath, useRuntime } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
 import { ProductListContext } from 'vtex.product-list-context'
 import { Spinner } from 'vtex.styleguide'
+import { useCssHandles } from 'vtex.css-handles'
 
 import { mapCatalogProductToProductSummary } from './utils/normalize'
 import ProductListEventCaller from './components/ProductListEventCaller'
@@ -13,6 +15,7 @@ import { getSession } from './modules/session'
 import storageFactory from './utils/storage'
 
 const localStore = storageFactory(() => localStorage)
+const CSS_HANDLES = ['emptyMessage'] as const
 
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
@@ -41,27 +44,29 @@ const ProductSummaryList = ({ children }) => {
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
   const { navigate, history } = useRuntime()
+  const handles = useCssHandles(CSS_HANDLES)
 
   const sessionResponse: any = useSessionResponse()
 
-  const { data: dataLists } = useQuery(ViewLists, {
+  const [
+    loadLists,
+    { data: dataLists, loading: listLoading, called: listCalled },
+  ] = useLazyQuery(ViewLists, {
     ssr: false,
-    skip: !isAuthenticated,
     fetchPolicy: 'no-cache',
-    variables: {
-      shopperId,
-    },
   })
 
-  const { data, loading, error } = useQuery(productsQuery, {
-    ssr: false,
-    skip: !dataLists || !dataLists.viewLists,
-    variables: {
-      ids: dataLists?.viewLists[0].data.map(item => {
-        return item.productId
-      }),
-    },
-  })
+  const [loadProducts, { data, loading, error, called }] = useLazyQuery(
+    productsQuery,
+    {
+      ssr: false,
+      variables: {
+        ids: dataLists?.viewLists[0].data.map(item => {
+          return item.productId
+        }),
+      },
+    }
+  )
 
   if (sessionResponse) {
     isAuthenticated =
@@ -73,6 +78,17 @@ const ProductSummaryList = ({ children }) => {
       JSON.stringify(isAuthenticated)
     )
     localStore.setItem('wishlist_shopperId', String(shopperId))
+    if (!listCalled) {
+      loadLists({
+        variables: {
+          shopperId,
+        },
+      })
+    }
+  }
+
+  if (!called && dataLists) {
+    loadProducts()
   }
 
   const { productsByIdentifier: products } = data || {}
@@ -111,8 +127,16 @@ const ProductSummaryList = ({ children }) => {
     return <Spinner />
   }
 
-  if (!data || error) {
+  if (!dataLists || !data || error) {
     return null
+  }
+
+  if (listCalled && !listLoading && !dataLists?.viewLists[0].data.length) {
+    return (
+      <div className={`ml5 ${handles.emptyMessage}`}>
+        <FormattedMessage id="store/myaccount-empty-list" />
+      </div>
+    )
   }
 
   return (
@@ -122,7 +146,7 @@ const ProductSummaryList = ({ children }) => {
   )
 }
 
-const EnhancedProductList = ({ children }) => {
+const EnhancedProductList: FC<WrappedComponentProps> = ({ children }) => {
   const { ProductListProvider } = ProductListContext
   return (
     <ProductListProvider listName="wishlist">
@@ -132,4 +156,4 @@ const EnhancedProductList = ({ children }) => {
   )
 }
 
-export default EnhancedProductList
+export default injectIntl(EnhancedProductList)
