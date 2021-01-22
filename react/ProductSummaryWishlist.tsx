@@ -50,12 +50,7 @@ const ProductSummaryList = ({ children }) => {
 
   const [
     loadLists,
-    {
-      data: dataLists,
-      loading: listLoading,
-      error: errorDataLists,
-      called: listCalled,
-    },
+    { data: dataLists, loading: listLoading, called: listCalled },
   ] = useLazyQuery(ViewLists, {
     ssr: false,
     fetchPolicy: 'no-cache',
