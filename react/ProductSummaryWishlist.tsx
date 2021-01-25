@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect, FC } from 'react'
 import { useLazyQuery } from 'react-apollo'
-import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl'
-import { ExtensionPoint, useTreePath, useRuntime } from 'vtex.render-runtime'
+import { FormattedMessage } from 'react-intl'
+// @ts-expect-error - useTreePath is a private API
+import { ExtensionPoint, useRuntime, useTreePath } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
 import { ProductListContext } from 'vtex.product-list-context'
 import { Spinner } from 'vtex.styleguide'
@@ -40,7 +41,7 @@ const useSessionResponse = () => {
   return session
 }
 
-const ProductSummaryList = ({ children }) => {
+const ProductSummaryList: FC = ({ children }) => {
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
   const { navigate, history } = useRuntime()
@@ -53,7 +54,7 @@ const ProductSummaryList = ({ children }) => {
     { data: dataLists, loading: listLoading, called: listCalled },
   ] = useLazyQuery(ViewLists, {
     ssr: false,
-    fetchPolicy: 'no-cache',
+    fetchPolicy: 'network-only',
   })
 
   const [loadProducts, { data, loading, error, called }] = useLazyQuery(
@@ -61,7 +62,7 @@ const ProductSummaryList = ({ children }) => {
     {
       ssr: false,
       variables: {
-        ids: dataLists?.viewLists[0].data.map(item => {
+        ids: dataLists?.viewLists[0]?.data.map((item: any) => {
           return item.productId
         }),
       },
@@ -95,11 +96,11 @@ const ProductSummaryList = ({ children }) => {
 
   const newListContextValue = useMemo(() => {
     const getWishlistId = (productId: string) => {
-      return dataLists?.viewLists[0].data.find(item => {
+      return dataLists?.viewLists[0]?.data.find((item: any) => {
         return item.productId === productId
       })?.id
     }
-    const componentList = products?.map(product => {
+    const componentList = products?.map((product: any) => {
       const normalizedProduct = mapCatalogProductToProductSummary(
         product,
         getWishlistId(product.productId)
@@ -131,7 +132,7 @@ const ProductSummaryList = ({ children }) => {
     return null
   }
 
-  if (listCalled && !listLoading && !dataLists?.viewLists[0].data.length) {
+  if (listCalled && !listLoading && !dataLists?.viewLists[0]?.data?.length) {
     return (
       <div className={`ml5 ${handles.emptyMessage}`}>
         <FormattedMessage id="store/myaccount-empty-list" />
@@ -146,7 +147,7 @@ const ProductSummaryList = ({ children }) => {
   )
 }
 
-const EnhancedProductList: FC<WrappedComponentProps> = ({ children }) => {
+const EnhancedProductList: FC = ({ children }) => {
   const { ProductListProvider } = ProductListContext
   return (
     <ProductListProvider listName="wishlist">
@@ -156,4 +157,4 @@ const EnhancedProductList: FC<WrappedComponentProps> = ({ children }) => {
   )
 }
 
-export default injectIntl(EnhancedProductList)
+export default EnhancedProductList
