@@ -1,3 +1,7 @@
-mutation AddToList($listItem: ListItemInputType!, $shopperId: String!, $name: String!) {
+mutation AddToList(
+  $listItem: ListItemInputType!
+  $shopperId: String!
+  $name: String!
+) {
   addToList(listItem: $listItem, shopperId: $shopperId, name: $name)
 }

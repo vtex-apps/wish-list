@@ -33,37 +33,21 @@ input ListItemInputType {
 }
 
 type Query {
-  viewList(
-    shopperId: String!
-	name: String!
-    from: Int
-    to: Int
-    ): WishList @cacheControl(scope: PRIVATE)
-  viewLists(
-    shopperId: String!
-    from: Int
-    to: Int
-    ): [WishList] @cacheControl(scope: PRIVATE)
-  checkList(
-    shopperId: String!
-    productId: String!
-    sku: String
-    ) : CheckListType @cacheControl(scope: PRIVATE)
-  listNames(
-    shopperId: String!
-	): [String]
+  viewList(shopperId: String!, name: String!, from: Int, to: Int): WishList
+    @cacheControl(scope: PRIVATE, maxAge: ZERO)
+  viewLists(shopperId: String!, from: Int, to: Int): [WishList]
+    @cacheControl(scope: PRIVATE, maxAge: ZERO)
+  checkList(shopperId: String!, productId: String!, sku: String): CheckListType
+    @cacheControl(scope: PRIVATE)
+  listNames(shopperId: String!): [String]
 }
 
 type Mutation {
   addToList(
     listItem: ListItemInputType!
-	shopperId: String!
-	name: String!
-	public: Boolean
-	): ID
-  removeFromList(
-    id: ID!
-	shopperId: String!
-	name: String
-	): Boolean
+    shopperId: String!
+    name: String!
+    public: Boolean
+  ): ID
+  removeFromList(id: ID!, shopperId: String!, name: String): Boolean
 }

@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import React, { FC, useState, useContext, useEffect } from 'react'
+import React, {
+  FC,
+  useState,
+  useContext,
+  useEffect,
+  SyntheticEvent,
+} from 'react'
 import { useMutation, useLazyQuery } from 'react-apollo'
-import { WrappedComponentProps, defineMessages, injectIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
 import { useRuntime } from 'vtex.render-runtime'
@@ -21,12 +27,16 @@ let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
 let shopperId = localStore.getItem('wishlist_shopperId') ?? null
 
-const productCheck = {}
+const productCheck: {
+  [key: string]: { isWishlisted: boolean; wishListId: string }
+} = {}
 const defaultValues = {
   LIST_NAME: 'Wishlist',
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: { defaultMessage: string; id: string }
+} = defineMessages({
   addButton: {
     defaultMessage: '',
     id: 'store/wishlist.addButton',
@@ -76,7 +86,8 @@ const useSessionResponse = () => {
   return session
 }
 
-const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
+const AddBtn: FC = () => {
+  const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
     isWishlisted: false,
@@ -196,7 +207,7 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
     })
   }
 
-  const handleAddProductClick = e => {
+  const handleAddProductClick = (e: SyntheticEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
@@ -271,4 +282,4 @@ const AddBtn: FC<WrappedComponentProps> = ({ intl }) => {
   )
 }
 
-export default injectIntl(AddBtn)
+export default AddBtn

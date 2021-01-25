@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Update tooling, lint code
+- Adjust GraphQL caching
+
 ## [1.5.0] - 2021-01-22
 
 ### Fixed
@@ -15,39 +20,51 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - First `/account/#/wishlist` page load with empty list
 
 ### Added
+
 - Message when the Wishlist is empty
 - CSS handle `emptyMessage`
+
 ## [1.4.2] - 2021-01-22
 
 ### Fixed
+
 - Null object check
 
 ## [1.4.1] - 2021-01-21
 
 ### Fixed
+
 - UrlEncode shopperId
 
 ## [1.4.0] - 2021-01-14
 
 ### Updated
+
 - Docs
 - Plugins dependency to the My Account page
 
 ### Added
+
 - Change menu label under My Account page
 
 ### Removed
+
 - `plugins.json` from the app
 
 ### Fixed
+
 - Blocks configuration not being overwritten by the theme's block
 
 ## [1.3.3] - 2020-12-22
+
 ### Fixed
+
 - Docs.
 
 ## [1.3.2] - 2020-12-22
+
 ### Added
+
 - Romanian translation
 
 ## [1.3.1] - 2020-12-22
@@ -59,12 +76,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.3.0] - 2020-12-21
 
 ### Updated
+
 - Message after adding to the wishlist now has a link to the `/account/#wishlist` page
 
 ### Fixed
+
 - Missing seller's additional information from GraphQL search
 
 ## [1.2.1] - 2020-12-11
+
 ### Fixed
 
 - My Account page rendering.
@@ -72,55 +92,72 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.2.0] - 2020-12-07
 
 ### Added
+
 - Added Wishlist menu under My Account
 
 ## [1.1.1] - 2020-11-25
 
 ### Fixed
+
 - SSR loading old data at the listing page
 - Error removing recent added item on the listing page
 - Duplicated lists on the same email
 - Retry checking existent list
 
 ### Added
+
 - Default title on the listing page route
 
 ## [1.1.0] - 2020-11-11
 
 ### Fixed
+
 - Performance improvements
 
 ## [1.0.10] - 2020-11-06
 
 ### Fixed
+
 - New terms of use
 
 ## [1.0.9] - 2020-11-06
+
 ### Updated
+
 - Doc update
 
 ## [1.0.8] - 2020-11-06
+
 ### Fixed
+
 - `/wishlist` products link not working
 
 ## [1.0.7] - 2020-10-14
+
 ### Fixed
+
 - Doc review and update
 
 ## [1.0.6] - 2020-09-25
 
 ### Added
+
 - App Store Assets - new format.
 
 ## [1.0.5] - 2020-09-21
+
 - Doc update `peerDependencies`
 
 ## [1.0.4] - 2020-09-21
+
 ### Added
+
 - `crowdin.yml` config file
 
 ## [1.0.3] - 2020-09-16
+
 ### Fixed
+
 - App documentation update (`readme.md` file)
 
 ## [1.0.2] - 2020-09-04
