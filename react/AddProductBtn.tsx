@@ -86,7 +86,11 @@ const useSessionResponse = () => {
   return session
 }
 
-const AddBtn: FC = () => {
+interface AddBtnProps {
+  seeListFeedBackLink?: string
+}
+
+const AddBtn: FC<AddBtnProps> = ({ seeListFeedBackLink }) => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
@@ -139,7 +143,7 @@ const AddBtn: FC = () => {
         label: intl.formatMessage(messages.seeLists),
         onClick: () =>
           navigate({
-            to: '/account/#wishlist',
+            to: seeListFeedBackLink || '/account/#wishlist',
             fetchPage: true,
           }),
       }
@@ -273,9 +277,8 @@ const AddBtn: FC = () => {
         isLoading={loading || addLoading || removeLoading}
       >
         <span
-          className={`${handles.wishlistIcon} ${
-            checkFill() ? styles.fill : styles.outline
-          } ${styles.iconSize}`}
+          className={`${handles.wishlistIcon} ${checkFill() ? styles.fill : styles.outline
+            } ${styles.iconSize}`}
         />
       </Button>
     </div>

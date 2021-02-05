@@ -158,6 +158,11 @@ If you want to configure the layout without the `slider-layout` dependency, you 
 | Prop name |   Type   |                         Description                         | Default value |
 | :-------: | :------: | :---------------------------------------------------------: | :-----------: |
 |  `label`  | `string` | Change the label for the section menu under My Account page |  `Wishlist`   |
+#### `"add-to-list-btn"` props
+
+| Prop name |   Type   |                                Description                                | Default value |
+| :-------: | :------: | :-----------------------------------------------------------------------: | :-----------: |
+|  `seeListFeedBackLink`  | `string` | Change the label for the section menu under My Account page |  `'/account/#wishlist'`   |
 
 ## Customization
 
