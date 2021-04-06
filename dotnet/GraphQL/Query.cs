@@ -48,6 +48,15 @@ namespace WishList.GraphQL
                                 resultList = await wishListService.LimitList(resultList, from, to);
                                 Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
                             }
+
+                            // Normalize Title field
+                            foreach (ListItem listItem in resultList)
+                            {
+                                if (string.IsNullOrWhiteSpace(listItem.Title))
+                                {
+                                    listItem.Title = string.Empty;
+                                }
+                            }
                         }
                         else
                         {
@@ -99,6 +108,15 @@ namespace WishList.GraphQL
                                     {
                                         resultList = await wishListService.LimitList(resultList, from, to);
                                         Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                                    }
+
+                                    // Normalize Title field
+                                    foreach (ListItem listItem in resultList)
+                                    {
+                                        if (string.IsNullOrWhiteSpace(listItem.Title))
+                                        {
+                                            listItem.Title = string.Empty;
+                                        }
                                     }
                                 }
                                 else
