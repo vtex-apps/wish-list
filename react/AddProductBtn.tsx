@@ -20,12 +20,15 @@ import addToList from './queries/addToList.gql'
 import removeFromList from './queries/removeFromList.gql'
 import styles from './styles.css'
 
-const localStore = storageFactory(() => sessionStorage)
+const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
 let shopperId = localStore.getItem('wishlist_shopperId') ?? null
+let addAfterLogin = localStore.getItem('wishlist_addAfterLogin') ?? null
+const wishListed: any =
+  JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
 const productCheck: {
   [key: string]: { isWishlisted: boolean; wishListId: string }
@@ -99,12 +102,21 @@ const AddBtn: FC = () => {
     removeFromList,
     {
       onCompleted: (res: any) => {
-        if (productCheck[product.productId]) {
-          productCheck[product.productId] = {
+        const [productId] = String(product.productId).split('-')
+        if (productCheck[productId]) {
+          productCheck[productId] = {
             isWishlisted: false,
             wishListId: '',
           }
         }
+
+        const pos = wishListed.find((item: string) => item === productId)
+
+        if (pos !== -1) {
+          wishListed.splice(pos, 1)
+          localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+        }
+
         setState({
           ...state,
           isWishlisted: !res.removeFromList,
@@ -119,6 +131,7 @@ const AddBtn: FC = () => {
   const { showToast } = useContext(ToastContext)
   const { product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
+  const [productId] = String(product.productId).split('-')
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
   const toastMessage = (messsageKey: string) => {
     let action: any
@@ -154,6 +167,9 @@ const AddBtn: FC = () => {
     addToList,
     {
       onCompleted: (res: any) => {
+        wishListed.push(productId)
+        localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+
         setState({
           ...state,
           isWishlisted: !!res.addToList,
@@ -199,12 +215,27 @@ const AddBtn: FC = () => {
   }
 
   if (isAuthenticated && product && !called) {
-    handleCheck({
-      variables: {
-        shopperId: String(shopperId),
-        productId: String(product.productId),
-      },
-    })
+    if (isAuthenticated && addAfterLogin && addAfterLogin === productId) {
+      addProduct({
+        variables: {
+          listItem: {
+            productId,
+            title: product.productName,
+          },
+          shopperId,
+          name: defaultValues.LIST_NAME,
+        },
+      })
+      addAfterLogin = null
+      localStore.removeItem('wishlist_addAfterLogin')
+    } else {
+      handleCheck({
+        variables: {
+          shopperId: String(shopperId),
+          productId,
+        },
+      })
+    }
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
@@ -215,7 +246,7 @@ const AddBtn: FC = () => {
         addProduct({
           variables: {
             listItem: {
-              productId: product.productId,
+              productId,
               title: product.productName,
             },
             shopperId,
@@ -232,6 +263,7 @@ const AddBtn: FC = () => {
         })
       }
     } else {
+      localStore.setItem('wishlist_addAfterLogin', String(productId))
       toastMessage('notLogged')
     }
   }
@@ -239,8 +271,7 @@ const AddBtn: FC = () => {
   if (
     data?.checkList?.inList &&
     !wishListId &&
-    (!productCheck[product.productId] ||
-      productCheck[product.productId].wishListId === null)
+    (!productCheck[productId] || productCheck[productId].wishListId === null)
   ) {
     const itemWishListId = getIdFromList(
       defaultValues.LIST_NAME,
@@ -251,7 +282,7 @@ const AddBtn: FC = () => {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
     })
-    productCheck[product.productId] = {
+    productCheck[productId] = {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
     }
@@ -259,8 +290,9 @@ const AddBtn: FC = () => {
 
   const checkFill = () => {
     return (
+      wishListed.findIndex((item: string) => item === productId) !== -1 ||
       isWishlisted ||
-      productCheck[product.productId]?.isWishlisted ||
+      productCheck[productId]?.isWishlisted ||
       (isWishlistPage && wishListId === null)
     )
   }

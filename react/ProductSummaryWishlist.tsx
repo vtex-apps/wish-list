@@ -63,7 +63,8 @@ const ProductSummaryList: FC = ({ children }) => {
       ssr: false,
       variables: {
         ids: dataLists?.viewLists[0]?.data.map((item: any) => {
-          return item.productId
+          const [id] = item.productId.split('-')
+          return id
         }),
       },
     }
@@ -96,8 +97,10 @@ const ProductSummaryList: FC = ({ children }) => {
 
   const newListContextValue = useMemo(() => {
     const getWishlistId = (productId: string) => {
+      const [id] = productId.split('-')
       return dataLists?.viewLists[0]?.data.find((item: any) => {
-        return item.productId === productId
+        const [itemId] = item.productId.split('-')
+        return itemId === id
       })?.id
     }
     const componentList = products?.map((product: any) => {
