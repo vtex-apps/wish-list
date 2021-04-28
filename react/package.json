@@ -31,5 +31,5 @@
     "vtex.store-resources": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-resources@0.75.1/public/@types/vtex.store-resources",
     "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.135.0/public/@types/vtex.styleguide"
   },
-  "version": "1.6.0"
+  "version": "1.6.1"
 }
