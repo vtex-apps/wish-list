@@ -27,7 +27,7 @@ let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
 let shopperId = localStore.getItem('wishlist_shopperId') ?? null
 let addAfterLogin = localStore.getItem('wishlist_addAfterLogin') ?? null
-const wishListed: any =
+let wishListed: any =
   JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
 const productCheck: {
@@ -89,6 +89,22 @@ const useSessionResponse = () => {
   return session
 }
 
+const unify = (arr: any) => {
+  const obj: any = {}
+  for (let i = 0; i < arr.length; i++) {
+    obj[arr[i]] = true
+  }
+  return Object.getOwnPropertyNames(obj)
+}
+
+const addWishlisted = (productId: any) => {
+  if (wishListed.indexOf(productId) === -1) {
+    wishListed.push(productId)
+  }
+  wishListed = unify(wishListed)
+  localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+}
+
 const AddBtn: FC = () => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
@@ -110,7 +126,9 @@ const AddBtn: FC = () => {
           }
         }
 
-        const pos = wishListed.find((item: string) => item === productId)
+        wishListed = unify(wishListed)
+
+        const pos = wishListed.findIndex((item: string) => item === productId)
 
         if (pos !== -1) {
           wishListed.splice(pos, 1)
@@ -163,12 +181,12 @@ const AddBtn: FC = () => {
       action,
     })
   }
+
   const [addProduct, { loading: addLoading, error: addError }] = useMutation(
     addToList,
     {
       onCompleted: (res: any) => {
-        wishListed.push(productId)
-        localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+        addWishlisted(productId)
 
         setState({
           ...state,
@@ -285,6 +303,10 @@ const AddBtn: FC = () => {
     productCheck[productId] = {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
+    }
+
+    if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
+      addWishlisted(productId)
     }
   }
 
