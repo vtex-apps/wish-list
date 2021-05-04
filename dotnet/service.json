@@ -4,7 +4,10 @@
   "runtimeArgs": [
   ],
   "routes": {
-    
+    "ExportAllLists": {
+      "path": "/_v/wishlist/export-lists",
+      "public": true
+    }
   },
   "events": {
     "onAppsLinked": {
