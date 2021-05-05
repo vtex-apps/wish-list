@@ -7,5 +7,6 @@
   "store/myaccount-menu": "Wishlist",
   "store/myaccount-empty-list": "This list is empty",
   "store/wishlist-login": "Login",
-  "store/wishlist-not-logged": "You need to login before adding it to the list"
+  "store/wishlist-not-logged": "You need to login before adding it to the list",
+  "admin/wishlist.menu.label": "Wishlist"
 }

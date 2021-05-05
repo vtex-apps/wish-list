@@ -7,16 +7,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.6.2] - 2021-05-06
+
+### Added
+
+- Add ability to download all wishlists from the admin page as an xls file
+
 ## [1.6.1] - 2021-04-28
 
 ### Fixed
+
 - After checking as wishlisted, you cannot uncheck
+
 ## [1.6.0] - 2021-04-23
 
 ### Added
+
 - Add product after login
+
 ### Fixed
+
 - Products recently added from the shelf don't show up as wishlisted at the PDP
+
 ## [1.5.2] - 2021-04-06
 
 ### Fixed
