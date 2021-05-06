@@ -10,11 +10,10 @@ import {
   IconDownload,
 } from 'vtex.styleguide'
 import XLSX from 'xlsx'
-// import { useRuntime } from 'vtex.render-runtime'
+import { useRuntime } from 'vtex.render-runtime'
 
 const WishlistAdmin: FC<any> = ({ intl }) => {
-  // const { account } = useRuntime()
-  const account = 'tonys--sandboxusdev'
+  const { account } = useRuntime()
 
   const fetchWishlists = async (from: number, to: number) => {
     const response = await fetch(
@@ -77,7 +76,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
 
   const messages = defineMessages({
     title: {
-      id: 'admin/navigation.label',
+      id: 'admin/wishlist.menu.label',
       defaultMessage: 'Wishlist',
     },
     exportLabel: {
@@ -86,7 +85,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
     },
     download: {
       id: 'admin/settings.download',
-      defaultMessage: 'Download Wishlist',
+      defaultMessage: 'Download Wishlists',
     },
   })
 

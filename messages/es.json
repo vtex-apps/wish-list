@@ -7,5 +7,7 @@
   "store/myaccount-menu": "Lista de deseos",
   "store/myaccount-empty-list": "La tua wishlist è vuota",
   "store/wishlist-login": "Iniciar sesión",
-  "store/wishlist-not-logged": "Debe iniciar sesión antes de agregarlo a la lista"
+  "store/wishlist-not-logged": "Debe iniciar sesión antes de agregarlo a la lista",
+  "admin/settings.title": "",
+  "admin/settings.download": ""
 }
