@@ -1,7 +1,7 @@
 {
   "name": "wish-list",
   "vendor": "vtex",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "title": "Wish List",
   "description": "The Wishlist app is designed for B2C. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at /wishlist",
   "categories": [],
@@ -75,7 +75,9 @@
     },
     "free": true,
     "type": "free",
-    "availableCountries": ["*"]
+    "availableCountries": [
+      "*"
+    ]
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
