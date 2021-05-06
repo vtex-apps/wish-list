@@ -213,5 +213,51 @@
 
             Console.WriteLine($"Schema Response: {response.StatusCode}");
         }
+
+        public async Task<WishListsWrapper> GetAllLists()
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=email,ListItemsWrapper")
+            };
+
+            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            if (authToken != null)
+            {
+                request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
+            }
+
+            var client = _clientFactory.CreateClient();
+            var response = await client.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            WishListsWrapper wishListsWrapper = new WishListsWrapper();
+            wishListsWrapper.WishLists = new List<WishListWrapper>();
+            WishListWrapper responseListWrapper = new WishListWrapper();
+            try
+            {
+                JArray searchResult = JArray.Parse(responseContent);
+                for (int l = 0; l < searchResult.Count; l++)
+                {
+                    JToken listWrapper = searchResult[l];
+                    if (listWrapper != null)
+                    {
+                        responseListWrapper = JsonConvert.DeserializeObject<WishListWrapper>(listWrapper.ToString());
+                        if (responseListWrapper != null)
+                        {
+                            wishListsWrapper.WishLists.Add(responseListWrapper);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error:{ex.Message}: Rsp = {responseContent} ");
+            }
+
+            return wishListsWrapper;
+        }
     }
 }

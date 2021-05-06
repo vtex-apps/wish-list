@@ -7,5 +7,7 @@
   "store/myaccount-menu": "Wishlist",
   "store/myaccount-empty-list": "Esta lista está vazia",
   "store/wishlist-login": "Autenticar",
-  "store/wishlist-not-logged": "Você precisa se autenticar antes de adicionar um produto em sua lista"
+  "store/wishlist-not-logged": "Você precisa se autenticar antes de adicionar um produto em sua lista",
+  "admin/settings.title": "",
+  "admin/settings.download": ""
 }
