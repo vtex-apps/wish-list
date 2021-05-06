@@ -11,10 +11,8 @@ import {
   IconDownload,
 } from 'vtex.styleguide'
 import XLSX from 'xlsx'
-import { useRuntime } from 'vtex.render-runtime'
 
 const WishlistAdmin: FC<any> = ({ intl }) => {
-  const { account } = useRuntime()
   const [state, setState] = useState<any>({
     loading: false,
   })
@@ -23,7 +21,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
 
   const fetchWishlists = async (from: number, to: number) => {
     const response: any = await fetch(
-      `https://${account}.myvtex.com/_v/wishlist/export-lists?from=${from}&to=${to}`,
+      `/_v/wishlist/export-lists?from=${from}&to=${to}`,
       { mode: 'no-cors' }
     )
 
