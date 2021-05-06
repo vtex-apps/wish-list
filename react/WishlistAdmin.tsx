@@ -1,6 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { injectIntl, defineMessages } from 'react-intl'
 import {
   Layout,
@@ -14,9 +15,14 @@ import { useRuntime } from 'vtex.render-runtime'
 
 const WishlistAdmin: FC<any> = ({ intl }) => {
   const { account } = useRuntime()
+  const [state, setState] = useState<any>({
+    loading: false,
+  })
+
+  const { loading } = state
 
   const fetchWishlists = async (from: number, to: number) => {
-    const response = await fetch(
+    const response: any = await fetch(
       `https://${account}.myvtex.com/_v/wishlist/export-lists?from=${from}&to=${to}`,
       { mode: 'no-cors' }
     )
@@ -57,6 +63,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
     let status = true
     let i = 0
     const chunkLength = 100
+    setState({ ...state, loading: true })
 
     while (status) {
       await fetchWishlists(i, i + chunkLength).then(data => {
@@ -72,6 +79,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
     }
 
     downloadWishlist(allWishlists)
+    setState({ ...state, loading: false })
   }
 
   const messages = defineMessages({
@@ -98,6 +106,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
       <PageBlock variation="full">
         <ButtonWithIcon
           icon={download}
+          isLoading={loading}
           onClick={() => {
             getAllWishlists()
           }}
