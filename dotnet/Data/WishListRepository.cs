@@ -106,6 +106,8 @@
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                 request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
+            
+            request.Headers.Add("Cache-Control", "no-cache");
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
@@ -229,6 +231,8 @@
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                 request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
+            
+            request.Headers.Add("Cache-Control", "no-cache");
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
