@@ -246,26 +246,33 @@ const AddBtn: FC = () => {
       })
     }
   }
+  const checkFill = () => {
+    return (
+      wishListed.findIndex((item: string) => item === productId) !== -1 ||
+      productCheck[productId]?.isWishlisted ||
+      isWishlistPage
+    )
+  }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
-      if (isWishlistPage !== true) {
+      if (checkFill()) {
+        removeProduct({
+          variables: {
+            id: productCheck[productId].wishListId,
+            shopperId,
+            name: defaultValues.LIST_NAME,
+          },
+        })
+      } else {
         addProduct({
           variables: {
             listItem: {
               productId,
               title: product.productName,
             },
-            shopperId,
-            name: defaultValues.LIST_NAME,
-          },
-        })
-      } else {
-        removeProduct({
-          variables: {
-            id: product?.wishlistId,
             shopperId,
             name: defaultValues.LIST_NAME,
           },
@@ -294,14 +301,6 @@ const AddBtn: FC = () => {
     if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
       addWishlisted(productId)
     }
-  }
-
-  const checkFill = () => {
-    return (
-      wishListed.findIndex((item: string) => item === productId) !== -1 ||
-      productCheck[productId]?.isWishlisted ||
-      isWishlistPage
-    )
   }
 
   return (
