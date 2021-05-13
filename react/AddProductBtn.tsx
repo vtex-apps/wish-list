@@ -10,7 +10,7 @@ import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
-import { useRuntime } from 'vtex.render-runtime'
+import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 
 import { getSession } from './modules/session'
@@ -109,15 +109,13 @@ const AddBtn: FC = () => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
-    isWishlisted: false,
     isWishlistPage: null,
-    wishListId: null,
   })
 
   const [removeProduct, { loading: removeLoading }] = useMutation(
     removeFromList,
     {
-      onCompleted: (res: any) => {
+      onCompleted: () => {
         const [productId] = String(product.productId).split('-')
         if (productCheck[productId]) {
           productCheck[productId] = {
@@ -137,9 +135,7 @@ const AddBtn: FC = () => {
 
         setState({
           ...state,
-          isWishlisted: !res.removeFromList,
           isWishlistPage: false,
-          wishListId: res.removeFromList ? null : wishListId,
         })
       },
     }
@@ -151,6 +147,7 @@ const AddBtn: FC = () => {
   const sessionResponse: any = useSessionResponse()
   const [productId] = String(product.productId).split('-')
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
+
   const toastMessage = (messsageKey: string) => {
     let action: any
     if (messsageKey === 'notLogged') {
@@ -185,14 +182,8 @@ const AddBtn: FC = () => {
   const [addProduct, { loading: addLoading, error: addError }] = useMutation(
     addToList,
     {
-      onCompleted: (res: any) => {
+      onCompleted: () => {
         addWishlisted(productId)
-
-        setState({
-          ...state,
-          isWishlisted: !!res.addToList,
-          wishListId: res.addToList,
-        })
         toastMessage('productAddedToList')
       },
     }
@@ -214,7 +205,7 @@ const AddBtn: FC = () => {
     localStore.setItem('wishlist_shopperId', String(shopperId))
   }
 
-  const { isWishlisted, wishListId, isWishlistPage } = state
+  const { isWishlistPage } = state
 
   if (!product) return null
 
@@ -260,7 +251,7 @@ const AddBtn: FC = () => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
-      if (isWishlistPage !== true && !isWishlisted) {
+      if (isWishlistPage !== true) {
         addProduct({
           variables: {
             listItem: {
@@ -274,7 +265,7 @@ const AddBtn: FC = () => {
       } else {
         removeProduct({
           variables: {
-            id: product?.wishlistId ?? wishListId,
+            id: product?.wishlistId,
             shopperId,
             name: defaultValues.LIST_NAME,
           },
@@ -288,18 +279,13 @@ const AddBtn: FC = () => {
 
   if (
     data?.checkList?.inList &&
-    !wishListId &&
     (!productCheck[productId] || productCheck[productId].wishListId === null)
   ) {
     const itemWishListId = getIdFromList(
       defaultValues.LIST_NAME,
       data.checkList
     )
-    setState({
-      ...state,
-      isWishlisted: data.checkList.inList,
-      wishListId: itemWishListId,
-    })
+
     productCheck[productId] = {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
@@ -313,26 +299,27 @@ const AddBtn: FC = () => {
   const checkFill = () => {
     return (
       wishListed.findIndex((item: string) => item === productId) !== -1 ||
-      isWishlisted ||
       productCheck[productId]?.isWishlisted ||
-      (isWishlistPage && wishListId === null)
+      isWishlistPage
     )
   }
 
   return (
-    <div className={handles.wishlistIconContainer}>
-      <Button
-        variation="tertiary"
-        onClick={handleAddProductClick}
-        isLoading={loading || addLoading || removeLoading}
-      >
-        <span
-          className={`${handles.wishlistIcon} ${
-            checkFill() ? styles.fill : styles.outline
-          } ${styles.iconSize}`}
-        />
-      </Button>
-    </div>
+    <NoSSR>
+      <div className={handles.wishlistIconContainer}>
+        <Button
+          variation="tertiary"
+          onClick={handleAddProductClick}
+          isLoading={loading || addLoading || removeLoading}
+        >
+          <span
+            className={`${handles.wishlistIcon} ${
+              checkFill() ? styles.fill : styles.outline
+            } ${styles.iconSize}`}
+          />
+        </Button>
+      </div>
+    </NoSSR>
   )
 }
 
