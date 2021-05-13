@@ -61,12 +61,6 @@ const ProductSummaryList: FC = ({ children }) => {
     productsQuery,
     {
       ssr: false,
-      variables: {
-        ids: dataLists?.viewLists[0]?.data.map((item: any) => {
-          const [id] = item.productId.split('-')
-          return id
-        }),
-      },
     }
   )
 
@@ -90,7 +84,17 @@ const ProductSummaryList: FC = ({ children }) => {
   }
 
   if (!called && dataLists) {
-    loadProducts()
+    const ids = dataLists?.viewLists[0]?.data.map((item: any) => {
+      const [id] = item.productId.split('-')
+      return id
+    })
+
+    localStore.setItem('wishlist_wishlisted', JSON.stringify(ids))
+    loadProducts({
+      variables: {
+        ids,
+      },
+    })
   }
 
   const { productsByIdentifier: products } = data || {}

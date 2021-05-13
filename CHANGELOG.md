@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- At PDP, heart stays filled when changing to another product from the shelf
+
+### Added
+- No SSR
 ## [1.7.1] - 2021-05-12
 
 ### Fixed
