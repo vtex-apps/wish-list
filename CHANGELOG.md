@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Cannot remove from Wishlist immediately after adding it
 ## [1.7.3] - 2021-05-14
 
 ### Fixed

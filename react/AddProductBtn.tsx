@@ -182,7 +182,11 @@ const AddBtn: FC = () => {
   const [addProduct, { loading: addLoading, error: addError }] = useMutation(
     addToList,
     {
-      onCompleted: () => {
+      onCompleted: (res: any) => {
+        productCheck[productId] = {
+          wishListId: res.addToList,
+          isWishlisted: true,
+        }
         addWishlisted(productId)
         toastMessage('productAddedToList')
       },
