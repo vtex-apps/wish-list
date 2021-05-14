@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.7.3] - 2021-05-14
+
 ### Fixed
 - Cannot remove from Wishlist
 ## [1.7.2] - 2021-05-13
