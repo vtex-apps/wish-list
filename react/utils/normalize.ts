@@ -86,6 +86,17 @@ export function mapCatalogProductToProductSummary(
     wishlistId,
   }
   const items = normalizedProduct.items || []
+
+  items.forEach((eachSku: any, skuIndex: number) => {
+    eachSku.sellers.forEach((eachSeller: any, sellerIndex: number) => {
+      const skuSpotPrice = eachSeller.commertialOffer.spotPrice
+      const skuPrice = eachSeller.commertialOffer.Price
+      if (skuSpotPrice && skuSpotPrice === skuPrice) {
+        delete items[skuIndex].sellers[sellerIndex].commertialOffer.spotPrice
+      }
+    })
+  })
+
   const sku = items.find(findAvailableProduct) || items[0]
   if (sku) {
     const [seller = defaultSeller] = sku.sellers ?? []

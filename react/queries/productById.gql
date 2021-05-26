@@ -118,6 +118,7 @@ query productsByIdentifier($ids: [ID!]) {
             Name
           }
           AvailableQuantity
+          spotPrice
           Price
           PriceWithoutDiscount
           ListPrice
