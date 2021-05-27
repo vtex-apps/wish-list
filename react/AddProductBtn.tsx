@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, {
   FC,
@@ -145,8 +146,9 @@ const AddBtn: FC = () => {
   const { showToast } = useContext(ToastContext)
   const { product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
-  const [productId] = String(product.productId).split('-')
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
+
+  const [productId] = String(product?.productId).split('-')
 
   const toastMessage = (messsageKey: string) => {
     let action: any
