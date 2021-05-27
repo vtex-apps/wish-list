@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Spotprice not showing up
+- Error when the component loads before the content exists at the PDP
 ## [1.7.4] - 2021-05-14
 
 ### Fixed
