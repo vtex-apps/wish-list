@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.7.6] - 2021-05-28
+
 ### Fixed
 
 - Changed search to scroll when getting all records.
