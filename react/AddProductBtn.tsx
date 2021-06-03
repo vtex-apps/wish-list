@@ -209,6 +209,11 @@ const AddBtn: FC = () => {
       JSON.stringify(isAuthenticated)
     )
     localStore.setItem('wishlist_shopperId', String(shopperId))
+    if (!isAuthenticated && !shopperId) {
+      if (localStore.getItem('wishlist_wishlisted')) {
+        localStore.removeItem('wishlist_wishlisted',)
+      }
+    }
   }
 
   const { isWishlistPage } = state
@@ -254,9 +259,10 @@ const AddBtn: FC = () => {
   }
   const checkFill = () => {
     return (
-      wishListed.findIndex((item: string) => item === productId) !== -1 ||
+      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === "false" ? false :
+      (wishListed.findIndex((item: string) => item === productId) !== -1 ||
       productCheck[productId]?.isWishlisted ||
-      isWishlistPage
+      isWishlistPage)
     )
   }
 
