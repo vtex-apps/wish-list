@@ -313,6 +313,13 @@ const AddBtn: FC = () => {
     if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
       addWishlisted(productId)
     }
+  } else if (
+    data?.checkList?.inList === false &&
+    wishListed.length !== 0 && wishListed.indexOf(productId) !== -1
+  ) {
+    const indexWishListed = wishListed.indexOf(productId)
+    wishListed.splice(indexWishListed, 1);
+    localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
   }
 
   return (
