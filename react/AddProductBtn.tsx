@@ -24,6 +24,10 @@ import styles from './styles.css'
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
+interface AddBtnProps {
+  toastURL: string
+}
+
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
 let shopperId = localStore.getItem('wishlist_shopperId') ?? null
@@ -106,7 +110,8 @@ const addWishlisted = (productId: any) => {
   localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
 }
 
-const AddBtn: FC = () => {
+
+const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
@@ -150,7 +155,7 @@ const AddBtn: FC = () => {
 
   const [productId] = String(product?.productId).split('-')
 
-  const toastMessage = (messsageKey: string) => {
+  const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
     if (messsageKey === 'notLogged') {
       action = {
@@ -169,7 +174,7 @@ const AddBtn: FC = () => {
         label: intl.formatMessage(messages.seeLists),
         onClick: () =>
           navigate({
-            to: '/account/#wishlist',
+            to: linkWishlist,
             fetchPage: true,
           }),
       }
@@ -190,13 +195,13 @@ const AddBtn: FC = () => {
           isWishlisted: true,
         }
         addWishlisted(productId)
-        toastMessage('productAddedToList')
+        toastMessage('productAddedToList', toastURL)
       },
     }
   )
 
   if (addError) {
-    toastMessage('addProductFail')
+    toastMessage('addProductFail', toastURL)
   }
 
   if (sessionResponse) {
@@ -332,6 +337,17 @@ const AddBtn: FC = () => {
       </div>
     </NoSSR>
   )
+}
+
+AddBtn.schema = {
+  title: 'Toast Link',
+  type: 'object',
+  properties: {
+    toastURL: {
+      title: 'Toast Link',
+      type: 'string',
+    },
+  }
 }
 
 export default AddBtn
