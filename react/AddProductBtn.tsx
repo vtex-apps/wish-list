@@ -7,6 +7,7 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from 'react'
+import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
@@ -24,7 +25,7 @@ import styles from './styles.css'
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
-interface AddBtnProps {
+type AddBtnProps = {
   toastURL: string
 }
 
@@ -297,7 +298,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
       }
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
-      toastMessage('notLogged')
+      toastMessage('notLogged',toastURL)
     }
   }
 
@@ -339,15 +340,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
   )
 }
 
-AddBtn.schema = {
-  title: 'Toast Link',
-  type: 'object',
-  properties: {
-    toastURL: {
-      title: 'Toast Link',
-      type: 'string',
-    },
-  }
+AddBtn.propTypes = {
+  toastURL: PropTypes.string.isRequired,
 }
 
 export default AddBtn
