@@ -112,8 +112,7 @@ const addWishlisted = (productId: any) => {
   localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
 }
 
-
-const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
+const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
@@ -219,7 +218,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     localStore.setItem('wishlist_shopperId', String(shopperId))
     if (!isAuthenticated && !shopperId) {
       if (localStore.getItem('wishlist_wishlisted')) {
-        localStore.removeItem('wishlist_wishlisted',)
+        localStore.removeItem('wishlist_wishlisted')
       }
     }
   }
@@ -266,12 +265,12 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     }
   }
   const checkFill = () => {
-    return (
-      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === "false" ? false :
-      (wishListed.findIndex((item: string) => item === productId) !== -1 ||
-      productCheck[productId]?.isWishlisted ||
-      isWishlistPage)
-    )
+    return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
+      'false'
+      ? false
+      : wishListed.findIndex((item: string) => item === productId) !== -1 ||
+          productCheck[productId]?.isWishlisted ||
+          isWishlistPage
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
@@ -314,7 +313,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
       push(pixelEvent)
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
-      toastMessage('notLogged',toastURL)
+      toastMessage('notLogged', toastURL)
     }
   }
 
@@ -337,7 +336,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     }
   } else if (
     data?.checkList?.inList === false &&
-    wishListed.length !== 0 && wishListed.indexOf(productId) !== -1
+    wishListed.length !== 0 &&
+    wishListed.indexOf(productId) !== -1
   ) {
     const indexWishListed = wishListed.indexOf(productId)
     wishListed.splice(indexWishListed, 1)

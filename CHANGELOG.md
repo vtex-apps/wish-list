@@ -70,6 +70,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.7.9] - 2021-06-08
 
+### Added
+- prop `toastURL` to component AddBtn with default value '/account/#wishlist'
 ## [1.7.8] - 2021-06-08
 
 ### Fixed
