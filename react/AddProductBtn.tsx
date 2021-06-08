@@ -7,6 +7,7 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from 'react'
+import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
@@ -23,6 +24,10 @@ import styles from './styles.css'
 
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
+
+type AddBtnProps = {
+  toastURL: string
+}
 
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
@@ -106,7 +111,8 @@ const addWishlisted = (productId: any) => {
   localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
 }
 
-const AddBtn: FC = () => {
+
+const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
@@ -150,7 +156,7 @@ const AddBtn: FC = () => {
 
   const [productId] = String(product?.productId).split('-')
 
-  const toastMessage = (messsageKey: string) => {
+  const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
     if (messsageKey === 'notLogged') {
       action = {
@@ -169,7 +175,7 @@ const AddBtn: FC = () => {
         label: intl.formatMessage(messages.seeLists),
         onClick: () =>
           navigate({
-            to: '/account/#wishlist',
+            to: linkWishlist,
             fetchPage: true,
           }),
       }
@@ -190,13 +196,13 @@ const AddBtn: FC = () => {
           isWishlisted: true,
         }
         addWishlisted(productId)
-        toastMessage('productAddedToList')
+        toastMessage('productAddedToList', toastURL)
       },
     }
   )
 
   if (addError) {
-    toastMessage('addProductFail')
+    toastMessage('addProductFail', toastURL)
   }
 
   if (sessionResponse) {
@@ -292,7 +298,7 @@ const AddBtn: FC = () => {
       }
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
-      toastMessage('notLogged')
+      toastMessage('notLogged',toastURL)
     }
   }
 
@@ -339,6 +345,10 @@ const AddBtn: FC = () => {
       </div>
     </NoSSR>
   )
+}
+
+AddBtn.propTypes = {
+  toastURL: PropTypes.string.isRequired,
 }
 
 export default AddBtn
