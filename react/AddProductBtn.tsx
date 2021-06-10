@@ -144,7 +144,7 @@ const AddBtn: FC = () => {
   const { navigate, history } = useRuntime()
   const handles = useCssHandles(CSS_HANDLES)
   const { showToast } = useContext(ToastContext)
-  const { product } = useContext(ProductContext) as any
+  const { selectedItem, product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
@@ -284,6 +284,7 @@ const AddBtn: FC = () => {
             listItem: {
               productId,
               title: product.productName,
+              sku: selectedItem.itemId
             },
             shopperId,
             name: defaultValues.LIST_NAME,

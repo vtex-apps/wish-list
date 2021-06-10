@@ -107,11 +107,21 @@ const ProductSummaryList: FC = ({ children }) => {
         return itemId === id
       })?.id
     }
-    const componentList = products?.map((product: any) => {
+    const componentList = products?.map((product: any, index: any) => {
+      const sku = dataLists?.viewLists[0]?.data[index]?.sku
+      const items = data?.productsByIdentifier[index]?.items
+
       const normalizedProduct = mapCatalogProductToProductSummary(
         product,
         getWishlistId(product.productId)
       )
+      if (sku && items.length) {
+        for (const item of items) {
+          if (item.itemId === sku) {
+            normalizedProduct.sku.image = item.images[0]
+          }
+        }
+      }
       return (
         <ExtensionPoint
           id="product-summary"

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Wishlist displays cortect sku variation
+
 ## [1.7.7] - 2021-06-03
 
 ### Fixed
