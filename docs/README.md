@@ -159,6 +159,23 @@ If you want to configure the layout without the `slider-layout` dependency, you 
 | :-------: | :------: | :---------------------------------------------------------: | :-----------: |
 |  `label`  | `string` | Change the label for the section menu under My Account page |  `Wishlist`   |
 
+
+## Custom toast URL
+Change the link of toast message
+
+````` json
+{
+  "add-to-list-btn#myButton": {
+    "props": {
+      "toastURL": "/wishlist"
+    }
+  }
+}
+`````
+| Prop name |   Type   |                         Description                         | Default value |
+| :-------: | :------: | :---------------------------------------------------------: | :-----------: |
+|  `toastURL`  | `string` | Change the link of toast message |  `/account/#wishlist'`   |
+
 ## Customization
 
 In order to apply CSS customizations to this and other blocks, follow the instructions given in the recipe on [Using CSS Handles for store customization](https://vtex.io/docs/recipes/style/using-css-handles-for-store-customization).

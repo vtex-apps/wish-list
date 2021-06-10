@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Wishlist displays cortect sku variation
 
+## [1.7.9] - 2021-06-08
+
+## [1.7.8] - 2021-06-08
+
+### Fixed
+- Occasionally when trying to remove a product from the wish list it doesn't work.
+
 ## [1.7.7] - 2021-06-03
 
 ### Fixed
