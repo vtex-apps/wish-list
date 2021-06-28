@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Feature
+
+- Custom view in case you do not add any produtc to the wish list
+
 ## [1.7.10] - 2021-06-10
 
 ### Fixed
