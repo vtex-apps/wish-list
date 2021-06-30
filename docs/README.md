@@ -176,6 +176,39 @@ Change the link of toast message
 | :-------: | :------: | :---------------------------------------------------------: | :-----------: |
 |  `toastURL`  | `string` | Change the link of toast message |  `/account/#wishlist'`   |
 
+## Custom View Wishlist Empty
+Show custom view in case there are no added products.
+
+`````diff
+{
+  "list-context.wishlist": {
++    "blocks": ["wishlist-empty-list", "product-summary.shelf#wishlist"],
+    "children": ["slider-layout#wishlist"],
+    "props": {
+      "showViewEmptyList": true
+    }
+  },
+  "wishlist-empty-list": {
+    "children": [
+      "rich-text#description"
+    ]
+  },
+  "rich-text#description": {
+    "props": {
+      "text": "### There are no products",
+      "textAlignment": "CENTER",
+      "textPosition": "CENTER",
+      "font": "t-heading-2"
+    }
+  },
+}
+`````
+
+#### `list-context.wishlist` props
+| Prop name |   Type   |                         Description                         | Default value |
+| :-------: | :------: | :---------------------------------------------------------: | :-----------: |
+|  `showViewEmptyList`  | `boolean` | Show custom view in case there are no added products. |  `false`   |
+
 ## Customization
 
 In order to apply CSS customizations to this and other blocks, follow the instructions given in the recipe on [Using CSS Handles for store customization](https://vtex.io/docs/recipes/style/using-css-handles-for-store-customization).

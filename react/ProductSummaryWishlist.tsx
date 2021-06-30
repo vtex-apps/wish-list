@@ -1,22 +1,20 @@
 import React, { useMemo, useState, useEffect, FC } from 'react'
 import { useLazyQuery } from 'react-apollo'
-import { FormattedMessage } from 'react-intl'
 // @ts-expect-error - useTreePath is a private API
 import { ExtensionPoint, useRuntime, useTreePath } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
 import { ProductListContext } from 'vtex.product-list-context'
 import { Spinner } from 'vtex.styleguide'
-import { useCssHandles } from 'vtex.css-handles'
 
 import { mapCatalogProductToProductSummary } from './utils/normalize'
 import ProductListEventCaller from './components/ProductListEventCaller'
 import productsQuery from './queries/productById.gql'
 import ViewLists from './queries/viewLists.gql'
 import { getSession } from './modules/session'
-import storageFactory from './utils/storage'
+import storageFactory from './utils/storage';
+import { FormattedMessage } from 'react-intl'
 
 const localStore = storageFactory(() => localStorage)
-const CSS_HANDLES = ['emptyMessage'] as const
 
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
@@ -41,11 +39,18 @@ const useSessionResponse = () => {
   return session
 }
 
-const ProductSummaryList: FC = ({ children }) => {
+interface ProductSummaryProps {
+  children?: any,
+  showViewEmptyList?: boolean
+}
+
+const ProductSummaryList: FC<ProductSummaryProps> = ({ 
+  children,
+  showViewEmptyList = false
+}) => {
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
   const { navigate, history } = useRuntime()
-  const handles = useCssHandles(CSS_HANDLES)
 
   const sessionResponse: any = useSessionResponse()
 
@@ -150,11 +155,15 @@ const ProductSummaryList: FC = ({ children }) => {
   }
 
   if (listCalled && !listLoading && !dataLists?.viewLists[0]?.data?.length) {
-    return (
-      <div className={`ml5 ${handles.emptyMessage}`}>
-        <FormattedMessage id="store/myaccount-empty-list" />
-      </div>
-    )
+    if (showViewEmptyList) {
+      return (
+        <ExtensionPoint
+          id="wishlist-empty-list"
+        />
+      )
+    } else {
+      return <FormattedMessage id="store/myaccount-empty-list" />
+    }
   }
 
   return (
@@ -164,11 +173,14 @@ const ProductSummaryList: FC = ({ children }) => {
   )
 }
 
-const EnhancedProductList: FC = ({ children }) => {
+const EnhancedProductList: FC<ProductSummaryProps> = props => {
+  const { children, showViewEmptyList } = props;
   const { ProductListProvider } = ProductListContext
   return (
     <ProductListProvider listName="wishlist">
-      <ProductSummaryList>{children}</ProductSummaryList>
+      <ProductSummaryList showViewEmptyList={showViewEmptyList}>
+        {children}
+      </ProductSummaryList>
       <ProductListEventCaller />
     </ProductListProvider>
   )
