@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.7.11] - 2021-06-30
+
 ### Feature
 
 - Custom view in case you do not add any produtc to the wish list
