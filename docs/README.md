@@ -179,10 +179,10 @@ Change the link of toast message
 ## Custom View Wishlist Empty
 Show custom view in case there are no added products.
 
-````` json
+`````diff
 {
   "list-context.wishlist": {
-    "blocks": ["wishlist-empty-list", "product-summary.shelf#wishlist"],
++    "blocks": ["wishlist-empty-list", "product-summary.shelf#wishlist"],
     "children": ["slider-layout#wishlist"],
     "props": {
       "showViewEmptyList": true
