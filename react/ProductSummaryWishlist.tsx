@@ -11,7 +11,8 @@ import ProductListEventCaller from './components/ProductListEventCaller'
 import productsQuery from './queries/productById.gql'
 import ViewLists from './queries/viewLists.gql'
 import { getSession } from './modules/session'
-import storageFactory from './utils/storage'
+import storageFactory from './utils/storage';
+import { FormattedMessage } from 'react-intl'
 
 const localStore = storageFactory(() => localStorage)
 
@@ -38,7 +39,15 @@ const useSessionResponse = () => {
   return session
 }
 
-const ProductSummaryList: FC = ({ children }) => {
+interface ProductSummaryProps {
+  children?: any,
+  showViewEmptyList?: boolean
+}
+
+const ProductSummaryList: FC<ProductSummaryProps> = ({ 
+  children,
+  showViewEmptyList = false
+}) => {
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
   const { navigate, history } = useRuntime()
@@ -146,11 +155,15 @@ const ProductSummaryList: FC = ({ children }) => {
   }
 
   if (listCalled && !listLoading && !dataLists?.viewLists[0]?.data?.length) {
-    return (
-      <ExtensionPoint
-        id="wishlist-empty-list"
-      />
-    )
+    if (showViewEmptyList) {
+      return (
+        <ExtensionPoint
+          id="wishlist-empty-list"
+        />
+      )
+    } else {
+      return <FormattedMessage id="store/myaccount-empty-list" />
+    }
   }
 
   return (
@@ -160,11 +173,14 @@ const ProductSummaryList: FC = ({ children }) => {
   )
 }
 
-const EnhancedProductList: FC = ({ children }) => {
+const EnhancedProductList: FC<ProductSummaryProps> = props => {
+  const { children, showViewEmptyList } = props;
   const { ProductListProvider } = ProductListContext
   return (
     <ProductListProvider listName="wishlist">
-      <ProductSummaryList>{children}</ProductSummaryList>
+      <ProductSummaryList showViewEmptyList={showViewEmptyList}>
+        {children}
+      </ProductSummaryList>
       <ProductListEventCaller />
     </ProductListProvider>
   )
