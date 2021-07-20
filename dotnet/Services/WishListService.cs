@@ -45,7 +45,6 @@ namespace WishList.Services
             }
             else
             {
-                Console.WriteLine("GetList Null/Empty - Retrying");
                 wishListWrapper = await _wishListRepository.GetWishList(shopperId);
                 if (wishListWrapper != null && wishListWrapper.ListItemsWrapper != null)
                 {
@@ -137,18 +136,14 @@ namespace WishList.Services
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
-            Console.WriteLine(" REMOVE");
             bool wasRemoved = false;
             IList<ListItem> listItemsToSave = null;
             WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
-            //Console.WriteLine($"->{wishListWrapper.ListItemsWrapper.Count}");
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
-            //Console.WriteLine($"->{listItemsWrapper.ListItems.Count}");
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
                 ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
-                //Console.WriteLine($"->{itemToRemove != null}");
                 if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
                 {
                     wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
@@ -164,7 +159,6 @@ namespace WishList.Services
             if (to > 0)
             {
                 take = Math.Min((to - from) + 1, MaximumReturnedRecords);
-                //Console.WriteLine($"    >>>>>>>>>>>>>>>>>  Take {take} reviews {from}-{to}");
             }
 
             listItems = listItems.Skip(from - 1).Take(take).ToList();
