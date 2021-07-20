@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.7.12] - 2021-07-20
+
 ### Fixed
 - Added policy to fix inability to apply db schema
 - Removed Console writes
