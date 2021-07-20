@@ -83,7 +83,6 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Save:{response.StatusCode} Id:{documentId}");
 
             return response.IsSuccessStatusCode;
         }
@@ -112,7 +111,7 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Get:{response.StatusCode} ");
+            
             ResponseListWrapper responseListWrapper = new ResponseListWrapper();
             try
             {
@@ -134,7 +133,6 @@
             catch(Exception ex)
             {
                 responseListWrapper.message = $"Error:{ex.Message}: Rsp = {responseContent} ";
-                Console.WriteLine($"Error:{ex.Message}: Rsp = {responseContent} ");
             }
 
             if (!response.IsSuccessStatusCode)
@@ -166,14 +164,12 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Delete:{response.StatusCode} Id:{documentId}");
 
             return response.IsSuccessStatusCode;
         }
 
         public async Task VerifySchema()
         {
-            //Console.WriteLine("Verifing Schema");
             // https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/schemas/{{schema_name}}
             var request = new HttpRequestMessage
             {
@@ -192,10 +188,9 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-
-            if(response.IsSuccessStatusCode && !responseContent.Equals(WishListConstants.SCHEMA_JSON))
+            
+            if (response.IsSuccessStatusCode && !responseContent.Equals(WishListConstants.SCHEMA_JSON))
             {
-                Console.WriteLine("--------------- Applying Schema ---------------");
                 request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Put,
@@ -211,9 +206,8 @@
                 }
 
                 response = await client.SendAsync(request);
+                responseContent = await response.Content.ReadAsStringAsync();
             }
-
-            Console.WriteLine($"Schema Response: {response.StatusCode}");
         }
 
         public async Task<WishListsWrapper> GetAllLists()

@@ -27,7 +27,6 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ViewList [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
@@ -46,7 +45,6 @@ namespace WishList.GraphQL
                             if (from > 0 && to > 0)
                             {
                                 resultList = await wishListService.LimitList(resultList, from, to);
-                                Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
                             }
 
                             // Normalize Title field
@@ -85,7 +83,6 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ViewLists [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
@@ -107,7 +104,6 @@ namespace WishList.GraphQL
                                     if (from > 0 && to > 0)
                                     {
                                         resultList = await wishListService.LimitList(resultList, from, to);
-                                        Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
                                     }
 
                                     // Normalize Title field
@@ -150,7 +146,6 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] CheckList [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
@@ -162,17 +157,6 @@ namespace WishList.GraphQL
                     {
                         foreach (ListItemsWrapper listItemsWrapper in resultListWrapper.ListItemsWrapper)
                         {
-                            //Console.WriteLine($"[{resultListWrapper.ListItemsWrapper.Count}] Name = {listItemsWrapper.Name} [{listItemsWrapper.ListItems.Count}]");
-                            //foreach(ListItem item in listItemsWrapper.ListItems)
-                            //{
-                            //    Console.WriteLine($"[{item.Id}] '{item.ProductId}' = {productId}? {item.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)}");
-                            //}
-
-                            //if (listItemsWrapper.ListItems.Any(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)))
-                            //{
-                            //    namesList.Add(listItemsWrapper.Name);
-                            //}
-
                             ListItem listItem = new ListItem();
                             if (!string.IsNullOrEmpty(sku))
                             {
@@ -209,8 +193,6 @@ namespace WishList.GraphQL
                         };
                     }
 
-                    //Console.WriteLine($"[-] CheckList Response {JsonConvert.SerializeObject(checkListResponse)} [-]");
-
                     return checkListResponse;
                 }
             );
@@ -222,7 +204,6 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ListNames [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
                     IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;

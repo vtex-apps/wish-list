@@ -43,18 +43,6 @@
   },
   "policies": [
     {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "bnb.data.bl.uk"
-      }
-    },
-    {
-      "name": "outbound-access",
-      "attrs": {
-        "host": "nuget.org"
-      }
-    },
-    {
       "name": "ADMIN_DS"
     },
     {
@@ -66,6 +54,9 @@
     },
     {
       "name": "vbase-read-write"
+    },
+    {
+      "name": "POWER_USER_DS"
     }
   ],
   "billingOptions": {
