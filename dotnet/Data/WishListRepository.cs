@@ -12,6 +12,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using System.Web;
+    using Vtex.Api.Context;
 
     /// <summary>
     /// Concrete implementation of <see cref="IWishListRepository"/> for persisting data to/from Masterdata v2.
@@ -21,10 +22,11 @@
         private readonly IVtexEnvironmentVariableProvider _environmentVariableProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly IIOServiceContext _context;
         private readonly string _applicationName;
 
 
-        public WishListRepository(IVtexEnvironmentVariableProvider environmentVariableProvider, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory)
+        public WishListRepository(IVtexEnvironmentVariableProvider environmentVariableProvider, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context)
         {
             this._environmentVariableProvider = environmentVariableProvider ??
                                                 throw new ArgumentNullException(nameof(environmentVariableProvider));
@@ -34,6 +36,9 @@
 
             this._clientFactory = clientFactory ??
                                throw new ArgumentNullException(nameof(clientFactory));
+
+            this._context = context ??
+                               throw new ArgumentNullException(nameof(context));
 
             this._applicationName =
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
@@ -133,6 +138,7 @@
             catch(Exception ex)
             {
                 responseListWrapper.message = $"Error:{ex.Message}: Rsp = {responseContent} ";
+                _context.Vtex.Logger.Error("GetWishList", null, $"Error getting list for {shopperId}", ex);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -188,7 +194,7 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            
+            _context.Vtex.Logger.Debug("VerifySchema", null, $"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
             if (response.IsSuccessStatusCode && !responseContent.Equals(WishListConstants.SCHEMA_JSON))
             {
                 request = new HttpRequestMessage
@@ -207,6 +213,7 @@
 
                 response = await client.SendAsync(request);
                 responseContent = await response.Content.ReadAsStringAsync();
+                _context.Vtex.Logger.Debug("VerifySchema", null, $"Applying Schema [{response.StatusCode}] {responseContent}");
             }
         }
 
@@ -252,7 +259,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error:{ex.Message}: Rsp = {responseContent} ");
+                _context.Vtex.Logger.Error("GetAllLists", null, "Error getting lists", ex);
             }
 
             return wishListsWrapper;
