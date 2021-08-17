@@ -8,6 +8,7 @@
   "store/myaccount-empty-list": "La tua wishlist è vuota",
   "store/wishlist-login": "Iniciar sesión",
   "store/wishlist-not-logged": "Debe iniciar sesión antes de agregarlo a la lista",
-  "admin/settings.title": "",
-  "admin/settings.download": ""
+  "admin/wishlist.menu.label": "Wishlist",
+  "admin/settings.title": "Wishlist Export",
+  "admin/settings.download": "Download Wishlists"
 }
