@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Add to the list",
+  "store/wishlist-see-lists": "See lists",
+  "store/wishlist-product-added-to-list": "Product added to the list",
+  "store/wishlist-add-product-fail": "Couln't add product to the list",
+  "store/wishlist-default-list-name": "Wishlist",
+  "store/myaccount-menu": "Wishlist",
+  "store/myaccount-empty-list": "This list is empty",
+  "store/wishlist-login": "Login",
+  "store/wishlist-not-logged": "You need to login before adding it to the list",
+  "admin/wishlist.menu.label": "Wishlist",
+  "admin/settings.title": "Wishlist Export",
+  "admin/settings.download": "Download Wishlists"
+}
