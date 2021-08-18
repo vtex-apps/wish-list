@@ -1,7 +1,7 @@
 {
   "name": "wish-list",
   "vendor": "vtex",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "title": "Wish List",
   "description": "The Wishlist app is designed for B2C. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at /wishlist",
   "categories": [],
