@@ -195,10 +195,11 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
+            //Console.WriteLine($"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
             _context.Vtex.Logger.Debug("VerifySchema", null, $"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
             if (response.IsSuccessStatusCode)
             {
-                if (responseContent.Equals(WishListConstants.SCHEMA_JSON))
+                if (!responseContent.Equals(WishListConstants.SCHEMA_JSON))
                 {
                     _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
                 }
@@ -212,15 +213,17 @@
                         Content = new StringContent(WishListConstants.SCHEMA_JSON, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
                     };
 
-                    if (authToken != null)
-                    {
+                    authToken = _context.Vtex.AdminUserAuthToken;
+                    //if (authToken != null)
+                    //{
                         request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
                         request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                         request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
-                    }
+                    //}
 
                     response = await client.SendAsync(request);
                     responseContent = await response.Content.ReadAsStringAsync();
+                    //Console.WriteLine($"Applying Schema [{response.StatusCode}] {responseContent}");
                     _context.Vtex.Logger.Debug("VerifySchema", null, $"Applying Schema [{response.StatusCode}] {responseContent}");
                 }
             }

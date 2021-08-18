@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Use context.Vtex.AdminUserAuthToken when creating schema
+
 ## [1.8.0] - 2021-08-18
 
 ### Added
