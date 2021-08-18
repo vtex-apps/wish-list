@@ -43,7 +43,7 @@
             this._applicationName =
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
 
-            this.VerifySchema();
+            this.VerifySchema().Wait();
         }
 
         public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId)
