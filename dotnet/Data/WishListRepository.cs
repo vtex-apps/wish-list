@@ -199,7 +199,7 @@
             _context.Vtex.Logger.Debug("VerifySchema", null, $"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
             if (response.IsSuccessStatusCode)
             {
-                if (!responseContent.Equals(WishListConstants.SCHEMA_JSON))
+                if (responseContent.Equals(WishListConstants.SCHEMA_JSON))
                 {
                     _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
                 }
