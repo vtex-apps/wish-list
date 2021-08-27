@@ -278,6 +278,15 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
+      let pixelEvent: any = {
+        list: route?.canonicalPath?.replace('/', ''),
+        items: {
+          product,
+          selectedItem,
+          account
+        }
+      }
+
       if (checkFill()) {
         removeProduct({
           variables: {
@@ -286,6 +295,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
             name: defaultValues.LIST_NAME,
           },
         })
+        pixelEvent.event = 'removeToWishlist'
       } else {
         addProduct({
           variables: {
@@ -298,19 +308,10 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
             name: defaultValues.LIST_NAME,
           },
         })
-
-        const pixelEvent = {
-          event: 'addToWishlist',
-          list: route?.canonicalPath?.replace('/', ''),
-          items: {
-            product,
-            selectedItem,
-            account
-          }
-        }
-
-        push(pixelEvent)
+        pixelEvent.event = 'addToWishlist'
       }
+      
+      push(pixelEvent)
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
       toastMessage('notLogged',toastURL)
