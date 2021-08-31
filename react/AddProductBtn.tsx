@@ -14,6 +14,7 @@ import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
 import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
+import { usePixel } from 'vtex.pixel-manager'
 
 import { getSession } from './modules/session'
 import storageFactory from './utils/storage'
@@ -147,7 +148,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
       },
     }
   )
-  const { navigate, history } = useRuntime()
+  const { navigate, history, route, account } = useRuntime()
+  const { push } = usePixel()
   const handles = useCssHandles(CSS_HANDLES)
   const { showToast } = useContext(ToastContext)
   const { selectedItem, product } = useContext(ProductContext) as any
@@ -276,6 +278,15 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
+      const pixelEvent: any = {
+        list: route?.canonicalPath?.replace('/', ''),
+        items: {
+          product,
+          selectedItem,
+          account
+        }
+      }
+
       if (checkFill()) {
         removeProduct({
           variables: {
@@ -284,6 +295,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
             name: defaultValues.LIST_NAME,
           },
         })
+        pixelEvent.event = 'removeToWishlist'
       } else {
         addProduct({
           variables: {
@@ -296,7 +308,10 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
             name: defaultValues.LIST_NAME,
           },
         })
+        pixelEvent.event = 'addToWishlist'
       }
+      
+      push(pixelEvent)
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
       toastMessage('notLogged',toastURL)
@@ -325,7 +340,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     wishListed.length !== 0 && wishListed.indexOf(productId) !== -1
   ) {
     const indexWishListed = wishListed.indexOf(productId)
-    wishListed.splice(indexWishListed, 1);
+    wishListed.splice(indexWishListed, 1)
     localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
   }
 
