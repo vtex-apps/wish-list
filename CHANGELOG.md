@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Feature
 - Add pixel in AddProductBtn and removeProductBtn
+## [1.8.3] - 2021-08-31
 
 ## [1.8.2] - 2021-08-18
 
