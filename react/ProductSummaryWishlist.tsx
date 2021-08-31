@@ -151,6 +151,13 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
   }
 
   if (!dataLists || !data || error) {
+    if (error && error?.message?.includes('products') && showViewEmptyList) {
+      return (
+        <ExtensionPoint
+          id="wishlist-empty-list"
+        />
+      )
+    }
     return null
   }
 
