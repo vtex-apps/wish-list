@@ -278,7 +278,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     e.preventDefault()
     e.stopPropagation()
     if (isAuthenticated) {
-      let pixelEvent: any = {
+      const pixelEvent: any = {
         list: route?.canonicalPath?.replace('/', ''),
         items: {
           product,
