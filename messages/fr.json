@@ -1,14 +1,14 @@
 {
-  "store/wishlist.addButton": "Add to the list",
-  "store/wishlist-see-lists": "See lists",
-  "store/wishlist-product-added-to-list": "Product added to the list",
-  "store/wishlist-add-product-fail": "Couln't add product to the list",
-  "store/wishlist-default-list-name": "Wishlist",
-  "store/myaccount-menu": "Wishlist",
-  "store/myaccount-empty-list": "This list is empty",
-  "store/wishlist-login": "Login",
-  "store/wishlist-not-logged": "You need to login before adding it to the list",
-  "admin/wishlist.menu.label": "Wishlist",
-  "admin/settings.title": "Wishlist Export",
-  "admin/settings.download": "Download Wishlists"
+  "store/wishlist.addButton": "Ajouter à la liste",
+  "store/wishlist-see-lists": "Afficher les listes",
+  "store/wishlist-product-added-to-list": "Produit ajouté à la liste",
+  "store/wishlist-add-product-fail": "Impossible d'ajouter le produit à la liste",
+  "store/wishlist-default-list-name": "Liste de préférences",
+  "store/myaccount-menu": "Liste de préférences",
+  "store/myaccount-empty-list": "Cette liste est vide",
+  "store/wishlist-login": "Se connecter",
+  "store/wishlist-not-logged": "Vous devez vous connecter avant de faire un ajout dans la liste",
+  "admin/wishlist.menu.label": "Liste de préférences",
+  "admin/settings.title": "Exportation de la liste de préférences",
+  "admin/settings.download": "Télécharger les listes de préférences"
 }
