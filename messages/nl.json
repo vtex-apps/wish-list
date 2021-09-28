@@ -1,14 +1,14 @@
 {
-  "store/wishlist.addButton": "Add to the list",
-  "store/wishlist-see-lists": "See lists",
-  "store/wishlist-product-added-to-list": "Product added to the list",
-  "store/wishlist-add-product-fail": "Couln't add product to the list",
-  "store/wishlist-default-list-name": "Wishlist",
-  "store/myaccount-menu": "Wishlist",
-  "store/myaccount-empty-list": "This list is empty",
-  "store/wishlist-login": "Login",
-  "store/wishlist-not-logged": "You need to login before adding it to the list",
-  "admin/wishlist.menu.label": "Wishlist",
-  "admin/settings.title": "Wishlist Export",
-  "admin/settings.download": "Download Wishlists"
+  "store/wishlist.addButton": "Toevoegen aan de lijst",
+  "store/wishlist-see-lists": "Zie lijsten",
+  "store/wishlist-product-added-to-list": "Product toegevoegd aan de lijst",
+  "store/wishlist-add-product-fail": "Kan product niet toevoegen aan de lijst",
+  "store/wishlist-default-list-name": "Verlanglijst",
+  "store/myaccount-menu": "Verlanglijst",
+  "store/myaccount-empty-list": "De lijst is leeg",
+  "store/wishlist-login": "Inloggen",
+  "store/wishlist-not-logged": "U moet inloggen voordat u het aan de lijst kunt toevoegen",
+  "admin/wishlist.menu.label": "Verlanglijst",
+  "admin/settings.title": "Wishlist exporteren",
+  "admin/settings.download": "Wishlists downloaden"
 }
