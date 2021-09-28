@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Fixed
-- I18n en, es, fr, it, ja, ko, nl and ro
+- I18n en, es, fr, it, ja, ko, nl, pt and ro
 
 ## [1.9.0] - 2021-08-31
 
