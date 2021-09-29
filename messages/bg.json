@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Добавяне към списъка",
+  "store/wishlist-see-lists": "Вижте списъците",
+  "store/wishlist-product-added-to-list": "Продуктът е добавен към списъка",
+  "store/wishlist-add-product-fail": "Продуктът не можа да бъде добавен към списъка",
+  "store/wishlist-default-list-name": "Списък с желания",
+  "store/myaccount-menu": "Списък с желания",
+  "store/myaccount-empty-list": "Този списък е празен",
+  "store/wishlist-login": "Влизане",
+  "store/wishlist-not-logged": "Трябва да влезете, преди да добавяте към списъка",
+  "admin/wishlist.menu.label": "Списък с желания",
+  "admin/settings.title": "Експортиране на списък с желания",
+  "admin/settings.download": "Изтегляне на списъци с желания"
+}
