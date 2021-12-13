@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Add pixel in ProductSummaryWishlist to trigger productClick analytics event
+
 ## [1.9.2] - 2021-09-29
 
 ### Added
