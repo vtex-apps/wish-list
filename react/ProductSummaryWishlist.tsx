@@ -117,6 +117,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
     const componentList = products?.map((product: any, index: any) => {
       const sku = dataLists?.viewLists[0]?.data[index]?.sku
       const items = data?.productsByIdentifier[index]?.items
+      const position = index + 1
 
       const normalizedProduct = mapCatalogProductToProductSummary(
         product,
@@ -135,7 +136,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           event: 'productClick',
           list: 'wishlist',
           product: normalizedProduct,
-          position: index,
+          position,
         })
       }
 
