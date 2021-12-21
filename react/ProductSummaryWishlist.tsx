@@ -5,6 +5,7 @@ import { ExtensionPoint, useRuntime, useTreePath } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
 import { ProductListContext } from 'vtex.product-list-context'
 import { Spinner } from 'vtex.styleguide'
+import { usePixel } from 'vtex.pixel-manager'
 
 import { mapCatalogProductToProductSummary } from './utils/normalize'
 import ProductListEventCaller from './components/ProductListEventCaller'
@@ -51,6 +52,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
   const { navigate, history } = useRuntime()
+  const { push } = usePixel()
 
   const sessionResponse: any = useSessionResponse()
 
@@ -115,6 +117,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
     const componentList = products?.map((product: any, index: any) => {
       const sku = dataLists?.viewLists[0]?.data[index]?.sku
       const items = data?.productsByIdentifier[index]?.items
+      const position = index + 1
 
       const normalizedProduct = mapCatalogProductToProductSummary(
         product,
@@ -127,12 +130,23 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           }
         }
       }
+
+      const handleOnClick = () =>{
+        push({
+          event: 'productClick',
+          list: 'wishlist',
+          product: normalizedProduct,
+          position,
+        })
+      }
+
       return (
         <ExtensionPoint
           id="product-summary"
           key={product.id}
           treePath={treePath}
           product={normalizedProduct}
+          actionOnClick={handleOnClick}
         />
       )
     })
