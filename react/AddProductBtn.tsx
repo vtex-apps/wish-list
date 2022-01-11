@@ -156,6 +156,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
   const [productId] = String(product?.productId).split('-')
+  const sku = product?.sku?.itemId
+
+  console.log('SKU =>', sku)
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -260,6 +263,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         variables: {
           shopperId: String(shopperId),
           productId,
+          sku,
         },
       })
     }
@@ -309,7 +313,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         })
         pixelEvent.event = 'addToWishlist'
       }
-      
+
       push(pixelEvent)
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
