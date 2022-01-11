@@ -286,8 +286,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         items: {
           product,
           selectedItem,
-          account
-        }
+          account,
+        },
       }
 
       if (checkFill()) {
@@ -305,7 +305,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
             listItem: {
               productId,
               title: product.productName,
-              sku: selectedItem.itemId
+              sku: selectedItem.itemId,
             },
             shopperId,
             name: defaultValues.LIST_NAME,
