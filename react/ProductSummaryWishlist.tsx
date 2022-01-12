@@ -95,16 +95,14 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
   }
   let productList = [] as any;
   productList = dataLists?.viewLists[0]?.data.map((item: any) => {      
-      const [id] = item.productId.split('-')
-      console.log('ID =>', item)
+      const [id] = item.productId.split('-')      
       return {
         productId: id,
         sku: item.sku
       }
   });
   if (!called && dataLists) {
-    const ids = productList.map((item: any) => item.productId);    
-    console.log(">>>", productList);
+    const ids = productList.map((item: any) => item.productId);        
     localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
     loadProducts({
       variables: {
@@ -151,7 +149,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
         product,
         getWishlistId(product.productId)
       )
-      
+
       if (sku && items.length) {
         for (const item of items) {
           if (item.itemId === sku) {
@@ -168,8 +166,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           position,
         })
       }
-      
-      console.log(">>>3", normalizedProduct)
+            
       return (
         <ExtensionPoint
           id="product-summary"

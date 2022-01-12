@@ -152,9 +152,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
   const [productId] = String(product?.productId).split('-')
-  const sku = product?.sku?.itemId
-  console.log("Product >>>", product)
-  // console.log('SKU 2 =>', sku)
+  const sku = product?.sku?.itemId  
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -266,8 +264,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     }
   }  
 
-  const checkFill = () => {
-    console.log(">>>", wishListed, productId, sku);
+  const checkFill = () => {    
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       'false'
       ? false
