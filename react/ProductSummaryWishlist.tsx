@@ -16,7 +16,7 @@ import ViewLists from './queries/viewLists.gql'
 import { getSession } from './modules/session'
 import storageFactory from './utils/storage'
 
-const localStore = storageFactory(() => localStorage)
+const localStore = storageFactory(() => sessionStorage)
 
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
@@ -93,18 +93,19 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       })
     }
   }
-
-  if (!called && dataLists) {
-    const ids = dataLists?.viewLists[0]?.data.map((item: any) => {
+  let productList = [] as any;
+  productList = dataLists?.viewLists[0]?.data.map((item: any) => {      
       const [id] = item.productId.split('-')
-      console.log('ID =>', id)
-      return id
-    })
-
-    console.log('IDs =>', ids)
-
-    localStore.setItem('wishlist_wishlisted', JSON.stringify(ids))
-
+      console.log('ID =>', item)
+      return {
+        productId: id,
+        sku: item.sku
+      }
+  });
+  if (!called && dataLists) {
+    const ids = productList.map((item: any) => item.productId);    
+    console.log(">>>", productList);
+    localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
     loadProducts({
       variables: {
         ids,
@@ -119,18 +120,38 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       const [id] = productId.split('-')
       return dataLists?.viewLists[0]?.data.find((item: any) => {
         const [itemId] = item.productId.split('-')
-        return itemId === id
+        return itemId === id        
       })?.id
     }
-    const componentList = products?.map((product: any, index: number) => {
+    let newProductList = []
+    if (productList) {
+      newProductList = productList.map((_product: any) => {        
+        if (products) {
+          const product = products.find(
+            (item: any) => 
+              item.productId === _product.productId && 
+              item.items && 
+              item.items.find(
+                (sku: any) => sku.itemId === _product.sku)
+          );
+          const sku = product && product.items.find((sku: any) => sku.itemId === _product.sku);
+          return {...product, sku};
+        }  else {
+          return undefined;
+        }                  
+      }).filter((item: any) => item !== undefined)
+    }
+    
+    const componentList = newProductList?.map((product: any, index: number) => {
       const sku = dataLists?.viewLists[0]?.data[index]?.sku
-      const items = data?.productsByIdentifier[index]?.items
-      const position = index + 1
+      const items = product.items
+      const position = index + 1          
 
       const normalizedProduct = mapCatalogProductToProductSummary(
         product,
         getWishlistId(product.productId)
       )
+      
       if (sku && items.length) {
         for (const item of items) {
           if (item.itemId === sku) {
@@ -147,7 +168,8 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           position,
         })
       }
-
+      
+      console.log(">>>3", normalizedProduct)
       return (
         <ExtensionPoint
           id="product-summary"
@@ -157,7 +179,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           actionOnClick={handleOnClick}
         />
       )
-    })
+    })    
     return list.concat(componentList)
   }, [products, treePath, list, dataLists])
 

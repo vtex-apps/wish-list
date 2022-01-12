@@ -97,7 +97,7 @@ export function mapCatalogProductToProductSummary(
     })
   })
 
-  const sku = items.find(findAvailableProduct) || items[0]
+  const sku = product.sku || items.find(findAvailableProduct) || items[0]
   if (sku) {
     const [seller = defaultSeller] = sku.sellers ?? []
     const [referenceId = defaultReference] = sku.referenceId ?? []

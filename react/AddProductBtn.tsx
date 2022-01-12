@@ -153,7 +153,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
 
   const [productId] = String(product?.productId).split('-')
   const sku = product?.sku?.itemId
-
+  console.log("Product >>>", product)
   // console.log('SKU 2 =>', sku)
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
@@ -264,9 +264,10 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         },
       })
     }
-  }
+  }  
 
   const checkFill = () => {
+    console.log(">>>", wishListed, productId, sku);
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       'false'
       ? false
