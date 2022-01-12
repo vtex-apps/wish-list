@@ -25,6 +25,7 @@ import styles from './styles.css'
 
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
+const WISHLISTED_LOCALSTORAGE_KEY = 'wishlist_wishlisted';
 
 type AddBtnProps = {
   toastURL: string
@@ -35,10 +36,10 @@ let isAuthenticated =
 let shopperId = localStore.getItem('wishlist_shopperId') ?? null
 let addAfterLogin = localStore.getItem('wishlist_addAfterLogin') ?? null
 let wishListed: any =
-  JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
+  JSON.parse(localStore.getItem(WISHLISTED_LOCALSTORAGE_KEY)) ?? []
 
 const productCheck: {
-  [key: string]: { isWishlisted: boolean; wishListId: string }
+  [key: string]: { isWishlisted: boolean; wishListId: string, sku: string; }
 } = {}
 const defaultValues = {
   LIST_NAME: 'Wishlist',
@@ -96,21 +97,21 @@ const useSessionResponse = () => {
   return session
 }
 
-const unify = (arr: any) => {
-  const obj: any = {}
-  for (let i = 0; i < arr.length; i++) {
-    obj[arr[i]] = true
+
+const addWishlisted = (productId: any, sku: any) => {
+  if (wishListed.find((item: any) => item.productId && item.sku && item.productId === productId && item.sku === sku) === undefined) {
+    wishListed.push({
+      productId: productId,
+      sku: sku
+    });
   }
-  return Object.getOwnPropertyNames(obj)
+  saveToLocalStorageItem(wishListed);
 }
 
-const addWishlisted = (productId: any) => {
-  if (wishListed.indexOf(productId) === -1) {
-    wishListed.push(productId)
-  }
-  wishListed = unify(wishListed)
-  localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
-}
+const saveToLocalStorageItem = (data: any): any => {
+  localStore.setItem(WISHLISTED_LOCALSTORAGE_KEY, JSON.stringify(data));
+  return data;
+};
 
 const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const intl = useIntl()
@@ -128,17 +129,12 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
           productCheck[productId] = {
             isWishlisted: false,
             wishListId: '',
+            sku: ''
           }
         }
 
-        wishListed = unify(wishListed)
-
-        const pos = wishListed.findIndex((item: string) => item === productId)
-
-        if (pos !== -1) {
-          wishListed.splice(pos, 1)
-          localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
-        }
+        wishListed = wishListed.filter((item: any) => !(item.productId === productId && item.sku === sku));
+        saveToLocalStorageItem(wishListed);
 
         setState({
           ...state,
@@ -158,7 +154,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const [productId] = String(product?.productId).split('-')
   const sku = product?.sku?.itemId
 
-  console.log('SKU =>', sku)
+  // console.log('SKU 2 =>', sku)
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -198,8 +194,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         productCheck[productId] = {
           wishListId: res.addToList,
           isWishlisted: true,
+          sku: sku
         }
-        addWishlisted(productId)
+        addWishlisted(productId, sku);
         toastMessage('productAddedToList', toastURL)
       },
     }
@@ -220,8 +217,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     )
     localStore.setItem('wishlist_shopperId', String(shopperId))
     if (!isAuthenticated && !shopperId) {
-      if (localStore.getItem('wishlist_wishlisted')) {
-        localStore.removeItem('wishlist_wishlisted')
+      if (localStore.getItem(WISHLISTED_LOCALSTORAGE_KEY)) {
+        localStore.removeItem(WISHLISTED_LOCALSTORAGE_KEY)
       }
     }
   }
@@ -268,13 +265,12 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
       })
     }
   }
+
   const checkFill = () => {
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       'false'
       ? false
-      : wishListed.findIndex((item: string) => item === productId) !== -1 ||
-          productCheck[productId]?.isWishlisted ||
-          isWishlistPage
+      : wishListed.find((item: any) => item.productId === productId && item.sku === sku) !== undefined
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
@@ -333,10 +329,11 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     productCheck[productId] = {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
+      sku: sku
     }
 
     if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
-      addWishlisted(productId)
+      addWishlisted(productId, sku);
     }
   } else if (
     data?.checkList?.inList === false &&
@@ -345,7 +342,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   ) {
     const indexWishListed = wishListed.indexOf(productId)
     wishListed.splice(indexWishListed, 1)
-    localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+    // localStore.setItem(WISHLISTED_LOCALSTORAGE_KEY, JSON.stringify(wishListed))
+    saveToLocalStorageItem(wishListed);
   }
 
   return (
