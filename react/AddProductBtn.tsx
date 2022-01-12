@@ -7,7 +7,7 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from 'react'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
@@ -28,7 +28,7 @@ const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 const WISHLISTED_LOCALSTORAGE_KEY = 'wishlist_wishlisted';
 
 type AddBtnProps = {
-  toastURL: string
+  toastURL?: string
 }
 
 let isAuthenticated =
@@ -365,8 +365,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   )
 }
 
-AddBtn.propTypes = {
-  toastURL: PropTypes.string.isRequired,
-}
+// AddBtn.propTypes = {
+//   toastURL: PropTypes.string.isRequired,
+// }
 
 export default AddBtn
