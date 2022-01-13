@@ -25,7 +25,7 @@ import styles from './styles.css'
 
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
-const WISHLISTED_LOCALSTORAGE_KEY = 'wishlist_wishlisted';
+
 
 type AddBtnProps = {
   toastURL?: string
@@ -36,7 +36,7 @@ let isAuthenticated =
 let shopperId = localStore.getItem('wishlist_shopperId') ?? null
 let addAfterLogin = localStore.getItem('wishlist_addAfterLogin') ?? null
 let wishListed: any =
-  JSON.parse(localStore.getItem(WISHLISTED_LOCALSTORAGE_KEY)) ?? []
+  JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
 const productCheck: {
   [key: string]: { isWishlisted: boolean; wishListId: string, sku: string; }
@@ -109,7 +109,7 @@ const addWishlisted = (productId: any, sku: any) => {
 }
 
 const saveToLocalStorageItem = (data: any): any => {
-  localStore.setItem(WISHLISTED_LOCALSTORAGE_KEY, JSON.stringify(data));
+  localStore.setItem('wishlist_wishlisted', JSON.stringify(data));
   return data;
 };
 
@@ -215,8 +215,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     )
     localStore.setItem('wishlist_shopperId', String(shopperId))
     if (!isAuthenticated && !shopperId) {
-      if (localStore.getItem(WISHLISTED_LOCALSTORAGE_KEY)) {
-        localStore.removeItem(WISHLISTED_LOCALSTORAGE_KEY)
+      if (localStore.getItem('wishlist_wishlisted')) {
+        localStore.removeItem('wishlist_wishlisted')
       }
     }
   }
@@ -340,7 +340,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   ) {
     const indexWishListed = wishListed.indexOf(productId)
     wishListed.splice(indexWishListed, 1)
-    // localStore.setItem(WISHLISTED_LOCALSTORAGE_KEY, JSON.stringify(wishListed))
+    // localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
     saveToLocalStorageItem(wishListed);
   }
 
