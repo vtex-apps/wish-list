@@ -2,7 +2,6 @@ export const DEFAULT_WIDTH = 'auto'
 export const DEFAULT_HEIGHT = 'auto'
 export const MAX_WIDTH = 3000
 export const MAX_HEIGHT = 4000
-
 /**
  * Having the url below as base for the LEGACY file manager,
  * https://storecomponents.vteximg.com.br/arquivos/ids/155472/Frame-3.jpg?v=636793763985400000
@@ -97,7 +96,7 @@ export function mapCatalogProductToProductSummary(
     })
   })
 
-  const sku = items.find(findAvailableProduct) || items[0]
+  const sku = product.sku || items.find(findAvailableProduct) || items[0]
   if (sku) {
     const [seller = defaultSeller] = sku.sellers ?? []
     const [referenceId = defaultReference] = sku.referenceId ?? []

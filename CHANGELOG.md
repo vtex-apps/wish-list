@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
+- Bug fixed on adding wishlist with the same product ID, filtering by SKU values
 ## [1.9.3] - 2021-12-21
 
 ### Added
@@ -70,6 +70,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.7.9] - 2021-06-08
 
+### Added
+- prop `toastURL` to component AddBtn with default value '/account/#wishlist'
 ## [1.7.8] - 2021-06-08
 
 ### Fixed
