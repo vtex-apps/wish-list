@@ -116,11 +116,13 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
 
   const newListContextValue = useMemo(() => {
     const getWishlistId = (productId: string) => {
-      const [id] = productId.split('-')
-      return dataLists?.viewLists[0]?.data.find((item: any) => {
-        const [itemId] = item.productId.split('-')
-        return itemId === id
-      })?.id
+      if (productId) {
+        const [id] = productId.split('-')
+        return dataLists?.viewLists[0]?.data.find((item: any) => {
+          const [itemId] = item.productId.split('-')
+          return itemId === id
+        })?.id
+      }
     }
     let newProductList = []
     if (productList) {
@@ -141,45 +143,48 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           return undefined
         })
         .filter((item: any) => item !== undefined)
+      // console.log('>>', newProductList)
     }
 
-    const componentList = newProductList?.map((product: any, index: number) => {
-      const sku = dataLists?.viewLists[0]?.data[index]?.sku
-      const { items } = product
-      const position = index + 1
+    const componentList = newProductList
+      ?.filter((item: any) => item.sku && item.productId)
+      ?.map((product: any, index: number) => {
+        const sku = dataLists?.viewLists[0]?.data[index]?.sku
+        const { items } = product
+        const position = index + 1
 
-      const normalizedProduct = mapCatalogProductToProductSummary(
-        product,
-        getWishlistId(product.productId)
-      )
+        const normalizedProduct = mapCatalogProductToProductSummary(
+          product,
+          getWishlistId(product.productId)
+        )
 
-      if (sku && items.length) {
-        for (const item of items) {
-          if (item.itemId === sku) {
-            normalizedProduct.sku.image = item.images[0]
+        if (sku && items && items.length) {
+          for (const item of items) {
+            if (item.itemId === sku) {
+              normalizedProduct.sku.image = item.images[0]
+            }
           }
         }
-      }
 
-      const handleOnClick = () => {
-        push({
-          event: 'productClick',
-          list: 'wishlist',
-          product: normalizedProduct,
-          position,
-        })
-      }
+        const handleOnClick = () => {
+          push({
+            event: 'productClick',
+            list: 'wishlist',
+            product: normalizedProduct,
+            position,
+          })
+        }
 
-      return (
-        <ExtensionPoint
-          id="product-summary"
-          key={product.id}
-          treePath={treePath}
-          product={normalizedProduct}
-          actionOnClick={handleOnClick}
-        />
-      )
-    })
+        return (
+          <ExtensionPoint
+            id="product-summary"
+            key={product.id}
+            treePath={treePath}
+            product={normalizedProduct}
+            actionOnClick={handleOnClick}
+          />
+        )
+      })
     return list.concat(componentList)
   }, [products, treePath, list, dataLists, productList, push])
 
