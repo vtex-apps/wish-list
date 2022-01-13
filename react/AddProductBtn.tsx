@@ -26,7 +26,6 @@ import styles from './styles.css'
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
-
 type AddBtnProps = {
   toastURL?: string
 }
@@ -39,7 +38,7 @@ let wishListed: any =
   JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
 const productCheck: {
-  [key: string]: { isWishlisted: boolean; wishListId: string, sku: string; }
+  [key: string]: { isWishlisted: boolean; wishListId: string; sku: string }
 } = {}
 const defaultValues = {
   LIST_NAME: 'Wishlist',
@@ -97,21 +96,28 @@ const useSessionResponse = () => {
   return session
 }
 
-
 const addWishlisted = (productId: any, sku: any) => {
-  if (wishListed.find((item: any) => item.productId && item.sku && item.productId === productId && item.sku === sku) === undefined) {
+  if (
+    wishListed.find(
+      (item: any) =>
+        item.productId &&
+        item.sku &&
+        item.productId === productId &&
+        item.sku === sku
+    ) === undefined
+  ) {
     wishListed.push({
-      productId: productId,
-      sku: sku
-    });
+      productId,
+      sku,
+    })
   }
-  saveToLocalStorageItem(wishListed);
+  saveToLocalStorageItem(wishListed)
 }
 
 const saveToLocalStorageItem = (data: any): any => {
-  localStore.setItem('wishlist_wishlisted', JSON.stringify(data));
-  return data;
-};
+  localStore.setItem('wishlist_wishlisted', JSON.stringify(data))
+  return data
+}
 
 const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const intl = useIntl()
@@ -129,12 +135,14 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
           productCheck[productId] = {
             isWishlisted: false,
             wishListId: '',
-            sku: ''
+            sku: '',
           }
         }
 
-        wishListed = wishListed.filter((item: any) => !(item.productId === productId && item.sku === sku));
-        saveToLocalStorageItem(wishListed);
+        wishListed = wishListed.filter(
+          (item: any) => !(item.productId === productId && item.sku === sku)
+        )
+        saveToLocalStorageItem(wishListed)
 
         setState({
           ...state,
@@ -152,7 +160,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
   const [productId] = String(product?.productId).split('-')
-  const sku = product?.sku?.itemId  
+  const sku = product?.sku?.itemId
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -192,9 +200,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         productCheck[productId] = {
           wishListId: res.addToList,
           isWishlisted: true,
-          sku: sku
+          sku,
         }
-        addWishlisted(productId, sku);
+        addWishlisted(productId, sku)
         toastMessage('productAddedToList', toastURL)
       },
     }
@@ -262,13 +270,15 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         },
       })
     }
-  }  
+  }
 
-  const checkFill = () => {    
+  const checkFill = () => {
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       'false'
       ? false
-      : wishListed.find((item: any) => item.productId === productId && item.sku === sku) !== undefined
+      : wishListed.find(
+          (item: any) => item.productId === productId && item.sku === sku
+        ) !== undefined
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
@@ -327,11 +337,11 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     productCheck[productId] = {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
-      sku: sku
+      sku,
     }
 
     if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
-      addWishlisted(productId, sku);
+      addWishlisted(productId, sku)
     }
   } else if (
     data?.checkList?.inList === false &&
@@ -341,7 +351,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     const indexWishListed = wishListed.indexOf(productId)
     wishListed.splice(indexWishListed, 1)
     // localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
-    saveToLocalStorageItem(wishListed);
+    saveToLocalStorageItem(wishListed)
   }
 
   return (

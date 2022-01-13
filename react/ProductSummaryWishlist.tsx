@@ -93,16 +93,17 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       })
     }
   }
-  let productList = [] as any;
-  productList = dataLists?.viewLists[0]?.data.map((item: any) => {      
-      const [id] = item.productId.split('-')      
-      return {
-        productId: id,
-        sku: item.sku
-      }
-  });
-  if (!called && dataLists) {
-    const ids = productList.map((item: any) => item.productId);        
+  let productList = [] as any
+  productList = dataLists?.viewLists[0]?.data.map((item: any) => {
+    const [id] = item.productId.split('-')
+    return {
+      productId: id,
+      sku: item.sku,
+    }
+  })
+  console.log('>>', dataLists)
+  if (!called && dataLists && productList) {
+    const ids = productList.map((item: any) => item.productId)
     localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
     loadProducts({
       variables: {
@@ -118,32 +119,34 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       const [id] = productId.split('-')
       return dataLists?.viewLists[0]?.data.find((item: any) => {
         const [itemId] = item.productId.split('-')
-        return itemId === id        
+        return itemId === id
       })?.id
     }
     let newProductList = []
     if (productList) {
-      newProductList = productList.map((_product: any) => {        
-        if (products) {
-          const product = products.find(
-            (item: any) => 
-              item.productId === _product.productId && 
-              item.items && 
-              item.items.find(
-                (sku: any) => sku.itemId === _product.sku)
-          );
-          const sku = product && product.items.find((sku: any) => sku.itemId === _product.sku);
-          return {...product, sku};
-        }  else {
-          return undefined;
-        }                  
-      }).filter((item: any) => item !== undefined)
+      newProductList = productList
+        .map((_product: any) => {
+          if (products) {
+            const product = products.find(
+              (item: any) =>
+                item.productId === _product.productId &&
+                item.items &&
+                item.items.find((sku: any) => sku.itemId === _product.sku)
+            )
+            const _sku = product?.items.find(
+              (sku: any) => sku.itemId === _product.sku
+            )
+            return { ...product, sku: _sku }
+          }
+          return undefined
+        })
+        .filter((item: any) => item !== undefined)
     }
-    
+
     const componentList = newProductList?.map((product: any, index: number) => {
       const sku = dataLists?.viewLists[0]?.data[index]?.sku
-      const items = product.items
-      const position = index + 1          
+      const { items } = product
+      const position = index + 1
 
       const normalizedProduct = mapCatalogProductToProductSummary(
         product,
@@ -166,7 +169,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           position,
         })
       }
-            
+
       return (
         <ExtensionPoint
           id="product-summary"
@@ -176,9 +179,9 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           actionOnClick={handleOnClick}
         />
       )
-    })    
+    })
     return list.concat(componentList)
-  }, [products, treePath, list, dataLists])
+  }, [products, treePath, list, dataLists, productList, push])
 
   if (sessionResponse && !isAuthenticated) {
     navigate({
