@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.9.4] - 2022-01-13
 - Bug fixed on adding wishlist with the same product ID, filtering by SKU values
 ## [1.9.3] - 2021-12-21
 
