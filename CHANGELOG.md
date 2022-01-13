@@ -7,55 +7,70 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Hotfix when the SKU is unvailable
+
 ## [1.9.4] - 2022-01-13
+
 - Bug fixed on adding wishlist with the same product ID, filtering by SKU values
+
 ## [1.9.3] - 2021-12-21
 
 ### Added
+
 - Add pixel in ProductSummaryWishlist to trigger productClick analytics event
 
 ## [1.9.2] - 2021-09-29
 
 ### Added
+
 - I18n bg
 
 ### Fixed
+
 - I18n ro
 
 ## [1.9.1] - 2021-09-28
 
 ### Fixed
+
 - I18n en, es, fr, it, ja, ko, nl, pt and ro
 
 ## [1.9.0] - 2021-08-31
 
 ### Feature
+
 - Add pixel in AddProductBtn and removeProductBtn
+
 ## [1.8.4] - 2021-08-31
 
 ### Fix
+
 - Add view empty when user has only one product and this product has no inventory
 
 ## [1.8.3] - 2021-08-31
-
 
 ## [1.8.2] - 2021-08-18
 
 ## [1.8.1] - 2021-08-18
 
 ### Changed
+
 - Use context.Vtex.AdminUserAuthToken when creating schema
 
 ## [1.8.0] - 2021-08-18
 
 ### Added
+
 - Added logging
+
 ### Changed
+
 - Wait for VerifySchema to complete
 
 ## [1.7.12] - 2021-07-20
 
 ### Fixed
+
 - Added policy to fix inability to apply db schema
 - Removed Console writes
 
@@ -68,20 +83,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.7.10] - 2021-06-10
 
 ### Fixed
+
 - Wishlist displays cortect sku variation
 
 ## [1.7.9] - 2021-06-08
 
 ### Added
+
 - prop `toastURL` to component AddBtn with default value '/account/#wishlist'
+
 ## [1.7.8] - 2021-06-08
 
 ### Fixed
+
 - Occasionally when trying to remove a product from the wish list it doesn't work.
 
 ## [1.7.7] - 2021-06-03
 
 ### Fixed
+
 - User logged and then logout, the button is not shown as activated.
 
 ## [1.7.6] - 2021-05-28
@@ -93,23 +113,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.7.5] - 2021-05-27
 
 ### Fixed
+
 - Spotprice not showing up
 - Error when the component loads before the content exists at the PDP
+
 ## [1.7.4] - 2021-05-14
 
 ### Fixed
+
 - Cannot remove from Wishlist immediately after adding it
+
 ## [1.7.3] - 2021-05-14
 
 ### Fixed
+
 - Cannot remove from Wishlist
+
 ## [1.7.2] - 2021-05-13
 
 ### Fixed
+
 - At PDP, heart stays filled when changing to another product from the shelf
 
 ### Added
+
 - No SSR
+
 ## [1.7.1] - 2021-05-12
 
 ### Fixed
