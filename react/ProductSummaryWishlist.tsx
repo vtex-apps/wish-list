@@ -101,7 +101,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       sku: item.sku,
     }
   })
-  console.log('>>', dataLists)
+
   if (!called && dataLists && productList) {
     const ids = productList.map((item: any) => item.productId)
     localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
