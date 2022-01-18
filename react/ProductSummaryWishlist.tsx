@@ -101,7 +101,6 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       sku: item.sku,
     }
   })
-
   if (!called && dataLists && productList) {
     const ids = productList.map((item: any) => item.productId)
     localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
@@ -149,22 +148,12 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
     const componentList = newProductList
       ?.filter((item: any) => item.sku && item.productId)
       ?.map((product: any, index: number) => {
-        const sku = dataLists?.viewLists[0]?.data[index]?.sku
-        const { items } = product
         const position = index + 1
 
         const normalizedProduct = mapCatalogProductToProductSummary(
           product,
           getWishlistId(product.productId)
         )
-
-        if (sku && items && items.length) {
-          for (const item of items) {
-            if (item.itemId === sku) {
-              normalizedProduct.sku.image = item.images[0]
-            }
-          }
-        }
 
         const handleOnClick = () => {
           push({
