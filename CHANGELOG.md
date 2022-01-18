@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Quality engineering actions
+
 ## [1.9.5] - 2022-01-13
 
 - Hotfix when the SKU is unvailable
