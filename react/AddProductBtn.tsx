@@ -161,6 +161,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
 
   const [productId] = String(product?.productId).split('-')
   const sku = product?.sku?.itemId
+  wishListed = JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -340,19 +341,25 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
       sku,
     }
 
-    if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
+    if (
+      data.checkList.inList &&
+      wishListed.find(
+        (item: any) => item.productId === productId && item.sku === sku
+      ) === undefined
+    ) {
       addWishlisted(productId, sku)
     }
-  } else if (
-    data?.checkList?.inList === false &&
-    wishListed.length !== 0 &&
-    wishListed.indexOf(productId) !== -1
-  ) {
-    const indexWishListed = wishListed.indexOf(productId)
-    wishListed.splice(indexWishListed, 1)
-    // localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
-    saveToLocalStorageItem(wishListed)
   }
+  // } else if (
+  //   data?.checkList?.inList === false &&
+  //   wishListed.length !== 0 &&
+  //   wishListed.indexOf(productId) !== -1
+  // ) {
+  //   // const indexWishListed = wishListed.indexOf(productId)
+  //   // wishListed.splice(indexWishListed, 1)
+  //   // // localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+  //   // saveToLocalStorageItem(wishListed)
+  // }
 
   return (
     <NoSSR>
