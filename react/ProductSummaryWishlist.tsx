@@ -44,6 +44,8 @@ const useSessionResponse = () => {
 interface ProductSummaryProps {
   children?: any
   showViewEmptyList?: boolean
+  backButton?: boolean
+  title?: string
 }
 
 const ProductSummaryList: FC<ProductSummaryProps> = ({
@@ -167,7 +169,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
         return (
           <ExtensionPoint
             id="product-summary"
-            key={product.id}
+            key={product?.sku?.itemId}
             treePath={treePath}
             product={normalizedProduct}
             actionOnClick={handleOnClick}

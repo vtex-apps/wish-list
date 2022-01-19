@@ -80,7 +80,10 @@ According to the Wishlist app composition, the `/wishlist` page can be highly cu
     }
   },
   "my-account-page.wishlist-page": {
-    "children": ["flex-layout.row#top", "list-context.wishlist"]
+    "props": {
+      "title": "Wishlist"
+    },
+    "children": ["list-context.wishlist"]
   },
   "store.wishlist": {
     "blocks": ["flex-layout.row#top", "list-context.wishlist"]
