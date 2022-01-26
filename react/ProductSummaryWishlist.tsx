@@ -75,8 +75,6 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
     }
   )
 
-  console.log('loadProducts error =>', error)
-
   if (sessionResponse) {
     isAuthenticated =
       sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
@@ -124,6 +122,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           return itemId === id
         })?.id
       }
+      return null
     }
     let newProductList = []
     if (productList) {
@@ -144,7 +143,6 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
           return undefined
         })
         .filter((item: any) => item !== undefined)
-      // console.log('>>', newProductList)
     }
 
     const componentList = newProductList

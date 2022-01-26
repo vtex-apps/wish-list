@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+
 - Added a property title on the my-account-page.wishlist-page / MyAccountWishlistLink in order to show the back button (ContentWrapper). Also, it needs to remove "flex-layout.row#top" to avoid duplicating the header.
 - Quality engineering actions
+
 ### Fixed
+
 - Fix on image list on the wish-list page
 - Fix on heart button and session storage array
 
