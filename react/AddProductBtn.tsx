@@ -350,16 +350,6 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
       addWishlisted(productId, sku)
     }
   }
-  // } else if (
-  //   data?.checkList?.inList === false &&
-  //   wishListed.length !== 0 &&
-  //   wishListed.indexOf(productId) !== -1
-  // ) {
-  //   // const indexWishListed = wishListed.indexOf(productId)
-  //   // wishListed.splice(indexWishListed, 1)
-  //   // // localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
-  //   // saveToLocalStorageItem(wishListed)
-  // }
 
   return (
     <NoSSR>
