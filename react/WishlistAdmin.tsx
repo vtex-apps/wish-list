@@ -18,15 +18,6 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
 
   const { loading } = state
 
-  const fetchWishlists = async (from: number, to: number) => {
-    const response: any = await fetch(
-      `/_v/wishlist/export-lists?from=${from}&to=${to}`,
-      { mode: 'no-cors' }
-    )
-
-    return response.json()
-  }
-
   const downloadWishlist = (allWishlists: any) => {
     const header = ['Email', 'Product ID', 'SKU', 'Title']
     const data: any = []
@@ -54,28 +45,15 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
     XLSX.writeFile(wb, exportFileName)
   }
 
-  let allWishlists: any = []
-
   const getAllWishlists = async () => {
-    let status = true
-    let i = 0
-    const chunkLength = 100
     setState({ ...state, loading: true })
 
-    while (status) {
-      await fetchWishlists(i, i + chunkLength).then(data => {
-        const wishlistArr = data.wishLists
+    const data: any = await fetch(`/_v/wishlist/export-lists`).then(response =>
+      response.json()
+    )
+    const wishlistArr = data.wishLists
 
-        if (!wishlistArr.length) {
-          status = false
-        }
-        allWishlists = [...allWishlists, ...wishlistArr]
-      })
-
-      i += 100
-    }
-
-    downloadWishlist(allWishlists)
+    downloadWishlist(wishlistArr)
     setState({ ...state, loading: false })
   }
 

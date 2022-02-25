@@ -26,12 +26,7 @@
         public async Task<IActionResult> ExportAllLists()
         {
             WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();
-            var queryString = HttpContext.Request.Query;
-            int from = int.Parse(queryString["from"]);
-            int to = int.Parse(queryString["to"]);
-            IList<WishListWrapper> wishListsWrappers = wishListsWrapper.WishLists;
-            wishListsWrapper.WishLists = wishListsWrappers.Skip(from - 1).Take(to - from).ToList();
-
+            
             return Json(wishListsWrapper);
         }
     }

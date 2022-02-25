@@ -24,7 +24,18 @@
         private readonly IHttpClientFactory _clientFactory;
         private readonly IIOServiceContext _context;
         private readonly string _applicationName;
-
+        private static string _tokenResponse;
+        public static string tokenResponse 
+        {
+            get
+            {
+                return _tokenResponse;
+            }
+            set
+            {
+                _tokenResponse = value;
+            }
+        }
 
         public WishListRepository(IVtexEnvironmentVariableProvider environmentVariableProvider, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context)
         {
@@ -229,12 +240,13 @@
             }
         }
 
-        public async Task<WishListsWrapper> GetAllLists()
+        private async Task<string> firstScroll()
         {
+            var client = _clientFactory.CreateClient();
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_fields=email,ListItemsWrapper")
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_size=200&_fields=email,ListItemsWrapper")
             };
 
             string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
@@ -244,19 +256,73 @@
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                 request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
-            
             request.Headers.Add("Cache-Control", "no-cache");
-
-            var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
+            tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
+
             string responseContent = await response.Content.ReadAsStringAsync();
             _context.Vtex.Logger.Debug("GetAllLists", null, $"[{response.StatusCode}]");
+
+            return responseContent;
+        }
+
+        private async Task<string> subScroll()
+        {
+            var client = _clientFactory.CreateClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_token={tokenResponse}")
+            };
+
+            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            if (authToken != null)
+            {
+                request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
+            }
+            request.Headers.Add("Cache-Control", "no-cache");
+            var response = await client.SendAsync(request);
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            _context.Vtex.Logger.Debug("GetAllLists", null, $"[{response.StatusCode}]");
+
+            return responseContent;
+        }
+        public async Task<WishListsWrapper> GetAllLists()
+        {
+            var i = 0;
+            var status = true;
+            JArray searchResult = new JArray();
+
+            while (status)
+            {
+                if( i == 0)
+                {
+                    var res = await firstScroll();
+                    JArray resArray = JArray.Parse(res);
+                    searchResult.Merge(resArray);
+                }
+                else
+                {
+                    var res = await subScroll();
+                    JArray resArray = JArray.Parse(res);
+                    if (resArray.Count < 200) 
+                    {
+                        status = false;
+                    }
+                    searchResult.Merge(resArray);
+                }
+                i++;
+            }
+            
             WishListsWrapper wishListsWrapper = new WishListsWrapper();
             wishListsWrapper.WishLists = new List<WishListWrapper>();
             WishListWrapper responseListWrapper = new WishListWrapper();
+
             try
             {
-                JArray searchResult = JArray.Parse(responseContent);
                 for (int l = 0; l < searchResult.Count; l++)
                 {
                     JToken listWrapper = searchResult[l];
