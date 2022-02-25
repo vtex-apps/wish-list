@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.11.0] - 2022-02-25
+
 ### Fixed
 
 - Fix the api for downloading all the wishlist records
