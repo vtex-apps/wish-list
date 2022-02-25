@@ -240,7 +240,7 @@
             }
         }
 
-        private async Task<string> firstScroll()
+        private async Task<string> FirstScroll()
         {
             var client = _clientFactory.CreateClient();
             var request = new HttpRequestMessage
@@ -266,7 +266,7 @@
             return responseContent;
         }
 
-        private async Task<string> subScroll()
+        private async Task<string> SubScroll()
         {
             var client = _clientFactory.CreateClient();
             var request = new HttpRequestMessage
@@ -300,13 +300,13 @@
             {
                 if( i == 0)
                 {
-                    var res = await firstScroll();
+                    var res = await FirstScroll();
                     JArray resArray = JArray.Parse(res);
                     searchResult.Merge(resArray);
                 }
                 else
                 {
-                    var res = await subScroll();
+                    var res = await SubScroll();
                     JArray resArray = JArray.Parse(res);
                     if (resArray.Count < 200) 
                     {
