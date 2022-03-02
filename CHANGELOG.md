@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix products added to wishlist before logging in are not displayed
+
 ## [1.11.1] - 2022-03-01
-
-## [1.11.0] - 2022-02-25
-
 ### Added
 
 - Added URL information in README file for the user
+
+## [1.11.0] - 2022-02-25
 
 ### Fixed
 
