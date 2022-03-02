@@ -255,6 +255,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
           listItem: {
             productId,
             title: product.productName,
+            sku: selectedItem.itemId,
           },
           shopperId,
           name: defaultValues.LIST_NAME,
