@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.11.3] - 2022-03-14
+
 ### Fixed
 
 - Fix favorited check and stop duplicate item added to same list
