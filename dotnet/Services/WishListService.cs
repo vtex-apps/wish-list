@@ -107,6 +107,13 @@ namespace WishList.Services
             {
                 _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
                 listItemsToSave = listItemsWrapper.ListItems;
+                foreach (ListItem item in listItemsToSave)
+                {
+                    if (listItem.ProductId ==  item.ProductId)
+                    {
+                        listItem.Id = item.Id;
+                    }
+                }
                 if(listItem.Id == null)
                 {
                     int maxId = 0;

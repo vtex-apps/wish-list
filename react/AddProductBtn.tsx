@@ -278,9 +278,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       'false'
       ? false
-      : wishListed.find(
-          (item: any) => item.productId === productId && item.sku === sku
-        ) !== undefined
+      : wishListed.find((item: any) => item.productId === productId) !==
+          undefined
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
