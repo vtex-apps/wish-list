@@ -61,6 +61,7 @@
         {
             // PATCH https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents
 
+            await this.VerifySchema();
             if (listItems == null)
             {
                 listItems = new List<ListItem>();
@@ -88,7 +89,7 @@
                 Content = new StringContent(jsonSerializedListItems, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
             };
 
-            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            string authToken = _context.Vtex.AuthToken;
             if (authToken != null)
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
@@ -109,13 +110,14 @@
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/search
 
+            await this.VerifySchema();
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=id,email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}&email={HttpUtility.UrlEncode(shopperId)}")
             };
 
-            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            string authToken = _context.Vtex.AuthToken;
             if (authToken != null)
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
@@ -164,14 +166,14 @@
         public async Task<bool> DeleteWishList(string documentId)
         {
             // DEL https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
-
+            await this.VerifySchema();
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
                 RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/documents/{documentId}")
             };
 
-            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            string authToken = _context.Vtex.AuthToken;
             if (authToken != null)
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
@@ -195,7 +197,7 @@
                 RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}")
             };
 
-            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            string authToken = _context.Vtex.AuthToken;
             if (authToken != null)
             {
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
@@ -223,14 +225,13 @@
                         RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}"),
                         Content = new StringContent(WishListConstants.SCHEMA_JSON, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
                     };
-
-                    authToken = _context.Vtex.AdminUserAuthToken;
-                    //if (authToken != null)
-                    //{
+                    
+                    if (authToken != null)
+                    {
                         request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
                         request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                         request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
-                    //}
+                    }
 
                     response = await client.SendAsync(request);
                     responseContent = await response.Content.ReadAsStringAsync();
@@ -292,6 +293,7 @@
         }
         public async Task<WishListsWrapper> GetAllLists()
         {
+            await this.VerifySchema();
             var i = 0;
             var status = true;
             JArray searchResult = new JArray();

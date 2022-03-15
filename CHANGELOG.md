@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix VerifySchema invalid header error when VerifySchema called without data entry, using app's authtoken instead of the user's authtoken.
 ## [1.11.2] - 2022-03-02
 
 ### Fixed
