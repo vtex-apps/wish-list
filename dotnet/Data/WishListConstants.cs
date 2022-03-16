@@ -20,6 +20,6 @@
         public const string DATA_ENTITY = "wishlist";
         public const string SCHEMA = "wishlist";
 
-        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]}}";
+        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]},\"v-immediate-indexing\":true}";
     }
 }
