@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "أضف إلى القائمة",
+  "store/wishlist-see-lists": "إظهار القوائم",
+  "store/wishlist-product-added-to-list": "تمت إضافة المنتج إلى القائمة",
+  "store/wishlist-add-product-fail": "تعذر إضافة منتج إلى القائمة",
+  "store/wishlist-default-list-name": "قائمة الامنيات",
+  "store/myaccount-menu": "قائمة الامنيات",
+  "store/myaccount-empty-list": "هذه القائمة فارغة",
+  "store/wishlist-login": "تسجيل دخول",
+  "store/wishlist-not-logged": "تحتاج إلى تسجيل الدخول قبل إضافته إلى القائمة",
+  "admin/wishlist.menu.label": "قائمة الامنيات",
+  "admin/settings.title": "تصدير قائمة الأمنيات",
+  "admin/settings.download": "تحميل قوائم الأمنيات"
+}
