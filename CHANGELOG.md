@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.11.5] - 2022-03-17
+
 ### Fixed
 
 - Set timeout to 60s to avoid proxy time out error when downloading a large amount of data
