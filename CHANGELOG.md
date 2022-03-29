@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix function of removing from storefront localstorage wishlist
+
 ## [1.12.0] - 2022-03-17
 
 ### Added
+
 - Arabic translation.
 
 ## [1.11.5] - 2022-03-17
@@ -41,6 +46,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix products added to wishlist before logging in are not displayed
 
 ## [1.11.1] - 2022-03-01
+
 ### Added
 
 - Added URL information in README file for the user

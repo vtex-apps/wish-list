@@ -140,7 +140,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         }
 
         wishListed = wishListed.filter(
-          (item: any) => !(item.productId === productId && item.sku === sku)
+          (item: any) => item.productId !== productId && item.sku !== sku
         )
         saveToLocalStorageItem(wishListed)
 
