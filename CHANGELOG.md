@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix updating removed wishlist item in localstorage
+
 ## [1.12.1] - 2022-03-29
 
 ### Fixed
