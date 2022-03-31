@@ -351,6 +351,23 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     }
   }
 
+  if (
+    data?.checkList?.inList !== true &&
+    productCheck[productId] === undefined &&
+    wishListed.find(
+      (item: any) => item.productId === productId && item.sku === sku
+    ) !== undefined
+  ) {
+    wishListed = wishListed.filter(
+      (item: any) => item.productId !== productId && item.sku !== sku
+    )
+    saveToLocalStorageItem(wishListed)
+    setState({
+      ...state,
+      isWishlistPage: false,
+    })
+  }
+
   return (
     <NoSSR>
       <div className={handles.wishlistIconContainer}>
