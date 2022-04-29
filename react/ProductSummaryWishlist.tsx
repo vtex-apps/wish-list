@@ -85,7 +85,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       JSON.stringify(isAuthenticated)
     )
     localStore.setItem('wishlist_shopperId', String(shopperId))
-    if (!listCalled) {
+    if (!listCalled && !!shopperId) {
       loadLists({
         variables: {
           shopperId,
