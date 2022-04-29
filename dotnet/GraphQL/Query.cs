@@ -20,7 +20,7 @@ namespace WishList.GraphQL
             FieldAsync<ListResponseType>(
                 "viewList",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id"},
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id"},
                     new QueryArgument<StringGraphType> { Name = "name", Description = "List Name" },
                     new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
                     new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
@@ -77,7 +77,7 @@ namespace WishList.GraphQL
             FieldAsync<ListGraphType<ListResponseType>>(
                 "viewLists",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" },
                     new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
                     new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
                 ),
@@ -140,7 +140,7 @@ namespace WishList.GraphQL
             FieldAsync<CheckListType>(
                 "checkList",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" },
                     new QueryArgument<StringGraphType> { Name = "productId", Description = "Product Id" },
                     new QueryArgument<StringGraphType> { Name = "sku", Description = "Product Sku" }
                 ),
@@ -200,7 +200,7 @@ namespace WishList.GraphQL
             FieldAsync<StringGraphType>(
                 "listNames",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" }
                 ),
                 resolve: async context =>
                 {

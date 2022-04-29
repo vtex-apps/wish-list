@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Set the shopperId as the required field for GetWishList to prevent empty shopperId passed
+
 ## [1.12.2] - 2022-03-31
 
 ### Fixed

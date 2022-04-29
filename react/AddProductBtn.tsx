@@ -248,7 +248,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     return item.listIds[pos]
   }
 
-  if (isAuthenticated && product && !called) {
+  if (isAuthenticated && product && !called && !!shopperId) {
     if (isAuthenticated && addAfterLogin && addAfterLogin === productId) {
       addProduct({
         variables: {
@@ -295,7 +295,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         },
       }
 
-      if (checkFill()) {
+      if (checkFill() && !!shopperId) {
         removeProduct({
           variables: {
             id: productCheck[productId].wishListId,

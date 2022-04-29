@@ -110,6 +110,12 @@
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/documents/{{id}}
             // GET https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/{{data_entity_name}}/search
 
+            ResponseListWrapper responseListWrapper = new ResponseListWrapper();
+            if (string.IsNullOrEmpty(shopperId)) {
+                _context.Vtex.Logger.Warn("GetWishList", null, $"Nonvalid shopperId");
+                return responseListWrapper;
+            }
+
             await this.VerifySchema();
             var request = new HttpRequestMessage
             {
@@ -131,7 +137,6 @@
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
             _context.Vtex.Logger.Debug("GetWishList", null, $"'{shopperId}' [{response.StatusCode}]\n{responseContent}");
-            ResponseListWrapper responseListWrapper = new ResponseListWrapper();
             try
             {
                 JArray searchResult = JArray.Parse(responseContent);
