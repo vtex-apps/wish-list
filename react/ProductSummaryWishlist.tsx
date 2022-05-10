@@ -94,13 +94,14 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
     }
   }
   let productList = [] as any
-  productList = dataLists?.viewLists[0]?.data.map((item: any) => {
-    const [id] = item.productId.split('-')
-    return {
-      productId: id,
-      sku: item.sku,
-    }
-  })
+  productList =
+    dataLists?.viewLists[0]?.data.map((item: any) => {
+      const [id] = item.productId.split('-')
+      return {
+        productId: id,
+        sku: item.sku,
+      }
+    }) ?? []
   if (!called && dataLists && productList) {
     const ids = productList.map((item: any) => item.productId)
     localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
