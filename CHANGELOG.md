@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.13.1] - 2022-05-10
+
 ### Fixed
 
 - Fix custom empty wishlist component display when viewed by users who have yet to interact with the wishlist
