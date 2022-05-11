@@ -41,7 +41,7 @@ describe('Testing Single Product and total amounts', () => {
   })
 
   it(
-    'Open wishlist and verify product added in wishlist',
+    'Verify we are able to see wishlist section and its product',
     updateRetry(5),
     () => {
       cy.get(selectors.ProfileLabel)
@@ -62,7 +62,19 @@ describe('Testing Single Product and total amounts', () => {
     }
   )
 
+  it(
+    'Verify we are able to see wishlist in /wishlist page',
+    updateRetry(5),
+    () => {
+      cy.visit('/wishlist')
+      cy.get(wishListSelectors.ProductSummaryContainer)
+        .should('exist')
+        .should('have.attr', 'href')
+        .then(href => {
+          cy.log(href)
+        })
+    }
+  )
+
   preserveCookie()
 })
-
-// alt = 'Fresh Coconuts'
