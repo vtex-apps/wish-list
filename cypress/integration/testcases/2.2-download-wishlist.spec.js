@@ -6,6 +6,8 @@ import {
 } from '../../support/common/support'
 import wishListSelectors from '../../support/wish-list-selectors'
 
+const fileName = '../../../../downloads/wishlists.xls'
+
 describe('Testing Single Product and total amounts', () => {
   // Load test setup
   testSetup(false)
@@ -58,19 +60,26 @@ describe('Testing Single Product and total amounts', () => {
   })
 
   it('Download wishlist file', updateRetry(4), () => {
-    cy.get('.layout__container button')
-      .should('be.visible')
-      .click()
+    cy.getVtexItems().then(vtex => {
+      cy.intercept('GET', `${vtex.baseUrl}/_v/wishlist/export-lists`).as(
+        'Export'
+      )
+      cy.get('.layout__container button')
+        .should('be.visible')
+        .click()
+      cy.wait('@Export', { timeout: 40000 })
+    })
   })
 
   it('Verify wishlist data', updateRetry(4), () => {
     cy.task('readXlsx', {
-      file: '../../../../downloads/wishlists.xls',
+      file: fileName,
       sheet: 'Sheet1',
     }).then(rows => {
       cy.log(rows.length)
       cy.writeFile('cypress/fixtures/xlsxData.json', { rows })
     })
+    cy.task('deleteFile', { fileName })
   })
 
   preserveCookie()

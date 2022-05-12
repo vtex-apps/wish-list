@@ -21,27 +21,12 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
 }
 
-const xlsx = require('node-xlsx').default
-const fs = require('fs') // for file
 const readXlsx = require('./read-xlsx')
-
-module.exports = (on) => {
-  on('task', {
-    parseXlsx({ filePath }) {
-      return new Promise((resolve, reject) => {
-        try {
-          const jsonData = xlsx.parse(fs.readFileSync(filePath))
-          resolve(jsonData)
-        } catch (e) {
-          reject(e)
-        }
-      })
-    },
-  })
-}
+const deleteXlsx = require('./delete-xlsx')
 
 module.exports = on => {
   on('task', {
     readXlsx: readXlsx.read,
+    deleteFile: deleteXlsx.deleteFile,
   })
 }
