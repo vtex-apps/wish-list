@@ -10,3 +10,7 @@ Cypress.Commands.add('openStoreFront', (login = false) => {
       .should('have.contain', `Hello,`)
   }
 })
+
+Cypress.Commands.add('parseXlsx', inputFile => {
+  return cy.task('parseXlsx', { filePath: inputFile })
+})
