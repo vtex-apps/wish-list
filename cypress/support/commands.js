@@ -102,7 +102,7 @@ Cypress.Commands.add('addDelayBetweenRetries', delay => {
 })
 
 // Save wishlists
-Cypress.Commands.add('setWishlistItem', (wishlistItem, wishlistValue) => {
+Cypress.Commands.add('setWishListItem', (wishlistItem, wishlistValue) => {
   cy.readFile(wishlistJson).then(items => {
     items[wishlistItem] = wishlistValue
     cy.writeFile(wishlistJson, items)
@@ -110,7 +110,13 @@ Cypress.Commands.add('setWishlistItem', (wishlistItem, wishlistValue) => {
 })
 
 // Get wishlists
-Cypress.Commands.add('getWishlistItems', () => {
+Cypress.Commands.add('getWishListItem', () => {
+  cy.readFile(wishlistJson).then(items => {
+    return items
+  })
+})
+
+Cypress.Commands.add('removeWishListItem', () => {
   cy.readFile(wishlistJson).then(items => {
     return items
   })

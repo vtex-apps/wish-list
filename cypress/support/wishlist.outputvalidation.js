@@ -10,6 +10,15 @@ const ANONYMOUS_USER = {
 }
 
 export default {
+  anonymousUser: {
+    listItem: {
+      productId: '880300',
+      sku: 'dehydrate',
+      title: 'FruitNut',
+    },
+    shopperId: 'saravananvenkatesan@bitcot.com',
+    name: PRODUCTS.coconut,
+  },
   testCase1: {
     title: 'Enable Anonymous review with no admin approval',
     product: PRODUCTS.onion,

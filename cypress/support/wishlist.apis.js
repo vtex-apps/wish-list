@@ -28,7 +28,7 @@ export function readWishListdata(dataEnv) {
       cy.getAPI(wishlistDataAPI(vtex.baseUrl)).then(response => {
         expect(response.status).to.have.equal(200)
         expect(response.body).to.have.property('wishLists')
-        cy.setWishlistItem(dataEnv, response.body.wishLists)
+        cy.setWishListItem(dataEnv, response.body.wishLists)
       })
     })
   })
@@ -65,7 +65,7 @@ export function updateMasterdata(data, env) {
       }).then(response => {
         expect(response.status).to.have.equal(201)
         expect(response.body).to.have.property('DocumentId')
-        cy.setWishlistItem(env, response.body.DocumentId)
+        cy.setWishListItem(env, response.body.DocumentId)
       })
     })
   })
@@ -75,7 +75,7 @@ export function deleteWishlistdata() {
   it('delete the wishlist data from the masterdata', updateRetry(3), () => {
     cy.addDelayBetweenRetries(2000)
     cy.getVtexItems().then(vtex => {
-      cy.getWishlistItems().then(wishListId => {
+      cy.getWishListItem().then(wishListId => {
         const documentId = wishListId.wishlistdata
         cy.request({
           method: 'DELETE',

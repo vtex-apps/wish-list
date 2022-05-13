@@ -10,7 +10,7 @@ describe('Testing Single Product and total amounts', () => {
   // Load test setup
   testSetup(false)
 
-  it('Add product to wish list', updateRetry(2), () => {
+  it('Add product to wish list', updateRetry(3), () => {
     cy.openStoreFront()
     cy.addProductToWishList(wishlistProducts.onion.link, true)
   })
