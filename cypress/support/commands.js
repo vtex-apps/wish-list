@@ -97,6 +97,14 @@ Cypress.Commands.add('verifyWishlistProduct', productLink => {
   ).should('exist')
 })
 
+Cypress.Commands.add('verifyProductInWishList', productLink => {
+  cy.visit('/wishlist')
+  cy.get(
+    `${wishListSelectors.ProductSummaryContainer} > a[href="${productLink}"]`,
+    { timeout: 40000 }
+  ).should('exist')
+})
+
 Cypress.Commands.add('addDelayBetweenRetries', delay => {
   if (cy.state('runnable')._currentRetry > 0) cy.wait(delay)
 })

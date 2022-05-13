@@ -27,11 +27,7 @@ describe('Testing Single Product and total amounts', () => {
     'Verify we are able to see wishlist in /wishlist page',
     updateRetry(3),
     () => {
-      cy.visit('/wishlist')
-      cy.get(
-        `${wishListSelectors.ProductSummaryContainer} > a[href="${wishlistProducts.onion.link}"]`,
-        { timeout: 40000 }
-      ).should('exist')
+      cy.verifyProductInWishList()
     }
   )
 
