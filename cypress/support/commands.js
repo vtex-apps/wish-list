@@ -51,10 +51,20 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
     file: fileName,
     sheet: 'Sheet1',
   }).then(rows => {
-    cy.writeFile(fixtureFile, { rows })
+    cy.writeFile(fixtureFile, rows)
   })
-  cy.fixture(fixtureFile).then(wishlistFixture => {
-    cy.log(wishlistFixture)
+  products.map(product => {
+    cy.fixture(fixtureFile).then(wishlistFixture => {
+      for (const list in wishlistFixture) {
+        cy.intercept('GET', '**/api', { fixture: fixtureFile })
+
+        cy.wrap(wishlistFixture[list])
+          .should('be.an', 'object')
+          .and('contain', {
+            title: product.name,
+          })
+      }
+    })
   })
 })
 
