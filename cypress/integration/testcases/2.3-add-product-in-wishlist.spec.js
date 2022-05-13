@@ -12,13 +12,7 @@ describe('Testing Single Product and total amounts', () => {
 
   it('Add product to wish list', updateRetry(2), () => {
     cy.openStoreFront()
-    cy.addProductToWishList(wishlistProducts.onion.link)
-  })
-
-  it('Login storefront', updateRetry(2), () => {
-    cy.getVtexItems().then(vtex => {
-      cy.loginStoreFrontAsUser(vtex.robotMail, vtex.robotPassword)
-    })
+    cy.addProductToWishList(wishlistProducts.onion.link, true)
   })
 
   it(
@@ -34,12 +28,10 @@ describe('Testing Single Product and total amounts', () => {
     updateRetry(3),
     () => {
       cy.visit('/wishlist')
-      cy.get(wishListSelectors.ProductSummaryContainer)
-        .should('exist')
-        .should('have.attr', 'href')
-        .then(href => {
-          cy.log(href)
-        })
+      cy.get(
+        `${wishListSelectors.ProductSummaryContainer} > a[href="${wishlistProducts.onion.link}"]`,
+        { timeout: 40000 }
+      ).should('exist')
     }
   )
 

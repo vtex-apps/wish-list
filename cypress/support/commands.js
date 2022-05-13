@@ -23,13 +23,16 @@ Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
     .click()
 
   // eslint-disable-next-line vtex/prefer-early-return
-  if (!login) {
+  if (login) {
     cy.get(selectors.ToastMsgInB2B, { timeout: 5000 })
       // .should('be.visible')
       .contains('You need to login')
     cy.get(wishListSelectors.ToastButton)
       .should('be.visible')
       .click()
+    cy.getVtexItems().then(vtex => {
+      cy.loginStoreFrontAsUser(vtex.robotMail, vtex.robotPassword)
+    })
   }
 })
 

@@ -16,13 +16,7 @@ describe('Download wishlist csv and verify data', () => {
 
   it('Add product to wish list', updateRetry(3), () => {
     cy.openStoreFront()
-    cy.addProductToWishList(wishlistProducts.cauliflower.link)
-  })
-
-  it('Login storefront', updateRetry(2), () => {
-    cy.getVtexItems().then(vtex => {
-      cy.loginStoreFrontAsUser(vtex.robotMail, vtex.robotPassword)
-    })
+    cy.addProductToWishList(wishlistProducts.cauliflower.link, true)
   })
 
   it(
@@ -32,7 +26,7 @@ describe('Download wishlist csv and verify data', () => {
       cy.get(selectors.ProfileLabel)
         .should('be.visible')
         .should('have.contain', `Hello,`)
-      cy.addProductToWishList(wishlistProducts.coconut.link, true)
+      cy.addProductToWishList(wishlistProducts.coconut.link)
       cy.get(selectors.ToastMsgInB2B, { timeout: 50000 })
         // .should('be.visible')
         .contains('Product added')
