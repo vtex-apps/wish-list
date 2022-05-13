@@ -4,14 +4,13 @@ import {
   updateRetry,
   preserveCookie,
 } from '../../support/common/support'
-import wishListSelectors from '../../support/wish-list-selectors'
 import { downloadWishlistFile } from '../../support/wishlist'
 import wishlistProducts from '../../support/wishlistProducts'
 
 const fileName = 'cypress/downloads/wishlists.xls'
 const fixtureFile = 'cypress/fixtures/wishlistData.json'
 
-describe('Testing Single Product and total amounts', () => {
+describe('Download wishlist csv and verify data', () => {
   // Load test setup
   testSetup(false)
 
