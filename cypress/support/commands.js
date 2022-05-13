@@ -1,16 +1,42 @@
-import selectors from './common/selectors'
+// ***********************************************
+// This example commands.js shows you how to
+// create various custom commands and overwrite
+// existing commands.
+//
+// For more comprehensive examples of custom
+// commands please read more here:
+// https://on.cypress.io/custom-commands
+// ***********************************************
+//
+//
+// -- This is a parent command --
+// Cypress.Commands.add('login', (email, password) => { ... })
+//
+//
+// -- This is a child command --
+// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
+//
+//
+// -- This is a dual command --
+// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
+//
+//
+// -- This will overwrite an existing command --
+// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('openStoreFront', (login = false) => {
-  cy.intercept('**/rc.vtex.com.br/api/events').as('events')
-  cy.visit('/')
-  cy.wait('@events')
-  if (login === true) {
-    cy.get(selectors.ProfileLabel, { timeout: 20000 })
-      .should('be.visible')
-      .should('have.contain', `Hello,`)
-  }
+const wishlistJson = '.wishlist.json'
+
+// Save orders
+Cypress.Commands.add('setWishlistItem', (wishlistItem, wishlistValue) => {
+  cy.readFile(wishlistJson).then((items) => {
+    items[wishlistItem] = wishlistValue
+    cy.writeFile(wishlistJson, items)
+  })
 })
 
-Cypress.Commands.add('parseXlsx', inputFile => {
-  return cy.task('parseXlsx', { filePath: inputFile })
+// Get orders
+Cypress.Commands.add('getWishlistItems', () => {
+  cy.readFile(wishlistJson).then((items) => {
+    return items
+  })
 })

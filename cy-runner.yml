@@ -10,8 +10,8 @@ base:
     vtexIdUrl: https://vtexid.vtex.com.br/api/vtexid/pub/authenticate/default
     deployCli:
       # using robot Mail, we are not able to link wish-list app
-      # deployCli is disabled for now. 
-      # So, before testing wishlist app ensure you are logged in to vtex account using your mail 
+      # deployCli is disabled for now.
+      # So, before testing wishlist app ensure you are logged in to vtex account using your mail
       # Command to check: vtex whoami
       enabled: false
       git: https://github.com/vtex/toolbelt.git
@@ -50,13 +50,13 @@ base:
   stateFiles: [.wishlist.json]
 
 workspace:
-  name: random
+  name: syedwish2
   prefix: wishlist
   linkApp:
     enabled: true
     logOutput:
       enabled: false
-  installApps: 
+  installApps:
     # wish-list theme will work only when its peer dependency wish-list is added in the workspace
     # So, installing wish-list@1.x version
     - vtex.wish-list@1.x
@@ -66,8 +66,8 @@ workspace:
   wipe:
     enabled: true
     stopOnFail: false
-    specs: 
-    - cypress/integration/wipe.spec.js
+    specs:
+      - cypress/integration/wipe.spec.js
   teardown:
     enabled: true
 

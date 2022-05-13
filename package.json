@@ -31,6 +31,7 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
+    "cypress": "9.6.0",
     "node-xlsx": "^0.21.0",
     "vtex": "^3.0.0"
   }
