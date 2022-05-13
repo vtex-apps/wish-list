@@ -4,5 +4,7 @@ export default {
   LoginEmail: '.vtex-login-2-x-inputContainerEmail input[type=text]',
   LoginPassword: '.vtex-login-2-x-inputContainerPassword input[type=password]',
   LoginButton: '.vtex-login-2-x-sendButton > button',
-  ProductSummaryContainer: '.vtex-product-summary-2-x-container > a',
+  ProductSummaryContainer: '.vtex-product-summary-2-x-container',
+  AccounPage: '.vtex-account__page',
+  WishlistDownloadButton: '.layout__container button'
 }

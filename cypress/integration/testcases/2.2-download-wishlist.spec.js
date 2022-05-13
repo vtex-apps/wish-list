@@ -5,81 +5,50 @@ import {
   preserveCookie,
 } from '../../support/common/support'
 import wishListSelectors from '../../support/wish-list-selectors'
+import { downloadWishlistFile } from '../../support/wishlist'
+import wishlistProducts from '../../support/wishlistProducts'
 
-const fileName = '../../../../downloads/wishlists.xls'
+const fileName = 'cypress/downloads/wishlists.xls'
+const fixtureFile = 'cypress/fixtures/wishlistData.json'
 
 describe('Testing Single Product and total amounts', () => {
   // Load test setup
   testSetup(false)
 
-  it('Open storefront', updateRetry(3), () => {
+  it('Add product to wish list', updateRetry(3), () => {
     cy.openStoreFront()
-  })
-
-  it('Add product to wish list', updateRetry(4), () => {
-    cy.get(`a[href="/cauliflower-fresh/p"] ${wishListSelectors.WishListIcon}`)
-      .should('be.visible')
-      .eq(0)
-      .click()
-    cy.get(selectors.ToastMsgInB2B, { timeout: 5000 })
-      // .should('be.visible')
-      .contains('You need to login')
-    cy.get(wishListSelectors.ToastButton)
-      .should('be.visible')
-      .click()
+    cy.addProductToWishList(wishlistProducts.cauliflower.link)
   })
 
   it('Login storefront', updateRetry(2), () => {
-    cy.get(wishListSelectors.LoginEmail)
-      .should('be.visible')
-      .clear()
-      .type('robot.partnerhere@gmail.com')
-    cy.get(wishListSelectors.LoginPassword)
-      .should('be.visible')
-      .clear()
-      .type('!Q2w#E4r%T6y&U')
-
-    cy.get(wishListSelectors.LoginButton).click()
+    cy.getVtexItems().then(vtex => {
+      cy.loginStoreFrontAsUser(vtex.robotMail, vtex.robotPassword)
+    })
   })
 
   it(
-    'Verify we are able to see wishlist section and its product',
-    updateRetry(5),
+    'Add another product to wishlist and verify we are able to see wishlist section and its product',
+    updateRetry(3),
     () => {
       cy.get(selectors.ProfileLabel)
         .should('be.visible')
         .should('have.contain', `Hello,`)
-      cy.get(selectors.ToastMsgInB2B, { timeout: 5000 })
+      cy.addProductToWishList(wishlistProducts.coconut.link, true)
+      cy.get(selectors.ToastMsgInB2B, { timeout: 50000 })
         // .should('be.visible')
         .contains('Product added')
     }
   )
 
-  it('Open admin dashboard wishlist', updateRetry(3), () => {
-    cy.visit('admin/app/wishlist')
+  downloadWishlistFile()
+
+  it('Verify wishlist data', updateRetry(2), () => {
+    cy.verifyExcelFile(fileName, fixtureFile)
   })
 
-  it('Download wishlist file', updateRetry(4), () => {
-    cy.getVtexItems().then(vtex => {
-      cy.intercept('GET', `${vtex.baseUrl}/_v/wishlist/export-lists`).as(
-        'Export'
-      )
-      cy.get('.layout__container button')
-        .should('be.visible')
-        .click()
-      cy.wait('@Export', { timeout: 40000 })
-    })
-  })
-
-  it('Verify wishlist data', updateRetry(4), () => {
-    cy.task('readXlsx', {
-      file: fileName,
-      sheet: 'Sheet1',
-    }).then(rows => {
-      cy.log(rows.length)
-      cy.writeFile('cypress/fixtures/xlsxData.json', { rows })
-    })
+  it('Deleting files', () => {
     cy.task('deleteFile', { fileName })
+    cy.task('deleteFile', { fileName: fixtureFile })
   })
 
   preserveCookie()

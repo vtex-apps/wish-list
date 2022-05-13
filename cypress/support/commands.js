@@ -1,4 +1,5 @@
 import selectors from './common/selectors'
+import wishListSelectors from './wish-list-selectors'
 
 Cypress.Commands.add('openStoreFront', (login = false) => {
   cy.intercept('**/rc.vtex.com.br/api/events').as('events')
@@ -13,4 +14,69 @@ Cypress.Commands.add('openStoreFront', (login = false) => {
 
 Cypress.Commands.add('parseXlsx', inputFile => {
   return cy.task('parseXlsx', { filePath: inputFile })
+})
+
+Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
+  cy.get(`a[href="${productLink}"] ${wishListSelectors.WishListIcon}`)
+    .should('be.visible')
+    .click()
+
+  // eslint-disable-next-line vtex/prefer-early-return
+  if (!login) {
+    cy.get(selectors.ToastMsgInB2B, { timeout: 5000 })
+      // .should('be.visible')
+      .contains('You need to login')
+    cy.get(wishListSelectors.ToastButton)
+      .should('be.visible')
+      .click()
+  }
+})
+
+Cypress.Commands.add('loginStoreFrontAsUser', (email, password) => {
+  cy.get(wishListSelectors.LoginEmail)
+    .should('be.visible')
+    .clear()
+    .type(email)
+  cy.get(wishListSelectors.LoginPassword)
+    .should('be.visible')
+    .clear()
+    .type(password)
+
+  cy.get(wishListSelectors.LoginButton).click()
+})
+
+Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile) => {
+  cy.task('readXlsx', {
+    file: fileName,
+    sheet: 'Sheet1',
+  }).then(rows => {
+    cy.log(rows.length)
+    cy.writeFile(fixtureFile, { rows })
+  })
+})
+
+Cypress.Commands.add('verifyWishlistProduct', productLink => {
+  cy.get(selectors.ProfileLabel)
+    .should('be.visible')
+    .should('have.contain', `Hello,`)
+  cy.get(selectors.ToastMsgInB2B, { timeout: 50000 })
+    // .should('be.visible')
+    .contains('Product added')
+  cy.get(wishListSelectors.ToastButton)
+    .should('be.visible')
+    .click()
+  cy.getVtexItems().then(vtex => {
+    cy.intercept('POST', `${vtex.baseUrl}/**`, req => {
+      if (req.body.operationName === 'ViewLists') {
+        req.continue()
+      }
+    }).as('ViewList')
+    cy.get(wishListSelectors.AccounPage, { timeout: 50000 }).should(
+      'be.visible'
+    )
+    cy.wait('@ViewList', { timeout: 40000 })
+  })
+  cy.get(
+    `${wishListSelectors.ProductSummaryContainer} > a[href="${productLink}"]`
+  ).should('exist')
 })
