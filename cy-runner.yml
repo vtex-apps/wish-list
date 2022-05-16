@@ -62,9 +62,10 @@ workspace:
     - vtex.wish-list@1.x
     # Published a new theme for wishlist E2E test
     - vtex.wishlist-qa-theme
-  removeApps: []
+  removeApps: 
+   - vtex.bitcot-qa-theme
   wipe:
-    enabled: true
+    enabled: false
     stopOnFail: false
     specs: 
     - cypress/integration/wipe.spec.js
@@ -74,7 +75,7 @@ workspace:
 strategy:
   # Clear reviews before testcase
   wipe:
-    enabled: true
+    enabled: false
     sendDashboard: false
     hardTries: 1
     stopOnFail: false
