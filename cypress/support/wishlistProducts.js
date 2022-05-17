@@ -15,4 +15,8 @@ export default {
     name: 'Whole Watermelon Mini Fresh',
     link: '/whole-watermelon-mini-fresh/p',
   },
+  orange:{
+    name:'Navel Oranges Grown Large Fresh Fruit',
+    link:'/navel-oranges-grown-large-fresh-fruit/p'
+  }
 }

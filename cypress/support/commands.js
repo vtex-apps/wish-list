@@ -42,6 +42,40 @@ Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
   }
 })
 
+Cypress.Commands.add('removeProductFromWishlist', productLink => {
+  cy.get(`a[href="${productLink}"] ${wishListSelectors.WishListIcon}`)
+    .should('be.visible')
+    .click()
+})
+
+Cypress.Commands.add('addWishListItem',(searchKey,link) =>{
+    cy.get(selectors.Search)
+      .should('be.visible')
+      .clear()
+      .type(searchKey)
+      .type('{enter}')
+    // Page should load successfully now searchResult & Filter should be visible
+    cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
+    cy.get(selectors.FilterHeading).should('be.visible')
+
+    cy.get(`a[href="${link}"]`)
+      .should('be.visible')
+      .click({ multiple: true })
+
+    cy.get(wishListSelectors.WishListIcon)
+      .should('be.visible')
+      .click({ multiple: true })
+})
+
+Cypress.Commands.add('addProductFromProductSpecification', productLink => {
+  cy.get(`a[href="${productLink}"]`)
+    .should('be.visible')
+    .click()
+  cy.get(wishListSelectors.WishListIcon)
+    .should('be.visible')
+    .click()
+})
+
 Cypress.Commands.add('loginStoreFrontAsUser', (email, password) => {
   cy.get(wishListSelectors.LoginEmail)
     .should('be.visible')
@@ -77,11 +111,12 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
   })
 })
 
-Cypress.Commands.add('verifyWishlistProduct', productLink => {
+Cypress.Commands.add('verifyWishlistProduct', (productLink, login = false) => {
   cy.get(selectors.ProfileLabel)
     .should('be.visible')
     .should('have.contain', `Hello,`)
-  cy.get(selectors.ToastMsgInB2B, { timeout: 50000 })
+
+  cy.get(selectors.ToastMsgInB2B, { timeout: 130000 })
     // .should('be.visible')
     .contains('Product added')
   cy.get(wishListSelectors.ToastButton)
