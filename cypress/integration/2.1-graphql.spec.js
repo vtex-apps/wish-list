@@ -14,42 +14,42 @@ import {
   listNames,
   addToList,
   removeFromList,
-} from '../../support/wishlist.graphql'
-import { testSetup } from '../../support/common/support'
-import { anonymousUser } from '../../support/wishlist.outputvalidation'
+} from '../support/graphql_testcase.js'
+import { testSetup, updateRetry } from '../support/common/support.js'
+import { anonymousUser } from '../support/outputvalidation.js'
 
 describe('Graphql queries', () => {
   testSetup(false)
-  it('addToList', () => {
+
+  it('addToList', updateRetry(3), () => {
     graphql(addToList(anonymousUser), response => {
-      validateaddToListResponse
-      expect(response.body.data.addToList).to.contain('1')
+      validateaddToListResponse(response)
       cy.setWishListItem('id', response.body.data.addToList)
     })
   })
 
-  it('Get Version', () => {
+  it('Get Version', updateRetry(3), () => {
     graphql(version(), validateGetVersionResponse)
   })
 
-  it('Get ViewList', () => {
+  it('Get ViewList', updateRetry(3), () => {
     graphql(viewList(), validateGetViewListResponse)
   })
 
-  it('Get All ViewList', () => {
+  it('Get All ViewList', updateRetry(3), () => {
     graphql(viewLists(), validateGetViewListsResponse)
   })
 
-  it('Get checkList', () => {
+  it('Get checkList', updateRetry(3), () => {
     graphql(checkList(), validateGetcheckListResponse)
   })
 
-  it('Get listNames', () => {
+  it('Get listNames', updateRetry(3), () => {
     graphql(listNames(), validateGetlistNamesResponse)
   })
 
-  it('removeFromList', () => {
-    cy.removeWishListItem().then(wishlistid => {
+  it('removeFromList', updateRetry(3), () => {
+    cy.getWishListItem().then(wishlistid => {
       graphql(removeFromList(wishlistid.id), validateRemoveFromListResponse)
     })
   })

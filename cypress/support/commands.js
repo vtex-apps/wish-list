@@ -1,17 +1,22 @@
-import selectors from './common/selectors'
-import wishListSelectors from './wish-list-selectors'
+import selectors from './common/selectors.js'
+import wishListSelectors from './selectors.js'
 
 const wishlistJson = '.wishlist.json'
+
+function scroll() {
+  // Page loads heart icon only on scroll
+  // So, scroll first then look for selectors
+  cy.scrollTo(0, 1000)
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1000)
+  cy.scrollTo(0, -100)
+}
 
 Cypress.Commands.add('openStoreFront', (login = false) => {
   cy.intercept('**/rc.vtex.com.br/api/events').as('events')
   cy.visit('/')
   cy.wait('@events')
-  // Page loads heart icon only on scroll
-  // So, scroll first then look for selectors
-  cy.scrollTo(0, 800)
-  cy.wait(1000)
-  cy.scrollTo(0, -200)
+  scroll()
   if (login === true) {
     cy.get(selectors.ProfileLabel, { timeout: 20000 })
       .should('be.visible')
@@ -23,11 +28,29 @@ Cypress.Commands.add('parseXlsx', inputFile => {
   return cy.task('parseXlsx', { filePath: inputFile })
 })
 
-Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
-  cy.get(`a[href="${productLink}"] ${wishListSelectors.WishListIcon}`)
-    .should('be.visible')
-    .click()
+function clickWishListIcon(productLink = '') {
+  cy.get(wishListSelectors.WishListContainer).should('be.visible')
+  if (productLink) {
+    cy.get(productLink).should('be.visible')
+  }
+  const wishListOutLineSelector = `${productLink} ${wishListSelectors.WishListOutLine}`
+  const wishListIconSelector = `${productLink} ${wishListSelectors.WishListIcon}`
+  const wishListFillSelector = `${productLink} ${wishListSelectors.WishListFill}`
 
+  cy.get('body').then($body => {
+    if ($body.find(wishListOutLineSelector).length) {
+      cy.get(wishListIconSelector)
+        .should('be.visible')
+        .click()
+    } else {
+      cy.get(wishListFillSelector).should('be.visible')
+      cy.log('Product already added to wishlist')
+    }
+  })
+}
+
+Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
+  clickWishListIcon(productLink)
   // eslint-disable-next-line vtex/prefer-early-return
   if (login) {
     cy.get(selectors.ToastMsgInB2B, { timeout: 5000 })
@@ -43,32 +66,32 @@ Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
 })
 
 Cypress.Commands.add('removeProductFromWishlist', productLink => {
-  cy.get(`a[href="${productLink}"] ${wishListSelectors.WishListIcon}`)
+  cy.get(`${productLink} ${wishListSelectors.WishListIcon}`)
     .should('be.visible')
     .click()
 })
 
-Cypress.Commands.add('addWishListItem',(searchKey,link) =>{
-    cy.get(selectors.Search)
-      .should('be.visible')
-      .clear()
-      .type(searchKey)
-      .type('{enter}')
-    // Page should load successfully now searchResult & Filter should be visible
-    cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
-    cy.get(selectors.FilterHeading).should('be.visible')
+Cypress.Commands.add('addWishListItem', (searchKey, link) => {
+  cy.get(selectors.Search)
+    .should('be.visible')
+    .clear()
+    .type(searchKey)
+    .type('{enter}')
+  // Page should load successfully now searchResult & Filter should be visible
+  cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
+  cy.get(selectors.FilterHeading).should('be.visible')
 
-    cy.get(`a[href="${link}"]`)
-      .should('be.visible')
-      .click({ multiple: true })
+  cy.get(link)
+    .should('be.visible')
+    .click({ multiple: true })
 
-    cy.get(wishListSelectors.WishListIcon)
-      .should('be.visible')
-      .click({ multiple: true })
+  cy.get(wishListSelectors.ThumbnailSwiper).should('be.visible')
+
+  clickWishListIcon()
 })
 
 Cypress.Commands.add('addProductFromProductSpecification', productLink => {
-  cy.get(`a[href="${productLink}"]`)
+  cy.get(productLink)
     .should('be.visible')
     .click()
   cy.get(wishListSelectors.WishListIcon)
@@ -96,11 +119,11 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
   }).then(rows => {
     cy.writeFile(fixtureFile, rows)
   })
+  // eslint-disable-next-line array-callback-return
   products.map(product => {
     cy.fixture(fixtureFile).then(wishlistFixture => {
       for (const list in wishlistFixture) {
         cy.intercept('GET', '**/api', { fixture: fixtureFile })
-
         cy.wrap(wishlistFixture[list])
           .should('be.an', 'object')
           .and('contain', {
@@ -111,11 +134,12 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
   })
 })
 
-Cypress.Commands.add('verifyWishlistProduct', (productLink, login = false) => {
+Cypress.Commands.add('verifyWishlistProduct', productLink => {
   cy.get(selectors.ProfileLabel)
     .should('be.visible')
     .should('have.contain', `Hello,`)
 
+  scroll()
   cy.get(selectors.ToastMsgInB2B, { timeout: 130000 })
     // .should('be.visible')
     .contains('Product added')
@@ -134,16 +158,14 @@ Cypress.Commands.add('verifyWishlistProduct', (productLink, login = false) => {
     cy.wait('@ViewList', { timeout: 40000 })
   })
   cy.get(
-    `${wishListSelectors.ProductSummaryContainer} > a[href="${productLink}"]`
+    `${wishListSelectors.ProductSummaryContainer} > ${productLink}`
   ).should('exist')
 })
 
 Cypress.Commands.add('verifyProductInWishList', productLink => {
-  cy.visit('/wishlist')
-  cy.get(
-    `${wishListSelectors.ProductSummaryContainer} > a[href="${productLink}"]`,
-    { timeout: 40000 }
-  ).should('exist')
+  cy.get(`${wishListSelectors.ProductSummaryContainer} > ${productLink}`, {
+    timeout: 40000,
+  }).should('exist')
 })
 
 Cypress.Commands.add('addDelayBetweenRetries', delay => {
@@ -160,12 +182,6 @@ Cypress.Commands.add('setWishListItem', (wishlistItem, wishlistValue) => {
 
 // Get wishlists
 Cypress.Commands.add('getWishListItem', () => {
-  cy.readFile(wishlistJson).then(items => {
-    return items
-  })
-})
-
-Cypress.Commands.add('removeWishListItem', () => {
   cy.readFile(wishlistJson).then(items => {
     return items
   })

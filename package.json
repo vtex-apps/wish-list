@@ -27,12 +27,11 @@
     "eslint-config-vtex-react": "^6.2.1",
     "husky": "^4.2.0",
     "lint-staged": "^10.0.2",
+    "node-xlsx": "^0.21.0",
     "prettier": "^1.19.1",
     "typescript": "^3.7.5"
   },
   "dependencies": {
-    "cypress": "^9.6.1",
-    "node-xlsx": "^0.21.0",
     "vtex": "^3.0.0"
   }
 }
