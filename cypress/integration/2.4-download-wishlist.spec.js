@@ -2,9 +2,9 @@ import {
   testSetup,
   updateRetry,
   preserveCookie,
-} from '../../support/common/support'
-import { downloadWishlistFile } from '../../support/wishlist'
-import wishlistProducts from '../../support/wishlistProducts'
+} from '../support/common/support'
+import { downloadWishlistFile } from '../support/wishlist'
+import wishlistProducts from '../support/wishlistProducts'
 
 const fileName = 'cypress/downloads/wishlists.xls'
 const fixtureFileName = 'wishlistData.json'
