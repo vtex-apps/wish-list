@@ -6,7 +6,7 @@ import {
   wishlistEmailAPI,
   updateWishlistAPI,
   deleteWishlistAPI,
-} from '../support/product.apis'
+} from './product.apis'
 
 export function readWishListSchema() {
   it(`Read Wishlist Schema`, updateRetry(3), () => {
@@ -37,7 +37,7 @@ export function readwishlistByEmail(data) {
   it('read the wishlist data by using email', updateRetry(3), () => {
     cy.addDelayBetweenRetries(2000)
     cy.getVtexItems().then(vtex => {
-      const email = data.email
+      const { email } = data
       cy.getAPI(wishlistEmailAPI(vtex.baseUrl, email)).then(response => {
         expect(response.status).to.have.equal(200)
         expect(response.body).to.have.length(1)

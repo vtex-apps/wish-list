@@ -1,5 +1,7 @@
-import { FAIL_ON_STATUS_CODE } from '../support/common/constants'
+import { FAIL_ON_STATUS_CODE } from './common/constants.js'
+
 const path = require('path')
+
 const config = Cypress.env()
 
 // Constants
