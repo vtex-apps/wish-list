@@ -1,5 +1,6 @@
 export default {
-  WishListIcon: '.vtex-wish-list-1-x-wishlistIconContainer > button ',
+  WishListContainer: 'div[class*=wishlistIconContainer]',
+  WishListIcon: '.vtex-wish-list-1-x-wishlistIconContainer > button',
   ToastButton: '.vtex-toast-container button',
   LoginEmail: '.vtex-login-2-x-inputContainerEmail input[type=text]',
   LoginPassword: '.vtex-login-2-x-inputContainerPassword input[type=password]',
@@ -11,4 +12,7 @@ export default {
   AccountLoginButton: '.vtex-login-2-x-button',
   wishListSection: ':nth-child(6) > .vtex-account_menu-link',
   CloseToast: '.vtex-alert__close-icon',
+  WishListOutLine: 'span[class*=outline]',
+  WishListFill: 'span[class*=fill]',
+  ThumbnailSwiper: '[data-testid=thumbnail-swiper]',
 }

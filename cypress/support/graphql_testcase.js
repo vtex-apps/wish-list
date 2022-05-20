@@ -1,4 +1,4 @@
-import { FAIL_ON_STATUS_CODE } from './common/constants.js'
+import { FAIL_ON_STATUS_CODE } from './common/constants'
 
 const path = require('path')
 

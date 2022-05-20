@@ -1,5 +1,5 @@
 import { updateRetry } from './common/support'
-import wishListSelectors from './wish-list-selectors'
+import wishListSelectors from './selectors.js'
 
 export function downloadWishlistFile() {
   it(
