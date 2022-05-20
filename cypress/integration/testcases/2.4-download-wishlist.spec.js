@@ -8,7 +8,10 @@ import { downloadWishlistFile } from '../../support/wishlist'
 import wishlistProducts from '../../support/wishlistProducts'
 
 const fileName = 'cypress/downloads/wishlists.xls'
-const fixtureFile = 'cypress/fixtures/wishlistData.json'
+const fixtureFileName = 'wishlistData.json'
+const fixtureFilePath = 'cypress/fixtures/wishlistData.json'
+
+const products = [wishlistProducts.cauliflower, wishlistProducts.coconut]
 
 describe('Download wishlist csv and verify data', () => {
   // Load test setup
@@ -36,12 +39,12 @@ describe('Download wishlist csv and verify data', () => {
   downloadWishlistFile()
 
   it('Verify wishlist data', updateRetry(2), () => {
-    cy.verifyExcelFile(fileName, fixtureFile)
+    cy.verifyExcelFile(fileName, fixtureFileName, products)
   })
 
   it('Deleting files', () => {
     cy.task('deleteFile', { fileName })
-    cy.task('deleteFile', { fileName: fixtureFile })
+    cy.task('deleteFile', { fileName: fixtureFilePath })
   })
 
   preserveCookie()

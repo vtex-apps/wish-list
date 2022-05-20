@@ -3,7 +3,6 @@ import {
   updateRetry,
   preserveCookie,
 } from '../../support/common/support'
-import wishListSelectors from '../../support/wish-list-selectors'
 import wishlistProducts from '../../support/wishlistProducts'
 
 describe('Testing Single Product and total amounts', () => {
@@ -27,7 +26,7 @@ describe('Testing Single Product and total amounts', () => {
     'Verify we are able to see wishlist in /wishlist page',
     updateRetry(3),
     () => {
-      cy.verifyProductInWishList()
+      cy.verifyProductInWishList(wishlistProducts.onion.link)
     }
   )
 

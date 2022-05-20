@@ -10,7 +10,7 @@ Cypress.Commands.add('openStoreFront', (login = false) => {
   // Page loads heart icon only on scroll
   // So, scroll first then look for selectors
   cy.scrollTo(0, 800)
-  cy.wait(1000)
+  // cy.wait(1000)
   cy.scrollTo(0, -200)
   if (login === true) {
     cy.get(selectors.ProfileLabel, { timeout: 20000 })
@@ -24,13 +24,19 @@ Cypress.Commands.add('parseXlsx', inputFile => {
 })
 
 Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
+  if (!login) {
+    cy.get(selectors.ToastMsgInB2B, { timeout: 50000 }).contains(
+      'Product added to the list'
+    )
+    cy.get(wishListSelectors.CloseToast).click()
+  }
   cy.get(`a[href="${productLink}"] ${wishListSelectors.WishListIcon}`)
     .should('be.visible')
     .click()
 
   // eslint-disable-next-line vtex/prefer-early-return
   if (login) {
-    cy.get(selectors.ToastMsgInB2B, { timeout: 5000 })
+    cy.get(selectors.ToastMsgInB2B, { timeout: 50000 })
       // .should('be.visible')
       .contains('You need to login')
     cy.get(wishListSelectors.ToastButton)
@@ -48,23 +54,23 @@ Cypress.Commands.add('removeProductFromWishlist', productLink => {
     .click()
 })
 
-Cypress.Commands.add('addWishListItem',(searchKey,link) =>{
-    cy.get(selectors.Search)
-      .should('be.visible')
-      .clear()
-      .type(searchKey)
-      .type('{enter}')
-    // Page should load successfully now searchResult & Filter should be visible
-    cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
-    cy.get(selectors.FilterHeading).should('be.visible')
+Cypress.Commands.add('addWishListItem', (searchKey, link) => {
+  cy.get(selectors.Search)
+    .should('be.visible')
+    .clear()
+    .type(searchKey)
+    .type('{enter}')
+  // Page should load successfully now searchResult & Filter should be visible
+  cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
+  cy.get(selectors.FilterHeading).should('be.visible')
 
-    cy.get(`a[href="${link}"]`)
-      .should('be.visible')
-      .click({ multiple: true })
+  cy.get(`a[href="${link}"]`)
+    .should('be.visible')
+    .click({ multiple: true })
 
-    cy.get(wishListSelectors.WishListIcon)
-      .should('be.visible')
-      .click({ multiple: true })
+  cy.get(wishListSelectors.WishListIcon)
+    .should('be.visible')
+    .click({ multiple: true })
 })
 
 Cypress.Commands.add('addProductFromProductSpecification', productLink => {
@@ -94,24 +100,22 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
     file: fileName,
     sheet: 'Sheet1',
   }).then(rows => {
-    cy.writeFile(fixtureFile, rows)
+    cy.writeFile(`cypress/fixtures/${fixtureFile}`, rows)
   })
+  // eslint-disable-next-line array-callback-return
   products.map(product => {
-    cy.fixture(fixtureFile).then(wishlistFixture => {
-      for (const list in wishlistFixture) {
-        cy.intercept('GET', '**/api', { fixture: fixtureFile })
-
-        cy.wrap(wishlistFixture[list])
-          .should('be.an', 'object')
-          .and('contain', {
-            title: product.name,
-          })
-      }
+    cy.log(product)
+    cy.fixture(fixtureFile).then(fixtureData => {
+      cy.intercept('GET', '**/api', { fixture: fixtureFile })
+      const filterProducts = fixtureData.filter(
+        list => list.Title === product.name
+      )
+      expect(filterProducts.length).to.be.equal(1)
     })
   })
 })
 
-Cypress.Commands.add('verifyWishlistProduct', (productLink, login = false) => {
+Cypress.Commands.add('verifyWishlistProduct', productLink => {
   cy.get(selectors.ProfileLabel)
     .should('be.visible')
     .should('have.contain', `Hello,`)

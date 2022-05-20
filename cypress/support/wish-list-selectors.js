@@ -7,9 +7,8 @@ export default {
   ProductSummaryContainer: '.vtex-product-summary-2-x-container',
   AccounPage: '.vtex-account__page',
   WishlistDownloadButton: '.layout__container button',
-  RelativeButton:'.div.relative > .vtex-button',
-  AccountLoginButton:'.vtex-login-2-x-button',
-  wishListSection:':nth-child(6) > .vtex-account_menu-link'
-
-
+  RelativeButton: '.div.relative > .vtex-button',
+  AccountLoginButton: '.vtex-login-2-x-button',
+  wishListSection: ':nth-child(6) > .vtex-account_menu-link',
+  CloseToast: '.vtex-alert__close-icon',
 }
