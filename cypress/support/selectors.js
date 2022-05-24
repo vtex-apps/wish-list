@@ -1,6 +1,6 @@
 export default {
   WishListContainer: 'div[class*=wishlistIconContainer]',
-  WishListIcon: '.vtex-wish-list-1-x-wishlistIconContainer > button',
+  WishListIcon: 'div[class*=wishlistIconContainer] > button',
   ToastButton: '.vtex-toast-container button',
   LoginEmail: '.vtex-login-2-x-inputContainerEmail input[type=text]',
   LoginPassword: '.vtex-login-2-x-inputContainerPassword input[type=password]',

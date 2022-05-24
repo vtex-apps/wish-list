@@ -19,5 +19,9 @@ export default {
       emailId: EMAIL_IDS[0],
       IsPublic: true,
     },
+    orderProduct: {
+      prefix: 'orderProduct',
+      postalCode: '33180',
+    },
   },
 }

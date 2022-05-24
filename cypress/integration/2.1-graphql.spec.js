@@ -21,10 +21,9 @@ import { anonymousUser } from '../support/outputvalidation.js'
 describe('Graphql queries', () => {
   testSetup(false)
 
-  it('addToList', () => {
+  it('addToList', updateRetry(3), () => {
     graphql(addToList(anonymousUser), response => {
-      validateaddToListResponse
-      // expect(response.body.data.addToList).to.contain('1')
+      validateaddToListResponse(response)
       cy.setWishListItem('id', response.body.data.addToList)
     })
   })

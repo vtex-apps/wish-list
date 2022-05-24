@@ -1,16 +1,8 @@
 import selectors from './common/selectors.js'
 import wishListSelectors from './selectors.js'
+import { scroll } from './utils.js'
 
 const wishlistJson = '.wishlist.json'
-
-function scroll() {
-  // Page loads heart icon only on scroll
-  // So, scroll first then look for selectors
-  cy.scrollTo(0, 1000)
-  // eslint-disable-next-line cypress/no-unnecessary-waiting
-  cy.wait(1000)
-  cy.scrollTo(0, -100)
-}
 
 Cypress.Commands.add('openStoreFront', (login = false) => {
   cy.intercept('**/rc.vtex.com.br/api/events').as('events')
@@ -28,7 +20,7 @@ Cypress.Commands.add('parseXlsx', inputFile => {
   return cy.task('parseXlsx', { filePath: inputFile })
 })
 
-function clickWishListIcon(productLink = '') {
+function clickWishListIcon(productLink = '', login = '') {
   cy.get(wishListSelectors.WishListContainer).should('be.visible')
   if (productLink) {
     cy.get(productLink).should('be.visible')
@@ -42,6 +34,14 @@ function clickWishListIcon(productLink = '') {
       cy.get(wishListIconSelector)
         .should('be.visible')
         .click()
+      cy.get(wishListSelectors.ToastButton, { timeout: 15000 }).should(
+        'be.visible'
+      )
+      if (!login) {
+        cy.get('div[class*=close-icon]', { timeout: 5000 })
+          .should('be.visible')
+          .click()
+      }
     } else {
       cy.get(wishListFillSelector).should('be.visible')
       cy.log('Product already added to wishlist')
@@ -50,18 +50,21 @@ function clickWishListIcon(productLink = '') {
 }
 
 Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
-  clickWishListIcon(productLink)
+  clickWishListIcon(productLink, login)
   // eslint-disable-next-line vtex/prefer-early-return
   if (login) {
-    cy.get(selectors.ToastMsgInB2B, { timeout: 50000 })
-      // .should('be.visible')
-      .contains('You need to login')
+    cy.get(selectors.ToastMsgInB2B, { timeout: 15000 }).contains(
+      'You need to login'
+    )
     cy.get(wishListSelectors.ToastButton)
       .should('be.visible')
       .click()
     cy.getVtexItems().then(vtex => {
       cy.loginStoreFrontAsUser(vtex.robotMail, vtex.robotPassword)
     })
+    cy.get(selectors.ProfileLabel)
+      .should('be.visible')
+      .should('have.contain', `Hello,`)
   }
 })
 
@@ -124,7 +127,7 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
     cy.fixture(fixtureFile).then(fixtureData => {
       cy.intercept('GET', '**/api', { fixture: fixtureFile })
       const filterProducts = fixtureData.filter(
-        list => list.Title === product.name
+        list => list.Title === product.title
       )
       expect(filterProducts.length).to.be.equal(1)
     })
@@ -137,9 +140,7 @@ Cypress.Commands.add('verifyWishlistProduct', productLink => {
     .should('have.contain', `Hello,`)
 
   scroll()
-  cy.get(selectors.ToastMsgInB2B, { timeout: 130000 })
-    // .should('be.visible')
-    .contains('Product added')
+  cy.get(selectors.ToastMsgInB2B, { timeout: 60000 }).contains('Product added')
   cy.get(wishListSelectors.ToastButton)
     .should('be.visible')
     .click()
@@ -181,5 +182,20 @@ Cypress.Commands.add('setWishListItem', (wishlistItem, wishlistValue) => {
 Cypress.Commands.add('getWishListItem', () => {
   cy.readFile(wishlistJson).then(items => {
     return items
+  })
+})
+
+Cypress.Commands.add('waitForGraphql', (operationName, selector = null) => {
+  cy.getVtexItems().then(vtex => {
+    cy.intercept('POST', `${vtex.baseUrl}/**`, req => {
+      if (req.body.operationName === operationName) {
+        req.continue()
+      }
+    }).as(operationName)
+    if (selector)
+      cy.get(selector)
+        .last()
+        .click()
+    cy.wait(`@${operationName}`, { timeout: 40000 })
   })
 })

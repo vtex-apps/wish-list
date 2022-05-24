@@ -10,7 +10,13 @@ const fileName = 'cypress/downloads/wishlists.xls'
 const fixtureFileName = 'wishlistData.json'
 const fixtureFilePath = 'cypress/fixtures/wishlistData.json'
 
-const products = [wishlistProducts.cauliflower, wishlistProducts.coconut]
+const products = [
+  wishlistProducts.onion,
+  wishlistProducts.orange,
+  wishlistProducts.watermelon,
+  wishlistProducts.coconut,
+  wishlistProducts.irobot,
+]
 
 describe('Download wishlist csv and verify data', () => {
   // Load test setup
