@@ -57,7 +57,7 @@ workspace:
     # So, installing wish-list@1.x version
     - vtex.wish-list@1.x
     # Published a new theme for wishlist E2E test
-    - vtex.wishlist-qa-theme
+    - vtex.wishlist-qa-theme@0.0.2
   removeApps: 
    - vtex.bitcot-qa-theme
   wipe:

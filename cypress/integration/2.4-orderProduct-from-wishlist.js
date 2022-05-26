@@ -17,22 +17,22 @@ describe('Testing Order Product from wishlist', () => {
 
   const { prefix } = orderProduct
 
-  it(`In ${prefix} - Add product to wish list`, updateRetry(2), () => {
+  it(`${prefix} - Add product to wish list`, updateRetry(2), () => {
     cy.searchProduct(wishlistProducts.irobot.name)
   })
 
-  it(`In ${prefix} - Add product to cart & checkout`, updateRetry(2), () => {
+  it(`${prefix} - Add product to cart & checkout`, updateRetry(2), () => {
     addToWishList(wishlistProducts.irobot.name, wishlistProducts.irobot.link)
     addToCart(wishlistProducts.irobot.link)
   })
 
-  it(`In ${prefix} - Updating Shipping Information`, updateRetry(3), () => {
+  it(`${prefix} - Updating Shipping Information`, updateRetry(3), () => {
     // Update Shipping Section
     cy.get(selectors.CartTimeline).click({ force: true })
     cy.updateShippingInformation(orderProduct)
   })
 
-  it(`In ${prefix} - Ordering the product`, updateRetry(1), () => {
+  it(`${prefix} - Ordering the product`, updateRetry(1), () => {
     promissoryPayment()
     buyProduct()
     saveOrderId()
