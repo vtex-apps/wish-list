@@ -39,9 +39,6 @@ function clickWishListIcon(productLink = '', login = '') {
         cy.get(selectors.ToastMsgInB2B, { timeout: 10000 })
           .contains('added')
           .should('be.visible')
-        cy.get('div[class*=close-icon]', { timeout: 5000 })
-          .should('be.visible')
-          .click()
       } else {
         cy.get(selectors.ToastMsgInB2B, { timeout: 10000 })
           .contains('login')
@@ -188,6 +185,16 @@ Cypress.Commands.add('getWishListItem', () => {
 
 Cypress.Commands.add('visitWishlistPage', () => {
   cy.get(wishListSelectors.WishListMenu)
+    .should('be.visible')
+    .click()
+  cy.get(wishListSelectors.ProductSummaryContainer).should('be.visible')
+})
+
+Cypress.Commands.add('gotoMyAccountWishListPage', () => {
+  cy.get(selectors.ProfileLabel).should('be.visible')
+  cy.get(selectors.SignInBtn).click()
+  cy.get(selectors.MyAccount).click()
+  cy.get(wishListSelectors.WishListAccountPage)
     .should('be.visible')
     .click()
 })

@@ -51,6 +51,9 @@ jobs:
           yarn install --frozen-lockfile
         working-directory: ./cy-runner
 
+      - name: Install WishList required packages
+        run: yarn install --frozen-lockfile
+
       - name: Cypress Runner
         run: yarn cy-r
         env:

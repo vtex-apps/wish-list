@@ -19,22 +19,11 @@ export function addToWishList(searchKey, productLink) {
 }
 
 export function addToCart(productLink) {
-  cy.get('div.relative > .vtex-button')
-    .should('be.visible')
-    .click()
-  cy.get('.vtex-login-2-x-button')
-    .should('be.visible')
-    .click()
-  cy.get(':nth-child(6) > .vtex-account_menu-link')
-    .should('be.visible')
-    .click()
+  cy.gotoMyAccountWishListPage()
   cy.get(`${productLink} span[class*=cart]`)
     .should('be.visible')
     .click()
-  cy.get('#proceed-to-checkout > .vtex-button__label')
-    .should('be.visible')
-    .click()
-  cy.get('#cart-to-orderform')
+  cy.get(selectors.ProceedtoCheckout)
     .should('be.visible')
     .click()
 }

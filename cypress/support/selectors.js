@@ -16,4 +16,5 @@ export default {
   WishListFill: 'span[class*=fill]',
   ThumbnailSwiper: '[data-testid=thumbnail-swiper]',
   WishListMenu: '#menu-wishlist',
+  WishListAccountPage: 'a[href="#/wishlist"]',
 }

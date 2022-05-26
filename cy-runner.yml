@@ -103,4 +103,3 @@ strategy:
       - cypress/integration/2.2-*
       - cypress/integration/2.3-*
       - cypress/integration/2.4-*
-  

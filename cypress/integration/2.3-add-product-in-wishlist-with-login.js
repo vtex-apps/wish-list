@@ -7,6 +7,12 @@ import {
 import wishListSelectors from '../support/selectors.js'
 import wishlistProducts from '../support/wishlistProducts.js'
 
+function verifyProducts() {
+  cy.get(wishlistProducts.onion.link).should('be.visible')
+  cy.get(wishlistProducts.orange.link).should('be.visible')
+  cy.get(wishlistProducts.watermelon.link).should('be.visible')
+}
+
 describe('Testing wishlist with logged in user', () => {
   testSetup()
 
@@ -57,31 +63,15 @@ describe('Testing wishlist with logged in user', () => {
   )
 
   it(`${prefix} - Verify we are able to see wishlist section and its product`, () => {
-    cy.get(selectors.ProfileLabel)
-      .should('be.visible')
-      .should('have.contain', `Hello,`)
-    cy.get('div.relative > .vtex-button')
-      .should('be.visible')
-      .click()
-    cy.get('.vtex-login-2-x-button')
-      .should('be.visible')
-      .click()
-    cy.get(':nth-child(6) > .vtex-account_menu-link')
-      .should('be.visible')
-      .click()
-    cy.get(wishlistProducts.onion.link).should('be.visible')
-    cy.get(wishlistProducts.orange.link).should('be.visible')
+    cy.gotoMyAccountWishListPage()
+    verifyProducts()
     cy.get(wishlistProducts.cauliflower.link).should('be.visible')
-    cy.get(wishlistProducts.watermelon.link).should('be.visible')
   })
 
   it(`${prefix} - Verify we are able to see wishlist in /wishlist page`, () => {
     cy.visitWishlistPage()
-    cy.get(wishListSelectors.ProductSummaryContainer).should('be.visible')
-    cy.get(wishlistProducts.onion.link).should('be.visible')
-    cy.get(wishlistProducts.orange.link).should('be.visible')
+    verifyProducts()
     cy.get(wishlistProducts.cauliflower.link).should('be.visible')
-    cy.get(wishlistProducts.watermelon.link).should('be.visible')
   })
 
   it(`${prefix} - Remove the product onion from the wishlist page`, () => {
@@ -115,22 +105,12 @@ describe('Testing wishlist with logged in user', () => {
 
   it(`${prefix} - Verify we are able to see wishlist in /wishlist page`, () => {
     cy.visitWishlistPage()
-    cy.get(wishListSelectors.ProductSummaryContainer).should('be.visible')
-    cy.get(wishlistProducts.onion.link).should('be.visible')
-    cy.get(wishlistProducts.orange.link).should('be.visible')
-    cy.get(wishlistProducts.watermelon.link).should('be.visible')
+    verifyProducts()
   })
 
   it(`${prefix} - Verify now we are able to see three products in account wishlist page`, () => {
-    cy.get(selectors.ProfileLabel).should('be.visible')
-    cy.get(selectors.SignInBtn).click()
-    cy.get(selectors.MyAccount).click()
-    cy.get(':nth-child(6) > .vtex-account_menu-link')
-      .should('be.visible')
-      .click()
-    cy.get(wishlistProducts.onion.link).should('be.visible')
-    cy.get(wishlistProducts.orange.link).should('be.visible')
-    cy.get(wishlistProducts.watermelon.link).should('be.visible')
+    cy.gotoMyAccountWishListPage()
+    verifyProducts()
   })
 
   preserveCookie()
