@@ -4,19 +4,20 @@ import {
   preserveCookie,
   promissoryPayment,
   buyProduct,
+  saveOrderId,
 } from '../support/common/support.js'
 import { addToWishList, addToCart } from '../support/utils.js'
 import wishlistProducts from '../support/wishlistProducts.js'
 import { orderProduct } from '../support/outputvalidation.js'
 import selectors from '../support/common/selectors.js'
 
-describe('Testing Single Product and total amounts', () => {
+describe('Testing Order Product from wishlist', () => {
   // Load test setup
   testSetup()
 
   const { prefix } = orderProduct
 
-  it(`In ${prefix} - Add product to wish list`, updateRetry(3), () => {
+  it(`In ${prefix} - Add product to wish list`, updateRetry(2), () => {
     cy.searchProduct(wishlistProducts.irobot.name)
   })
 
@@ -31,9 +32,10 @@ describe('Testing Single Product and total amounts', () => {
     cy.updateShippingInformation(orderProduct)
   })
 
-  it(`In ${prefix} - ordered the product`, updateRetry(2), () => {
+  it(`In ${prefix} - Ordering the product`, updateRetry(1), () => {
     promissoryPayment()
     buyProduct()
+    saveOrderId()
   })
 
   preserveCookie()

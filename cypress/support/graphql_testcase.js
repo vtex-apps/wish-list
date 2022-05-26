@@ -44,15 +44,15 @@ export function version() {
     queryVariables: {},
   }
 }
-export function viewList() {
+export function viewList({ shopperId, name }) {
   return {
     query:
       'query' +
       '($shopperId: String!,$name: String!)' +
       '{  viewList(shopperId:$shopperId,name:$name) {public,name,range {total,from,to},data {id,productId,sku,title}}}',
     queryVariables: {
-      shopperId: 'saravananvenkatesan@bitcot.com',
-      name: 'Fresh Coconuts',
+      shopperId,
+      name,
     },
   }
 }
@@ -104,7 +104,7 @@ export function addToList(productId) {
   }
 }
 
-export function removeFromList(productId) {
+export function removeFromList(productId, { shopperId, name }) {
   const query =
     'mutation' +
     '($shopperId: String!,$id: ID!,$name: String)' +
@@ -114,8 +114,8 @@ export function removeFromList(productId) {
     query,
     queryVariables: {
       id: productId,
-      shopperId: 'saravananvenkatesan@bitcot.com',
-      name: 'Fresh Coconuts',
+      shopperId,
+      name,
     },
   }
 }

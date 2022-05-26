@@ -9,8 +9,10 @@ import {
   getAllWishlist,
 } from './apis'
 
+const PREFIX = 'REST API'
+
 export function readWishListSchema() {
-  it(`Read Wishlist Schema`, updateRetry(3), () => {
+  it(`${PREFIX} - Read Wishlist Schema`, updateRetry(3), () => {
     cy.addDelayBetweenRetries(2000)
     cy.getVtexItems().then(vtex => {
       cy.getAPI(wishlistSchemaAPI(vtex.baseUrl)).then(response => {
@@ -23,7 +25,7 @@ export function readWishListSchema() {
 }
 
 export function readWishListdata() {
-  it('Read all wishlist data', updateRetry(3), () => {
+  it(`${PREFIX} -Read all wishlist data`, updateRetry(3), () => {
     cy.addDelayBetweenRetries(2000)
     cy.getVtexItems().then(vtex => {
       cy.getAPI(wishlistDataAPI(vtex.baseUrl)).then(response => {
@@ -34,24 +36,25 @@ export function readWishListdata() {
   })
 }
 
-export function readwishlistByEmail(email = '', validate = true) {
-  it(`Read the wishlist data by using ${email}`, updateRetry(3), () => {
+export function readwishlistByEmail(shopperId, validate = true) {
+  it(`${PREFIX} - Read the wishlist data by using ${shopperId}`, () => {
     cy.addDelayBetweenRetries(2000)
     cy.getVtexItems().then(vtex => {
-      cy.getAPI(wishlistEmailAPI(vtex.baseUrl, email)).then(response => {
+      cy.getAPI(wishlistEmailAPI(vtex.baseUrl, shopperId)).then(response => {
         expect(response.status).to.have.equal(200)
         if (validate) {
           expect(response.body).to.have.length(1)
         }
 
-        cy.setWishListItem(email, response.body)
+        cy.setWishListItem(shopperId, response.body)
+        cy.log(response.body)
       })
     })
   })
 }
 
-export function getAllWishListTestCase(ENV) {
-  it(`Read all the wishlist data by using`, updateRetry(3), () => {
+function getAllWishListTestCase(ENV) {
+  it(`${PREFIX} - Read all the wishlist data`, updateRetry(3), () => {
     cy.addDelayBetweenRetries(2000)
     cy.getVtexItems().then(vtex => {
       cy.getAPI(getAllWishlist(vtex.baseUrl), {
@@ -64,25 +67,27 @@ export function getAllWishListTestCase(ENV) {
   })
 }
 
-export function updateMasterdata(data) {
-  it('update to the masterdata', updateRetry(3), () => {
+export function updateMasterdata(shopperId, newShopperId) {
+  it(`${PREFIX} - Update shopperId from ${shopperId} to ${newShopperId} to the masterdata`, () => {
     cy.addDelayBetweenRetries(2000)
-    cy.getVtexItems().then(vtex => {
-      cy.request({
-        method: 'PATCH',
-        url: updateWishlistAPI(vtex.baseUrl),
+    cy.getWishListItem().then(wishListId => {
+      const [data] = wishListId[shopperId]
+      data.email = newShopperId
 
-        headers: {
-          ...VTEX_AUTH_HEADER(vtex.apiKey, vtex.apiToken),
-        },
-        body: {
-          data,
-        },
+      cy.getVtexItems().then(vtex => {
+        cy.request({
+          method: 'PATCH',
+          url: updateWishlistAPI(vtex.baseUrl),
 
-        ...FAIL_ON_STATUS_CODE,
-      }).then(response => {
-        expect(response.status).to.have.equal(201)
-        expect(response.body).to.have.property('DocumentId')
+          headers: {
+            ...VTEX_AUTH_HEADER(vtex.apiKey, vtex.apiToken),
+          },
+          body: data,
+          ...FAIL_ON_STATUS_CODE,
+        }).then(response => {
+          expect(response.status).to.have.equal(200)
+          expect(response.body).to.have.property('DocumentId')
+        })
       })
     })
   })
@@ -90,7 +95,7 @@ export function updateMasterdata(data) {
 
 export function deleteWishlistdata(env) {
   it(
-    `Delete the wishlist data for this email ${env} from the masterdata`,
+    `${PREFIX} - Delete the wishlist data from the masterdata`,
     updateRetry(3),
     () => {
       cy.addDelayBetweenRetries(2000)
@@ -114,4 +119,11 @@ export function deleteWishlistdata(env) {
       })
     }
   )
+}
+
+export function wipe() {
+  const ALL_RECORDS = 'all'
+
+  getAllWishListTestCase(ALL_RECORDS)
+  deleteWishlistdata(ALL_RECORDS)
 }

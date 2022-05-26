@@ -8,12 +8,12 @@ Cypress.Commands.add('openStoreFront', (login = false) => {
   cy.intercept('**/rc.vtex.com.br/api/events').as('events')
   cy.visit('/')
   cy.wait('@events')
-  scroll()
   if (login === true) {
     cy.get(selectors.ProfileLabel, { timeout: 20000 })
       .should('be.visible')
       .should('have.contain', `Hello,`)
   }
+  scroll()
 })
 
 Cypress.Commands.add('parseXlsx', inputFile => {
@@ -34,13 +34,18 @@ function clickWishListIcon(productLink = '', login = '') {
       cy.get(wishListIconSelector)
         .should('be.visible')
         .click()
-      cy.get(wishListSelectors.ToastButton, { timeout: 15000 }).should(
-        'be.visible'
-      )
+
       if (!login) {
+        cy.get(selectors.ToastMsgInB2B, { timeout: 10000 })
+          .contains('added')
+          .should('be.visible')
         cy.get('div[class*=close-icon]', { timeout: 5000 })
           .should('be.visible')
           .click()
+      } else {
+        cy.get(selectors.ToastMsgInB2B, { timeout: 10000 })
+          .contains('login')
+          .should('be.visible')
       }
     } else {
       cy.get(wishListFillSelector).should('be.visible')
@@ -80,13 +85,14 @@ Cypress.Commands.add('addWishListItem', (searchKey, link) => {
     .clear()
     .type(searchKey)
     .type('{enter}')
+
   // Page should load successfully now searchResult & Filter should be visible
   cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
   cy.get(selectors.FilterHeading).should('be.visible')
 
   cy.get(link)
     .should('be.visible')
-    .click({ multiple: true })
+    .click()
 
   cy.get(wishListSelectors.ThumbnailSwiper).should('be.visible')
 
@@ -106,11 +112,11 @@ Cypress.Commands.add('loginStoreFrontAsUser', (email, password) => {
   cy.get(wishListSelectors.LoginEmail)
     .should('be.visible')
     .clear()
-    .type(email)
+    .type(email, { log: false })
   cy.get(wishListSelectors.LoginPassword)
     .should('be.visible')
     .clear()
-    .type(password)
+    .type(password, { log: false })
 
   cy.get(wishListSelectors.LoginButton).click()
 })
@@ -123,7 +129,6 @@ Cypress.Commands.add('verifyExcelFile', (fileName, fixtureFile, products) => {
     cy.writeFile(`cypress/fixtures/${fixtureFile}`, rows)
   })
   for (const product of products) {
-    cy.log(product)
     cy.fixture(fixtureFile).then(fixtureData => {
       cy.intercept('GET', '**/api', { fixture: fixtureFile })
       const filterProducts = fixtureData.filter(
@@ -166,10 +171,6 @@ Cypress.Commands.add('verifyProductInWishList', productLink => {
   }).should('exist')
 })
 
-Cypress.Commands.add('addDelayBetweenRetries', delay => {
-  if (cy.state('runnable')._currentRetry > 0) cy.wait(delay)
-})
-
 // Save wishlists
 Cypress.Commands.add('setWishListItem', (wishlistItem, wishlistValue) => {
   cy.readFile(wishlistJson).then(items => {
@@ -185,17 +186,8 @@ Cypress.Commands.add('getWishListItem', () => {
   })
 })
 
-Cypress.Commands.add('waitForGraphql', (operationName, selector = null) => {
-  cy.getVtexItems().then(vtex => {
-    cy.intercept('POST', `${vtex.baseUrl}/**`, req => {
-      if (req.body.operationName === operationName) {
-        req.continue()
-      }
-    }).as(operationName)
-    if (selector)
-      cy.get(selector)
-        .last()
-        .click()
-    cy.wait(`@${operationName}`, { timeout: 40000 })
-  })
+Cypress.Commands.add('visitWishlistPage', () => {
+  cy.get(wishListSelectors.WishListMenu)
+    .should('be.visible')
+    .click()
 })

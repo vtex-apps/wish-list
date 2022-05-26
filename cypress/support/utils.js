@@ -3,10 +3,10 @@ import selectors from './common/selectors.js'
 export function scroll() {
   // Page loads heart icon only on scroll
   // So, scroll first then look for selectors
-  cy.scrollTo(0, 1000)
+  cy.scrollTo(0, 2000)
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(1000)
-  cy.scrollTo(0, -100)
+  cy.scrollTo(0, -500)
 }
 
 export function addToWishList(searchKey, productLink) {

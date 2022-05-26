@@ -22,13 +22,15 @@ describe('Download wishlist csv and verify data', () => {
   // Load test setup
   testSetup(false)
 
-  downloadWishlistFile()
+  const prefix = 2.5
 
-  it('Verify wishlist data', updateRetry(2), () => {
+  downloadWishlistFile(prefix)
+
+  it(`In ${prefix} - Verify wishlist data`, updateRetry(2), () => {
     cy.verifyExcelFile(fileName, fixtureFileName, products)
   })
 
-  it('Deleting files', () => {
+  it(`In ${prefix} - Deleting files`, () => {
     cy.task('deleteFile', { fileName })
     cy.task('deleteFile', { fileName: fixtureFilePath })
   })

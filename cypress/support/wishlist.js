@@ -1,9 +1,9 @@
 import { updateRetry } from './common/support'
 import wishListSelectors from './selectors.js'
 
-export function downloadWishlistFile() {
+export function downloadWishlistFile(prefix) {
   it(
-    'Open admin dashboard wishlist and download wishlist file',
+    `In ${prefix} - Open admin dashboard wishlist and download wishlist file`,
     updateRetry(2),
     () => {
       cy.visit('admin/app/wishlist')

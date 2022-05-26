@@ -15,4 +15,5 @@ export default {
   WishListOutLine: 'span[class*=outline]',
   WishListFill: 'span[class*=fill]',
   ThumbnailSwiper: '[data-testid=thumbnail-swiper]',
+  WishListMenu: '#menu-wishlist',
 }
