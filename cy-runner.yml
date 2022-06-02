@@ -85,7 +85,7 @@ strategy:
     sendDashboard: true
     hardTries: 2
     stopOnFail: false
-    parallel: true
+    parallel: false
     specs:
       - cypress/integration/2.2-*
       - cypress/integration/2.3-*

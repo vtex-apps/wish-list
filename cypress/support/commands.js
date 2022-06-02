@@ -11,7 +11,6 @@ Cypress.Commands.add('openStoreFront', (login = false) => {
     if (url.includes('blank')) {
       cy.getVtexItems().then(vtex => {
         cy.intercept('**/rc.vtex.com.br/api/events').as('events')
-        // cy.intercept('**/ProductGiftDescription.js').as('a1')
         cy.visit('/')
         if (login === true) {
           cy.get(selectors.ProfileLabel, { timeout: 20000 })
@@ -21,7 +20,6 @@ Cypress.Commands.add('openStoreFront', (login = false) => {
         cy.wait('@events')
         interceptByOperationName(vtex, checkItemOperation)
         scroll()
-        // cy.wait('@a1')
         cy.wait(`@${checkItemOperation}`, { timeout: 20000 }).then(req => {
           expect(req.response.statusCode).to.equal(200)
         })
@@ -46,17 +44,12 @@ function interceptByOperationName(vtex, operationName) {
 
 function clickWishListIcon(productLink = '', login = '') {
   const addWishListOperation = 'AddToList'
-  // const checkItemOperation = 'CheckItem'
 
   cy.getVtexItems().then(vtex => {
-    // interceptByOperationName(vtex, checkItemOperation)
     cy.get(wishListSelectors.WishListContainer).should('be.visible')
     if (productLink) {
       cy.get(productLink).should('be.visible')
     }
-    // cy.wait(`@${checkItemOperation}`, { timeout: 20000 }).then(req => {
-    //   expect(req.response.statusCode).to.equal(200)
-    // })
     const wishListOutLineSelector = `${productLink} ${wishListSelectors.WishListOutLine}`
     const wishListIconSelector = `${productLink} ${wishListSelectors.WishListIcon}`
     const wishListFillSelector = `${productLink} ${wishListSelectors.WishListFill}`
