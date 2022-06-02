@@ -43,6 +43,7 @@ base:
     pageLoadTimeout: 45000
     browser: chrome
     chromeWebSecurity: false
+    sorry: false
   stateFiles: [.wishlist.json]
 
 workspace:

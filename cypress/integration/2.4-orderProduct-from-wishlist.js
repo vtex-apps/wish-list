@@ -11,20 +11,24 @@ import wishlistProducts from '../support/wishlistProducts.js'
 import { orderProduct } from '../support/outputvalidation.js'
 import selectors from '../support/common/selectors.js'
 
-describe('Testing Order Product from wishlist', () => {
+const { prefix } = orderProduct
+
+describe(`${prefix} - Testing order Product from wishlist`, () => {
   // Load test setup
   testSetup()
 
-  const { prefix } = orderProduct
-
-  it(`${prefix} - Add product to wish list`, updateRetry(2), () => {
+  it(`${prefix} - Add irobot to wish list`, updateRetry(2), () => {
     cy.searchProduct(wishlistProducts.irobot.name)
   })
 
-  it(`${prefix} - Add product to cart & checkout`, updateRetry(2), () => {
-    addToWishList(wishlistProducts.irobot.name, wishlistProducts.irobot.link)
-    addToCart(wishlistProducts.irobot.link)
-  })
+  it(
+    `${prefix} - Add irobot product to cart & checkout`,
+    updateRetry(2),
+    () => {
+      addToWishList(wishlistProducts.irobot.name, wishlistProducts.irobot.link)
+      addToCart(wishlistProducts.irobot.link)
+    }
+  )
 
   it(`${prefix} - Updating Shipping Information`, updateRetry(3), () => {
     // Update Shipping Section

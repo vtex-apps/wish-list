@@ -37,20 +37,23 @@ export function readWishListdata() {
 }
 
 export function readwishlistByEmail(shopperId, validate = true) {
-  it(`${PREFIX} - Read the wishlist data by using ${shopperId}`, () => {
-    cy.addDelayBetweenRetries(2000)
-    cy.getVtexItems().then(vtex => {
-      cy.getAPI(wishlistEmailAPI(vtex.baseUrl, shopperId)).then(response => {
-        expect(response.status).to.have.equal(200)
-        if (validate) {
-          expect(response.body).to.have.length(1)
-        }
+  it(
+    `${PREFIX} - Read the wishlist data by using ${shopperId}`,
+    updateRetry(3),
+    () => {
+      cy.addDelayBetweenRetries(2000)
+      cy.getVtexItems().then(vtex => {
+        cy.getAPI(wishlistEmailAPI(vtex.baseUrl, shopperId)).then(response => {
+          expect(response.status).to.have.equal(200)
+          if (validate) {
+            expect(response.body).to.have.length(1)
+          }
 
-        cy.setWishListItem(shopperId, response.body)
-        cy.log(response.body)
+          cy.setWishListItem(shopperId, response.body)
+        })
       })
-    })
-  })
+    }
+  )
 }
 
 function getAllWishListTestCase(ENV) {

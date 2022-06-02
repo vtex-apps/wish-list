@@ -6,7 +6,7 @@ export function scroll() {
   cy.scrollTo(0, 2000)
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(1000)
-  cy.scrollTo(0, -500)
+  cy.scrollTo(0, -1000)
 }
 
 export function addToWishList(searchKey, productLink) {

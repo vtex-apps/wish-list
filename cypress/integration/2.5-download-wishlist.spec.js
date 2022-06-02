@@ -18,15 +18,15 @@ const products = [
   wishlistProducts.irobot,
 ]
 
-describe('Download wishlist csv and verify data', () => {
+const prefix = 2.5
+
+describe(`${prefix} - Download wishlist csv and verify data`, () => {
   // Load test setup
   testSetup(false)
 
-  const prefix = 2.5
-
   downloadWishlistFile(prefix)
 
-  it(`In ${prefix} - Verify wishlist data`, updateRetry(2), () => {
+  it(`In ${prefix} - Verify wishlist data`, updateRetry(1), () => {
     cy.verifyExcelFile(fileName, fixtureFileName, products)
   })
 
