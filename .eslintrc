@@ -1,5 +1,8 @@
 {
-  "extends": "vtex",
+  "extends": [
+    "vtex",
+    "plugin:cypress/recommended"
+  ],
   "root": true,
   "env": {
     "node": true
