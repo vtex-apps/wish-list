@@ -7,10 +7,15 @@ import {
 import wishListSelectors from '../support/selectors.js'
 import wishlistProducts from '../support/wishlistProducts.js'
 
-function verifyProducts() {
+function verifyProducts(cauliflower = true) {
   cy.get(wishlistProducts.onion.link).should('be.visible')
   cy.get(wishlistProducts.orange.link).should('be.visible')
   cy.get(wishlistProducts.watermelon.link).should('be.visible')
+  if (cauliflower) {
+    cy.get(wishlistProducts.cauliflower.link).should('be.visible')
+  } else {
+    cy.get(wishlistProducts.cauliflower.link).should('not.exist')
+  }
 }
 
 const prefix = 2.3
@@ -64,13 +69,11 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   it(`${prefix} - Verify we are able to see wishlist in /wishlist page`, () => {
     cy.visitWishlistPage()
     verifyProducts()
-    cy.get(wishlistProducts.cauliflower.link).should('be.visible')
   })
 
   it(`${prefix} - Verify we are able to see wishlist section and its product`, () => {
     cy.gotoMyAccountWishListPage()
     verifyProducts()
-    cy.get(wishlistProducts.cauliflower.link).should('be.visible')
   })
 
   it(
@@ -115,14 +118,18 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
     updateRetry(2),
     () => {
       cy.gotoMyAccountWishListPage()
-      verifyProducts()
+      verifyProducts(false)
     }
   )
 
-  it(`${prefix} - Verify we are able to see wishlist in /wishlist page`, () => {
-    cy.visitWishlistPage()
-    verifyProducts()
-  })
+  it(
+    `${prefix} - Verify we are able to see wishlist in /wishlist page`,
+    updateRetry(1),
+    () => {
+      cy.visitWishlistPage()
+      verifyProducts(false)
+    }
+  )
 
   preserveCookie()
 })
