@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Thai translation.
 
+## [1.13.2] - 2022-06-10
+
+### Fixed
+
+- Added specificationGroups values for the productsByIdentifier query
+
 ## [1.13.1] - 2022-05-10
 
 ### Fixed
