@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "เพิ่มลงในรายการ",
+  "store/wishlist-see-lists": "ดูรายการ",
+  "store/wishlist-product-added-to-list": "เพิ่มผลิตถัณฑ์ลงในรายการแล้ว",
+  "store/wishlist-add-product-fail": "ไม่สามารถเพิ่มผลิตถัณฑ์ลงในรายการนี้ได้",
+  "store/wishlist-default-list-name": "รายการที่อยากได้",
+  "store/myaccount-menu": "รายการที่อยากได้",
+  "store/myaccount-empty-list": "ไม่มีสินค้าในรายการนี้",
+  "store/wishlist-login": "การเข้าสู่ระบบ",
+  "store/wishlist-not-logged": "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้าลงในรายการ",
+  "admin/wishlist.menu.label": "รายการที่อยากได้",
+  "admin/settings.title": "ส่งออกรายการที่อยากได้",
+  "admin/settings.download": "ดาวน์โหลดรายการที่อยากได้"
+}
