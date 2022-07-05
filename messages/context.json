@@ -5,6 +5,10 @@
   "store/wishlist-add-product-fail": "store/wishlist-add-product-fail",
   "store/wishlist-default-list-name": "store/wishlist-default-list-name",
   "store/myaccount-menu": "store/myaccount-menu",
+  "store/myaccount-empty-list": "store/myaccount-empty-list",
   "store/wishlist-login": "store/wishlist-login",
-  "store/wishlist-not-logged": "store/wishlist-not-logged"
+  "store/wishlist-not-logged": "store/wishlist-not-logged",
+  "admin/wishlist.menu.label": "admin/wishlist.menu.label",
+  "admin/settings.title": "admin/settings.title",
+  "admin/settings.download": "admin/settings.download"
 }

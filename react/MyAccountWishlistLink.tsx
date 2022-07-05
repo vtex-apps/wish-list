@@ -1,7 +1,14 @@
 import PropTypes from 'prop-types'
-import { injectIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 
-const MyAccountWishlistLink = ({ render, intl, label }) => {
+const MyAccountWishlistLink = ({
+  render,
+  label,
+}: {
+  render: ([{ name, path }]: Array<{ name: string; path: string }>) => any
+  label: string
+}) => {
+  const intl = useIntl()
   return render([
     {
       name: label ?? intl.formatMessage({ id: 'store/myaccount-menu' }),
@@ -12,8 +19,7 @@ const MyAccountWishlistLink = ({ render, intl, label }) => {
 
 MyAccountWishlistLink.propTypes = {
   render: PropTypes.func.isRequired,
-  intl: PropTypes.any,
   label: PropTypes.string,
 }
 
-export default injectIntl(MyAccountWishlistLink)
+export default MyAccountWishlistLink

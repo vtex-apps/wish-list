@@ -1,10 +1,15 @@
 {
   "stack": "dotnet",
   "memory": 256,
+  "timeout": 60,
+  "ttl": 60,
   "runtimeArgs": [
   ],
   "routes": {
-    
+    "ExportAllLists": {
+      "path": "/_v/wishlist/export-lists",
+      "public": true
+    }
   },
   "events": {
     "onAppsLinked": {

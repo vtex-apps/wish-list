@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "목록에 추가",
+  "store/wishlist-see-lists": "목록 보기",
+  "store/wishlist-product-added-to-list": "목록에 추가된 제품",
+  "store/wishlist-add-product-fail": "목록에 제품을 추가할 수 없습니다.",
+  "store/wishlist-default-list-name": "위시리스트",
+  "store/myaccount-menu": "위시리스트",
+  "store/myaccount-empty-list": "목록이 비어 있습니다",
+  "store/wishlist-login": "로그인",
+  "store/wishlist-not-logged": "목록에 추가하기 전에 로그인해야 합니다.",
+  "admin/wishlist.menu.label": "위시리스트",
+  "admin/settings.title": "위시리스트 내보내기",
+  "admin/settings.download": "위시리스트 다운로드"
+}

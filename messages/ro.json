@@ -2,9 +2,13 @@
   "store/wishlist.addButton": "Adaugă în listă",
   "store/wishlist-see-lists": "Vezi listele",
   "store/wishlist-product-added-to-list": "Produs adăugat în listă",
-  "store/wishlist-add-product-fail": "Produsul nu a putut fi adăugat în listă",
+  "store/wishlist-add-product-fail": "Nu s-a putut adăuga produsul în listă",
   "store/wishlist-default-list-name": "Wishlist",
   "store/myaccount-menu": "Wishlist",
+  "store/myaccount-empty-list": "Această listă este goală",
   "store/wishlist-login": "Autentificare",
-  "store/wishlist-not-logged": "Trebuie să te autentifici pentru a adăuga produsul în listă"
+  "store/wishlist-not-logged": "Trebuie să te autentifici pentru a adăuga produsul în listă",
+  "admin/wishlist.menu.label": "Wishlist",
+  "admin/settings.title": "Wishlist Export",
+  "admin/settings.download": "Download Wishlists"
 }

@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Toevoegen aan de lijst",
+  "store/wishlist-see-lists": "Zie lijsten",
+  "store/wishlist-product-added-to-list": "Product toegevoegd aan de lijst",
+  "store/wishlist-add-product-fail": "Kan product niet toevoegen aan de lijst",
+  "store/wishlist-default-list-name": "Verlanglijst",
+  "store/myaccount-menu": "Verlanglijst",
+  "store/myaccount-empty-list": "De lijst is leeg",
+  "store/wishlist-login": "Inloggen",
+  "store/wishlist-not-logged": "U moet inloggen voordat u het aan de lijst kunt toevoegen",
+  "admin/wishlist.menu.label": "Verlanglijst",
+  "admin/settings.title": "Wishlist exporteren",
+  "admin/settings.download": "Wishlists downloaden"
+}

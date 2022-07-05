@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Vtex.Api.Context;
 using WishList.Data;
 using WishList.Models;
 
@@ -15,10 +16,11 @@ namespace WishList.Services
         private readonly IWishListRepository _wishListRepository;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IIOServiceContext _context;
 
         private const int MaximumReturnedRecords = 999;
 
-        public WishListService(IWishListRepository wishListRepository, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory)
+        public WishListService(IWishListRepository wishListRepository, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context)
         {
             this._wishListRepository = wishListRepository ??
                                             throw new ArgumentNullException(nameof(wishListRepository));
@@ -28,6 +30,9 @@ namespace WishList.Services
 
             this._clientFactory = clientFactory ??
                                   throw new ArgumentNullException(nameof(clientFactory));
+
+            this._context = context ??
+                               throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<WishListWrapper> GetList(string shopperId, string listName)
@@ -45,7 +50,7 @@ namespace WishList.Services
             }
             else
             {
-                Console.WriteLine("GetList Null/Empty - Retrying");
+                _context.Vtex.Logger.Debug("GetList", null, $"Retrying... '{shopperId}' '{listName}'");
                 wishListWrapper = await _wishListRepository.GetWishList(shopperId);
                 if (wishListWrapper != null && wishListWrapper.ListItemsWrapper != null)
                 {
@@ -76,6 +81,7 @@ namespace WishList.Services
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
+                _context.Vtex.Logger.Debug("SaveList", null, $"Saving '{shopperId}' '{listName}' {listItems.Count} new items {listItemsWrapper.ListItems.Count} existing items.");
                 listItemsToSave = listItemsWrapper.ListItems;
                 foreach (ListItem listItem in listItems)
                 {
@@ -84,6 +90,7 @@ namespace WishList.Services
             }
             else
             {
+                _context.Vtex.Logger.Debug("SaveList", null, $"Saving '{shopperId}' '{listName}' {listItems.Count} new items.");
                 listItemsToSave = listItems;
             }
 
@@ -98,7 +105,15 @@ namespace WishList.Services
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
+                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
                 listItemsToSave = listItemsWrapper.ListItems;
+                foreach (ListItem item in listItemsToSave)
+                {
+                    if (listItem.ProductId ==  item.ProductId)
+                    {
+                        listItem.Id = item.Id;
+                    }
+                }
                 if(listItem.Id == null)
                 {
                     int maxId = 0;
@@ -108,6 +123,7 @@ namespace WishList.Services
                     }
 
                     listItem.Id = ++maxId;
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Setting Id: {listItem.Id}");
                 }
                 else
                 {
@@ -115,6 +131,7 @@ namespace WishList.Services
                     ListItem itemToRemove = listItemsToSave.Where(r => r.Id == listItem.Id).FirstOrDefault();
                     if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
                     {
+                        _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Removing {listItem.Id}");
                         listItemsToSave.Remove(itemToRemove);
                     }
                 }
@@ -125,11 +142,16 @@ namespace WishList.Services
             {
                 listItem.Id = listItem.Id ?? 0;
                 listItemsToSave = new List<ListItem> { listItem };
+                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' First Item: {listItem.Id}");
             }
 
             if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
             {
-
+                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Saved: {listItem.Id}");
+            }
+            else
+            {
+                _context.Vtex.Logger.Warn("SaveItem", null, $"Saving '{shopperId}' '{listName}' Failed to save: {listItem.Id}");
             }
 
             return listItem.Id;
@@ -137,18 +159,14 @@ namespace WishList.Services
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
-            Console.WriteLine(" REMOVE");
             bool wasRemoved = false;
             IList<ListItem> listItemsToSave = null;
             WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
-            //Console.WriteLine($"->{wishListWrapper.ListItemsWrapper.Count}");
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
-            //Console.WriteLine($"->{listItemsWrapper.ListItems.Count}");
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
                 listItemsToSave = listItemsWrapper.ListItems;
                 ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
-                //Console.WriteLine($"->{itemToRemove != null}");
                 if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
                 {
                     wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
@@ -164,7 +182,6 @@ namespace WishList.Services
             if (to > 0)
             {
                 take = Math.Min((to - from) + 1, MaximumReturnedRecords);
-                //Console.WriteLine($"    >>>>>>>>>>>>>>>>>  Take {take} reviews {from}-{to}");
             }
 
             listItems = listItems.Skip(from - 1).Take(take).ToList();

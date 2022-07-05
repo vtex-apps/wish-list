@@ -1,5 +1,5 @@
-query CheckItem($shopperId: String!, $productId: String!){
-  checkList(shopperId: $shopperId, productId: $productId) {
+query CheckItem($shopperId: String!, $productId: String!, $sku: String) {
+  checkList(shopperId: $shopperId, productId: $productId, sku: $sku) {
     inList
     listNames
     listIds

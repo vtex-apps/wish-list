@@ -4,7 +4,7 @@
   },
   "store.wishlist": {},
   "list-context.wishlist": {
-    "allowed": ["product-summary"],
+    "allowed": ["product-summary", "wishlist-empty-list"],
     "composition": "children",
     "component": "ProductSummaryWishlist"
   },
@@ -14,5 +14,9 @@
   },
   "my-account-link.wishlist-link": {
     "component": "MyAccountWishlistLink"
+  },
+  "wishlist-empty-list": {
+    "component": "WishlistEmpty",
+    "composition": "children"
   }
 }

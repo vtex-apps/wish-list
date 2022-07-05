@@ -4,7 +4,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint --ext js,jsx,ts,tsx .",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json}\"",
+    "cy-r": "cd cy-runner && node cy-runner"
   },
   "husky": {
     "hooks": {
@@ -27,7 +28,11 @@
     "eslint-config-vtex-react": "^6.2.1",
     "husky": "^4.2.0",
     "lint-staged": "^10.0.2",
+    "node-xlsx": "^0.21.0",
     "prettier": "^1.19.1",
     "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "vtex": "^3.0.0"
   }
 }

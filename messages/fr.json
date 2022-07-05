@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Ajouter à la liste",
+  "store/wishlist-see-lists": "Afficher les listes",
+  "store/wishlist-product-added-to-list": "Produit ajouté à la liste",
+  "store/wishlist-add-product-fail": "Impossible d'ajouter le produit à la liste",
+  "store/wishlist-default-list-name": "Liste de préférences",
+  "store/myaccount-menu": "Liste de préférences",
+  "store/myaccount-empty-list": "Cette liste est vide",
+  "store/wishlist-login": "Se connecter",
+  "store/wishlist-not-logged": "Vous devez vous connecter avant de faire un ajout dans la liste",
+  "admin/wishlist.menu.label": "Liste de préférences",
+  "admin/settings.title": "Exportation de la liste de préférences",
+  "admin/settings.download": "Télécharger les listes de préférences"
+}

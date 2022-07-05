@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "リストに追加",
+  "store/wishlist-see-lists": "リストを表示",
+  "store/wishlist-product-added-to-list": "リストに追加された製品",
+  "store/wishlist-add-product-fail": "製品をリストに追加できませんでした",
+  "store/wishlist-default-list-name": "ウィッシュリスト",
+  "store/myaccount-menu": "ウィッシュリスト",
+  "store/myaccount-empty-list": "リストが空です",
+  "store/wishlist-login": "ログイン",
+  "store/wishlist-not-logged": "リストに追加する前にログインする必要があります",
+  "admin/wishlist.menu.label": "ウィッシュリスト",
+  "admin/settings.title": "ウィッシュリストのエクスポート",
+  "admin/settings.download": "ウィッシュリストをダウンロード"
+}

@@ -20,14 +20,13 @@ namespace WishList.GraphQL
             FieldAsync<ListResponseType>(
                 "viewList",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id"},
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id"},
                     new QueryArgument<StringGraphType> { Name = "name", Description = "List Name" },
                     new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
                     new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ViewList [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
@@ -46,7 +45,15 @@ namespace WishList.GraphQL
                             if (from > 0 && to > 0)
                             {
                                 resultList = await wishListService.LimitList(resultList, from, to);
-                                Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                            }
+
+                            // Normalize Title field
+                            foreach (ListItem listItem in resultList)
+                            {
+                                if (string.IsNullOrWhiteSpace(listItem.Title))
+                                {
+                                    listItem.Title = string.Empty;
+                                }
                             }
                         }
                         else
@@ -70,13 +77,12 @@ namespace WishList.GraphQL
             FieldAsync<ListGraphType<ListResponseType>>(
                 "viewLists",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" },
                     new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
                     new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ViewLists [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
@@ -84,36 +90,47 @@ namespace WishList.GraphQL
                     IList<ListResponse> resultLists = new List<ListResponse>();
                     int totalCount = 0;
                     var resultListsWrapper = await wishListService.GetLists(shopperId);
-                    foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
+                    if (resultListsWrapper != null && resultListsWrapper.ListItemsWrapper != null)
                     {
-                        if (listItemsWrapper != null)
+                        foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
                         {
-                            if (listItemsWrapper.ListItems != null)
+                            if (listItemsWrapper != null)
                             {
-                                resultList = listItemsWrapper.ListItems;
-                                totalCount = resultList.Count;
-
-                                if (from > 0 && to > 0)
+                                if (listItemsWrapper.ListItems != null)
                                 {
-                                    resultList = await wishListService.LimitList(resultList, from, to);
-                                    Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
+                                    resultList = listItemsWrapper.ListItems;
+                                    totalCount = resultList.Count;
+
+                                    if (from > 0 && to > 0)
+                                    {
+                                        resultList = await wishListService.LimitList(resultList, from, to);
+                                    }
+
+                                    // Normalize Title field
+                                    foreach (ListItem listItem in resultList)
+                                    {
+                                        if (string.IsNullOrWhiteSpace(listItem.Title))
+                                        {
+                                            listItem.Title = string.Empty;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    resultList = new List<ListItem>();
                                 }
                             }
-                            else
+
+                            ListResponse listResponse = new ListResponse
                             {
-                                resultList = new List<ListItem>();
-                            }
+                                Data = new DataElement { data = resultList },
+                                Range = new ResultRange { From = from, To = to, Total = totalCount },
+                                Public = listItemsWrapper.IsPublic ?? false,
+                                Name = listItemsWrapper.Name
+                            };
+
+                            resultLists.Add(listResponse);
                         }
-
-                        ListResponse listResponse = new ListResponse
-                        {
-                            Data = new DataElement { data = resultList },
-                            Range = new ResultRange { From = from, To = to, Total = totalCount },
-                            Public = listItemsWrapper.IsPublic ?? false,
-                            Name = listItemsWrapper.Name
-                        };
-
-                        resultLists.Add(listResponse);
                     }
 
                     return resultLists;
@@ -123,13 +140,12 @@ namespace WishList.GraphQL
             FieldAsync<CheckListType>(
                 "checkList",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" },
                     new QueryArgument<StringGraphType> { Name = "productId", Description = "Product Id" },
                     new QueryArgument<StringGraphType> { Name = "sku", Description = "Product Sku" }
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] CheckList [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
@@ -141,17 +157,6 @@ namespace WishList.GraphQL
                     {
                         foreach (ListItemsWrapper listItemsWrapper in resultListWrapper.ListItemsWrapper)
                         {
-                            //Console.WriteLine($"[{resultListWrapper.ListItemsWrapper.Count}] Name = {listItemsWrapper.Name} [{listItemsWrapper.ListItems.Count}]");
-                            //foreach(ListItem item in listItemsWrapper.ListItems)
-                            //{
-                            //    Console.WriteLine($"[{item.Id}] '{item.ProductId}' = {productId}? {item.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)}");
-                            //}
-
-                            //if (listItemsWrapper.ListItems.Any(l => l.ProductId.Equals(productId, StringComparison.OrdinalIgnoreCase)))
-                            //{
-                            //    namesList.Add(listItemsWrapper.Name);
-                            //}
-
                             ListItem listItem = new ListItem();
                             if (!string.IsNullOrEmpty(sku))
                             {
@@ -188,8 +193,6 @@ namespace WishList.GraphQL
                         };
                     }
 
-                    //Console.WriteLine($"[-] CheckList Response {JsonConvert.SerializeObject(checkListResponse)} [-]");
-
                     return checkListResponse;
                 }
             );
@@ -197,11 +200,10 @@ namespace WishList.GraphQL
             FieldAsync<StringGraphType>(
                 "listNames",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" }
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ListNames [-]");
                     string shopperId = context.GetArgument<string>("shopperId");
                     ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
                     IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;

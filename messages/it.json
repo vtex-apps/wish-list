@@ -5,6 +5,10 @@
   "store/wishlist-add-product-fail": "Non è stato possibile aggiungere il prodotto alla lista",
   "store/wishlist-default-list-name": "Wishlist",
   "store/myaccount-menu": "Wishlist",
+  "store/myaccount-empty-list": "La tua wishlist è vuota",
   "store/wishlist-login": "Accedi",
-  "store/wishlist-not-logged": "Devi effettuare l'accesso prima di aggiungerlo alla lista"
+  "store/wishlist-not-logged": "Devi effettuare l'accesso prima di aggiungerlo alla lista",
+  "admin/wishlist.menu.label": "Wishlist",
+  "admin/settings.title": "Esporta wishlist",
+  "admin/settings.download": "Scarica wishlist"
 }
