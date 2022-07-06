@@ -43,20 +43,20 @@ describe('Graphql and REST API Testcase', () => {
     graphql(version(), validateGetVersionResponse)
   })
 
-  it('Query - Get ViewList', updateRetry(3), () => {
-    graphql(viewList(payload), validateGetViewListResponse)
-  })
-
-  it('Query - Get All ViewList', updateRetry(3), () => {
-    graphql(viewLists(), validateGetViewListsResponse)
-  })
-
   it('Query - Get checkList', updateRetry(3), () => {
     graphql(checkList(), validateGetcheckListResponse)
   })
 
   it('Query - Get listNames', updateRetry(3), () => {
     graphql(listNames(), validateGetlistNamesResponse)
+  })
+
+  it('Query - Get ViewList', updateRetry(3), () => {
+    graphql(viewList(payload), validateGetViewListResponse)
+  })
+
+  it('Query - Get All ViewList', updateRetry(3), () => {
+    graphql(viewLists(), validateGetViewListsResponse)
   })
 
   it('Mutation - removeFromList', updateRetry(3), () => {
