@@ -16,6 +16,7 @@ jobs:
       nodeSonar: true
       nodeSonarProjectKey: vtex-apps_wish-list-ts
       nodeSonarOrganization: vtex-apps
+      dotnetLint: true
       dotnetSonar: true
       dotnetSonarProjectKey: vtex-apps_wish-list-dotnet
       dotnetSonarOrganization: vtex-apps
