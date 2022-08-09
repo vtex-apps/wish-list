@@ -7,14 +7,12 @@ import {
 import wishListSelectors from '../support/selectors.js'
 import wishlistProducts from '../support/wishlistProducts.js'
 
-function verifyProducts(cauliflower = true) {
+function verifyProducts(orange = true) {
   cy.get(wishlistProducts.onion.link).should('be.visible')
-  cy.get(wishlistProducts.orange.link).should('be.visible')
-  cy.get(wishlistProducts.watermelon.link).should('be.visible')
-  if (cauliflower) {
-    cy.get(wishlistProducts.cauliflower.link).should('be.visible')
+  if (orange) {
+    cy.get(wishlistProducts.orange.link).should('be.visible')
   } else {
-    cy.get(wishlistProducts.cauliflower.link).should('not.exist')
+    cy.get(wishlistProducts.orange.link).should('not.exist')
   }
 }
 
@@ -34,15 +32,6 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   )
 
   it(
-    `${prefix} - adding a cauliflower to wishlists from homepage`,
-    updateRetry(1),
-    () => {
-      // adding cauliflower to wishlists
-      cy.addProductToWishList(wishlistProducts.cauliflower.link)
-    }
-  )
-
-  it(
     `${prefix} -adding orange from product specification page`,
     updateRetry(2),
     () => {
@@ -50,18 +39,6 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
       cy.addWishListItem(
         wishlistProducts.orange.name,
         wishlistProducts.orange.link
-      )
-    }
-  )
-
-  it(
-    `${prefix} - adding watermelon from product secification page`,
-    updateRetry(2),
-    () => {
-      // adding watermelon from the product specification page
-      cy.addWishListItem(
-        wishlistProducts.watermelon.name,
-        wishlistProducts.watermelon.link
       )
     }
   )
@@ -77,11 +54,11 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   })
 
   it(
-    `${prefix} - Remove onion, cauliflower from the wishlist page`,
+    `${prefix} - Remove onion, orange from the wishlist page`,
     updateRetry(1),
     () => {
       cy.removeProductFromWishlist(wishlistProducts.onion.link)
-      cy.removeProductFromWishlist(wishlistProducts.cauliflower.link)
+      cy.removeProductFromWishlist(wishlistProducts.orange.link)
     }
   )
 

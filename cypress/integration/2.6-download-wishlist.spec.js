@@ -10,12 +10,11 @@ const fileName = 'cypress/downloads/wishlists.xls'
 const fixtureFileName = 'wishlistData.json'
 const fixtureFilePath = 'cypress/fixtures/wishlistData.json'
 
+// Below products should be available in downloaded wishlist csv
 const products = [
+  wishlistProducts.coconut,
   wishlistProducts.onion,
   wishlistProducts.orange,
-  wishlistProducts.watermelon,
-  wishlistProducts.coconut,
-  wishlistProducts.irobot,
 ]
 
 const prefix = 2.5
