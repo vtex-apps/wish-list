@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-loop-func */
 import React, { FC, useState } from 'react'
 import { injectIntl, defineMessages } from 'react-intl'
 import {
