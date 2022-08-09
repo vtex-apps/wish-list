@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- GraphQL mutation security.
+- Logging optimization.
+
 ## [1.14.0] - 2022-06-21
 
 ### Added
@@ -53,7 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Set timeout to 60s to avoid proxy time out error when downloading a large amount of data
+- Set timeout to 60s to avoid proxy time-out error when downloading a large amount of data
 
 ### Fixed
 

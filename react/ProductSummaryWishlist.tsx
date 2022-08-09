@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useMemo, useState, useEffect, FC } from 'react'
 import { useLazyQuery } from 'react-apollo'
 // @ts-expect-error - useTreePath is a private API

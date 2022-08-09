@@ -10,7 +10,7 @@
 
 The Wishlist app, designed for **B2C** stores, adds a heart icon to shelves and product detail pages, so users can add the desired products to a Wishlist.
 
-![wishlist-list](https://user-images.githubusercontent.com/52087100/94687168-40fbe500-0302-11eb-8239-135d773324dd.png)
+![wishlist-list](https://user-images.githubusercontent.com/52087100/94687168-40fbe500-0302-11eb-8239-135d773324dd.png)<br/>
 _Example of heart icons on a shelf._
 
 ![wish-list-pdp](https://user-images.githubusercontent.com/52087100/94687148-393c4080-0302-11eb-8ab4-e5bd44e642ec.png)
@@ -63,55 +63,6 @@ _Example of a wishlist page._
 ```
 
 > ℹ️ _The new route called `/wishlist`, responsible for creating the Wishlist custom page that displays wishlisted product items, already contains a default template, it is already rendered under the My Account menu and no further actions are required from you. However, you can **customize the Wishlist page, overwriting the template by creating a brand new one as you wish**. To do so, check the **Advanced configurations** section below._
-
-## Uages
-
-There are couple URLs to read, search and modify data for the app:
-
-To read the schema of the wishlist app: 
-`````
-curl --request GET \ 
-     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/schemas/wishlist' \
-     --header 'VtexIdClientAutCookie: {authToken}' \
-`````
-
-To GET all the wishlist data: 
-`````
-curl --request GET \
-     --url 'https://{environment}--{accountName}.myvtex.com/_v/wishlist/export-lists' \
-     --header 'VtexIdClientAutCookie: {authToken}' \
-`````
-
-To search wishlist by user email: 
-`````
-curl --request GET \
-     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/search?' \
-     --header 'VtexIdClientAutCookie: {authToken}' \
-`````
-
-To PATCH a wishlist to the MasterData: 
-`````
-curl --request PATCH \
-     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/documents' \
-     --header 'VtexIdClientAutCookie: {authToken}' \
-     --data '
-        [
-            "Email",
-            "Name",
-            .
-            .
-            .
-            "IsPublic",
-        ]
-     '
-`````
-
-To DELETE a wishlist from the MasterData:: 
-`````
-curl --request DELETE \
-     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/documents/{documentId}' \
-     --header 'VtexIdClientAutCookie: {authToken}' \
-`````
 
 ## Advanced configurations
 
@@ -211,7 +162,54 @@ If you want to configure the layout without the `slider-layout` dependency, you 
 | :-------: | :------: | :---------------------------------------------------------: | :-----------: |
 |  `label`  | `string` | Change the label for the section menu under My Account page |  `Wishlist`   |
 
+## Usages
 
+There are couple URLs to read, search and modify data for the app:
+
+To read the schema of the wishlist app: 
+`````
+curl --request GET \ 
+     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/schemas/wishlist' \
+     --header 'VtexIdClientAutCookie: {authToken}' \
+`````
+
+To GET all the wishlist data: 
+`````
+curl --request GET \
+     --url 'https://{environment}--{accountName}.myvtex.com/_v/wishlist/export-lists' \
+     --header 'VtexIdClientAutCookie: {authToken}' \
+`````
+
+To search wishlist by user email: 
+`````
+curl --request GET \
+     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/search?' \
+     --header 'VtexIdClientAutCookie: {authToken}' \
+`````
+
+To PATCH a wishlist to the MasterData: 
+`````
+curl --request PATCH \
+     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/documents' \
+     --header 'VtexIdClientAutCookie: {authToken}' \
+     --data '
+        [
+            "Email",
+            "Name",
+            .
+            .
+            .
+            "IsPublic",
+        ]
+     '
+`````
+
+To DELETE a wishlist from the MasterData:: 
+`````
+curl --request DELETE \
+     --url 'https://{{accountName}}.vtexcommercestable.com.br/api/dataentities/wishlist/documents/{documentId}' \
+     --header 'VtexIdClientAutCookie: {authToken}' \
+`````
 ## Custom toast URL
 Change the link of toast message
 
