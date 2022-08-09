@@ -17,20 +17,13 @@ import {
 } from '../support/graphql_testcase.js'
 import { loginViaCookies, updateRetry } from '../support/common/support.js'
 import { restAndGraphqlAPI } from '../support/outputvalidation.js'
-import {
-  readwishlistByEmail,
-  updateMasterdata,
-  deleteWishlistdata,
-  readWishListdata,
-  readWishListSchema,
-  wipe,
-} from '../support/api_testcase.js'
+import { wipe } from '../support/api_testcase.js'
 import { syncCheckoutUICustom } from '../support/common/testcase.js'
 
-describe('Graphql and REST API Testcase', () => {
+describe('Graphql Testcase', () => {
   loginViaCookies({ storeFrontCookie: false })
 
-  const { payload, newShopperId } = restAndGraphqlAPI
+  const { payload } = restAndGraphqlAPI
 
   wipe()
 
@@ -71,11 +64,4 @@ describe('Graphql and REST API Testcase', () => {
       )
     })
   })
-
-  readwishlistByEmail(payload.shopperId)
-  updateMasterdata(payload.shopperId, newShopperId)
-  readWishListSchema()
-  readWishListdata()
-  readwishlistByEmail(newShopperId)
-  deleteWishlistdata(newShopperId)
 })
