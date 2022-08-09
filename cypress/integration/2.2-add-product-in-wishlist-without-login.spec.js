@@ -23,7 +23,7 @@ describe(`${prefix} - Testing Wishlist with anonymous user`, () => {
     }
   )
 
-  it(`${prefix} - Verify we are able to see coconut in wishlist section`, () => {
+  it(`${prefix} - Verify we are able to see coconut in /wishlist page`, () => {
     cy.visitWishlistPage()
     cy.verifyProductInWishList(wishlistProducts.coconut.link)
   })
