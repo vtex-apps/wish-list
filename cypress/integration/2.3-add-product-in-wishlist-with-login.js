@@ -1,7 +1,7 @@
 import selectors from '../support/common/selectors.js'
 import {
   preserveCookie,
-  testSetup,
+  loginViaCookies,
   updateRetry,
 } from '../support/common/support.js'
 import wishListSelectors from '../support/selectors.js'
@@ -21,7 +21,7 @@ function verifyProducts(cauliflower = true) {
 const prefix = 2.3
 
 describe(`${prefix} - Testing wishlist with logged in user`, () => {
-  testSetup()
+  loginViaCookies()
 
   it(
     `${prefix} - adding onion to wishlist from homepage`,

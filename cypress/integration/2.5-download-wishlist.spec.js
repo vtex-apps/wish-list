@@ -1,5 +1,5 @@
 import {
-  testSetup,
+  loginViaCookies,
   updateRetry,
   preserveCookie,
 } from '../support/common/support'
@@ -21,8 +21,7 @@ const products = [
 const prefix = 2.5
 
 describe(`${prefix} - Download wishlist csv and verify data`, () => {
-  // Load test setup
-  testSetup(false)
+  loginViaCookies({ storeFrontCookie: false })
 
   downloadWishlistFile(prefix)
 
