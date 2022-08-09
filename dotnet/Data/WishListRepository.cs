@@ -80,7 +80,7 @@
             };
 
             var jsonSerializedListItems = JsonConvert.SerializeObject(wishListWrapper);
-            bool IsSuccessStatusCode = false;
+            bool isSuccessStatusCode = false;
             try 
             {
                 var request = new HttpRequestMessage
@@ -101,15 +101,18 @@
                 var client = _clientFactory.CreateClient();
                 var response = await client.SendAsync(request);
                 string responseContent = await response.Content.ReadAsStringAsync();
-                IsSuccessStatusCode = response.IsSuccessStatusCode;
-                _context.Vtex.Logger.Debug("SaveWishList", null, $"'{shopperId}' '{listName}' '{documentId}' [{response.StatusCode}]\n{responseContent}");
+                isSuccessStatusCode = response.IsSuccessStatusCode;
+                if (!isSuccessStatusCode) 
+                {
+                    _context.Vtex.Logger.Warn("SaveWishList", null, $"Failed to Save", new[] {("shopperId",  $"'{shopperId}'"), ("listName",  $"'{listName}'"), ("StatusCode",  $"'{response.StatusCode}'"), ("responseContent",  $"'{responseContent}'")});
+                }
             } 
             catch (Exception ex) 
             {
                 _context.Vtex.Logger.Error("SaveWishList", null, "Error: ", ex);
             }
 
-            return IsSuccessStatusCode;
+            return isSuccessStatusCode;
         }
 
         public async Task<ResponseListWrapper> GetWishList(string shopperId)
@@ -140,7 +143,11 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            _context.Vtex.Logger.Debug("GetWishList", null, $"'{shopperId}' [{response.StatusCode}]\n{responseContent}");
+            if (!response.IsSuccessStatusCode)
+            {
+                _context.Vtex.Logger.Warn("GetWishList", null, $"Failed to get wishlist", new[] {("shopperId", $"'{shopperId}'"), ("StatusCode", $"'{response.StatusCode}'"), ("responseContent", $"'{responseContent}'")});
+            }
+
             try
             {
                 JArray searchResult = JArray.Parse(responseContent);
@@ -175,7 +182,7 @@
         public async Task<bool> DeleteWishList(string documentId)
         {
             await this.VerifySchema();
-            bool IsSuccessStatusCode = false;
+            bool isSuccessStatusCode = false;
             try
             {
                 var request = new HttpRequestMessage
@@ -195,14 +202,14 @@
                 var client = _clientFactory.CreateClient();
                 var response = await client.SendAsync(request);
                 string responseContent = await response.Content.ReadAsStringAsync();
-                IsSuccessStatusCode = response.IsSuccessStatusCode;
+                isSuccessStatusCode = response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("DeleteWishList", null, "Error: ", ex);
             }
 
-            return IsSuccessStatusCode;
+            return isSuccessStatusCode;
         }
 
         public async Task VerifySchema()
@@ -226,7 +233,10 @@
                 var client = _clientFactory.CreateClient();
                 var response = await client.SendAsync(request);
                 string responseContent = await response.Content.ReadAsStringAsync();
-                _context.Vtex.Logger.Debug("VerifySchema", null, $"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
+                }
             
                 if (response.IsSuccessStatusCode)
                 {
@@ -236,7 +246,7 @@
                     }
                     else
                     {
-                        _context.Vtex.Logger.Debug("VerifySchema", null, $"Schema does not match.\n{responseContent}");
+                        _context.Vtex.Logger.Warn("VerifySchema", null, $"Schema does not match.\n{responseContent}");
                         request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Put,
@@ -253,7 +263,10 @@
 
                         response = await client.SendAsync(request);
                         responseContent = await response.Content.ReadAsStringAsync();
-                        _context.Vtex.Logger.Debug("VerifySchema", null, $"Applying Schema [{response.StatusCode}] {responseContent}");
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Apply Schema [{response.StatusCode}] {responseContent}");
+                        }
                     }
                 }
             }
@@ -265,7 +278,7 @@
 
         private async Task<string> FirstScroll()
         {
-            string responseContent = "\0";
+            string responseContent = string.Empty;
             try
             {
                 var client = _clientFactory.CreateClient();
@@ -298,7 +311,7 @@
 
         private async Task<string> SubScroll()
         {
-            string responseContent = "\0";
+            string responseContent = string.Empty;
             try
             {
                 var client = _clientFactory.CreateClient();
