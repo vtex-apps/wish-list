@@ -1,4 +1,5 @@
 import selectors from './common/selectors.js'
+import messages from '../../messages/en.json'
 
 export function scroll() {
   // Page loads heart icon only on scroll
@@ -26,4 +27,9 @@ export function addToCart(productLink) {
   cy.get(selectors.ProceedtoCheckout)
     .should('be.visible')
     .click()
+}
+
+export const MESSAGES = {
+  NotLoggedInUser: messages['store/wishlist-not-logged'],
+  AddedToWishList: messages['store/wishlist-product-added-to-list'],
 }

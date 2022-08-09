@@ -24,40 +24,26 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   loginViaCookies()
 
   it(
-    `${prefix} - adding onion to wishlist from homepage`,
+    `${prefix} - Add onion, cauliflower to wishlist from homepage`,
     updateRetry(1),
     () => {
       cy.openStoreFront(true)
       // adding onion to wishlists
       cy.addProductToWishList(wishlistProducts.onion.link)
-    }
-  )
-
-  it(
-    `${prefix} - adding a cauliflower to wishlists from homepage`,
-    updateRetry(1),
-    () => {
       // adding cauliflower to wishlists
       cy.addProductToWishList(wishlistProducts.cauliflower.link)
     }
   )
 
   it(
-    `${prefix} -adding orange from product specification page`,
-    updateRetry(2),
+    `${prefix} - Add orange, watermelon to wishlists from product specification page`,
+    updateRetry(1),
     () => {
       // adding orange from product specification page
       cy.addWishListItem(
         wishlistProducts.orange.name,
         wishlistProducts.orange.link
       )
-    }
-  )
-
-  it(
-    `${prefix} - adding watermelon from product secification page`,
-    updateRetry(2),
-    () => {
       // adding watermelon from the product specification page
       cy.addWishListItem(
         wishlistProducts.watermelon.name,
@@ -77,19 +63,10 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   })
 
   it(
-    `${prefix} - Remove the product onion from the wishlist page`,
+    `${prefix} - Remove onion, cauliflower from the wishlist page`,
     updateRetry(1),
     () => {
-      // Removing product onion from wishlist
       cy.removeProductFromWishlist(wishlistProducts.onion.link)
-    }
-  )
-
-  it(
-    `${prefix} - Remove the product cauliflower from the wishlist page`,
-    updateRetry(1),
-    () => {
-      // Removing product cauliflower from wishlist
       cy.removeProductFromWishlist(wishlistProducts.cauliflower.link)
     }
   )
