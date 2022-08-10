@@ -28,6 +28,7 @@ export function graphql(getQuery, validateResponseFn = null) {
   }).as('RESPONSE')
 
   if (validateResponseFn) {
+    cy.addDelayBetweenRetries(2000)
     cy.get('@RESPONSE').then(response => {
       expect(response.status).to.equal(200)
       expect(response.body.data).to.not.equal(null)

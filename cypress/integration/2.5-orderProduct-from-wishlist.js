@@ -1,5 +1,5 @@
 import {
-  testSetup,
+  loginViaCookies,
   updateRetry,
   preserveCookie,
   promissoryPayment,
@@ -14,8 +14,7 @@ import selectors from '../support/common/selectors.js'
 const { prefix } = orderProduct
 
 describe(`${prefix} - Testing order Product from wishlist`, () => {
-  // Load test setup
-  testSetup()
+  loginViaCookies()
 
   it(`${prefix} - Add irobot to wish list`, updateRetry(2), () => {
     cy.searchProduct(wishlistProducts.irobot.name)

@@ -15,23 +15,18 @@ import {
   addToList,
   removeFromList,
 } from '../support/graphql_testcase.js'
-import { testSetup, updateRetry } from '../support/common/support.js'
+import { loginViaCookies, updateRetry } from '../support/common/support.js'
 import { restAndGraphqlAPI } from '../support/outputvalidation.js'
-import {
-  readwishlistByEmail,
-  updateMasterdata,
-  deleteWishlistdata,
-  readWishListdata,
-  readWishListSchema,
-  wipe,
-} from '../support/api_testcase.js'
+import { wipe } from '../support/api_testcase.js'
+import { syncCheckoutUICustom } from '../support/common/testcase.js'
 
-describe('Graphql and REST API Testcase', () => {
-  testSetup(false)
+describe('Graphql Testcase', () => {
+  loginViaCookies({ storeFrontCookie: false })
 
-  const { payload, newShopperId } = restAndGraphqlAPI
+  const { payload } = restAndGraphqlAPI
 
   wipe()
+
   it('Mutation - addToList', updateRetry(3), () => {
     graphql(addToList(payload), response => {
       validateaddToListResponse(response)
@@ -47,9 +42,7 @@ describe('Graphql and REST API Testcase', () => {
     graphql(checkList(), validateGetcheckListResponse)
   })
 
-  it('Query - Get listNames', updateRetry(3), () => {
-    graphql(listNames(), validateGetlistNamesResponse)
-  })
+  syncCheckoutUICustom()
 
   it('Query - Get ViewList', updateRetry(3), () => {
     graphql(viewList(payload), validateGetViewListResponse)
@@ -57,6 +50,10 @@ describe('Graphql and REST API Testcase', () => {
 
   it('Query - Get All ViewList', updateRetry(3), () => {
     graphql(viewLists(), validateGetViewListsResponse)
+  })
+
+  it('Query - Get listNames', updateRetry(3), () => {
+    graphql(listNames(), validateGetlistNamesResponse)
   })
 
   it('Mutation - removeFromList', updateRetry(3), () => {
@@ -67,11 +64,4 @@ describe('Graphql and REST API Testcase', () => {
       )
     })
   })
-
-  readwishlistByEmail(payload.shopperId)
-  updateMasterdata(payload.shopperId, newShopperId)
-  readWishListSchema()
-  readWishListdata()
-  readwishlistByEmail(newShopperId)
-  deleteWishlistdata(newShopperId)
 })
