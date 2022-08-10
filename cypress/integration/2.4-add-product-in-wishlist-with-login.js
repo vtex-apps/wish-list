@@ -82,7 +82,7 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   })
 
   it(
-    `${prefix} - Verify now we are able to see three products in account wishlist page`,
+    `${prefix} - Verify now we are able to see one products in account wishlist page`,
     updateRetry(2),
     () => {
       cy.gotoMyAccountWishListPage()
@@ -91,7 +91,7 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
   )
 
   it(
-    `${prefix} - Verify we are able to see wishlist in /wishlist page`,
+    `${prefix} - Verify we are able to see one product in /wishlist page`,
     updateRetry(1),
     () => {
       cy.visitWishlistPage()

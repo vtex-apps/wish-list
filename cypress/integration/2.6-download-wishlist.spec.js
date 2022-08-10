@@ -14,7 +14,7 @@ const fixtureFilePath = 'cypress/fixtures/wishlistData.json'
 const products = [
   wishlistProducts.coconut,
   wishlistProducts.onion,
-  wishlistProducts.orange,
+  wishlistProducts.irobot,
 ]
 
 const prefix = 2.5
