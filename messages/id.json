@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Tambah ke daftar",
+  "store/wishlist-see-lists": "Lihat daftar",
+  "store/wishlist-product-added-to-list": "Produk ditambah ke daftar",
+  "store/wishlist-add-product-fail": "Tidak dapat menambah produk ke daftar",
+  "store/wishlist-default-list-name": "Wishlist",
+  "store/myaccount-menu": "Wishlist",
+  "store/myaccount-empty-list": "Daftar ini kosong",
+  "store/wishlist-login": "Masuk",
+  "store/wishlist-not-logged": "Anda perlu login sebelum menambahkannya ke daftar",
+  "admin/wishlist.menu.label": "Wishlist",
+  "admin/settings.title": "Ekspor Wishlist",
+  "admin/settings.download": "Unduh Wishlist"
+}
