@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- GitHub reusable workflow and cy-runner updated to version 2
+
 ## [1.15.1] - 2022-09-27
 
 ### Fixed
