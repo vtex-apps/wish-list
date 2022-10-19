@@ -170,7 +170,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
           navigate({
             page: 'store.login',
             query: `returnUrl=${encodeURIComponent(
-              history?.location?.pathname
+              String(history?.location?.pathname) +
+                String(history?.location?.search)
             )}`,
           }),
       }
