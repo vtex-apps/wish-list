@@ -202,7 +202,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
           isWishlisted: true,
           sku,
         }
-        addWishlisted(productId, sku)
+        if (productId && sku) {
+          addWishlisted(productId, sku)
+        }
         toastMessage('productAddedToList', toastURL)
       },
     }
@@ -346,7 +348,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         (item: any) => item.productId === productId && item.sku === sku
       ) === undefined
     ) {
-      addWishlisted(productId, sku)
+      if (productId && sku) {
+        addWishlisted(productId, sku)
+      }
     }
   }
 
