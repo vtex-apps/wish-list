@@ -1,5 +1,5 @@
 import {
-  testSetup,
+  loginViaCookies,
   updateRetry,
   preserveCookie,
 } from '../support/common/support.js'
@@ -8,8 +8,7 @@ import wishlistProducts from '../support/wishlistProducts.js'
 const prefix = '2.2'
 
 describe(`${prefix} - Testing Wishlist with anonymous user`, () => {
-  // Load test setup
-  testSetup(false)
+  loginViaCookies({ storeFrontCookie: false })
 
   it(`${prefix} - Add coconut to wish list`, updateRetry(1), () => {
     cy.openStoreFront()
@@ -24,7 +23,7 @@ describe(`${prefix} - Testing Wishlist with anonymous user`, () => {
     }
   )
 
-  it(`${prefix} - Verify we are able to see coconut in wishlist section`, () => {
+  it(`${prefix} - Verify we are able to see coconut in /wishlist page`, () => {
     cy.visitWishlistPage()
     cy.verifyProductInWishList(wishlistProducts.coconut.link)
   })

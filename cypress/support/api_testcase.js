@@ -113,6 +113,7 @@ export function deleteWishlistdata(env) {
               headers: {
                 ...VTEX_AUTH_HEADER(vtex.apiKey, vtex.apiToken),
               },
+              ...FAIL_ON_STATUS_CODE,
             }).then(response => {
               expect(response.status).to.equal(204)
               expect(response.body).to.have.oneOf([null, ''])

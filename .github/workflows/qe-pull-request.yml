@@ -14,13 +14,16 @@ on:
 jobs:
   quality-engineering:
     name: QE
-    uses: vtex-apps/usqa/.github/workflows/quality-engineering.yml@main
+    uses: vtex-apps/usqa/.github/workflows/quality-engineering.yml@v2
     with:
+      danger: true
+      dangerRequireChangelog: false
       nodeLint: true
-      nodeTest: false
+      reactTest: false
       nodeSonar: true
       nodeSonarProjectKey: vtex-apps_wish-list-ts
       nodeSonarOrganization: vtex-apps
+      dotnetLint: true
       dotnetSonar: true
       dotnetSonarProjectKey: vtex-apps_wish-list-dotnet
       dotnetSonarOrganization: vtex-apps

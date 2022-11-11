@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.15.2] - 2022-10-19
+
+### Fixed
+
+- Fixed the return url after login to include the search field
+
+### Changed
+
+- GitHub reusable workflow and cy-runner updated to version 2
+
+## [1.15.1] - 2022-09-27
+
+### Fixed
+
+- English, Spanish and Italian translations.
+
+## [1.15.0] - 2022-08-09
+
+### Added
+
+- GraphQL mutation security.
+- Logging optimization.
+
 ## [1.14.0] - 2022-06-21
 
 ### Added
@@ -53,7 +76,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Set timeout to 60s to avoid proxy time out error when downloading a large amount of data
+- Set timeout to 60s to avoid proxy time-out error when downloading a large amount of data
 
 ### Fixed
 

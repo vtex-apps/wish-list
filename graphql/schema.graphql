@@ -48,6 +48,7 @@ type Mutation {
     shopperId: String!
     name: String!
     public: Boolean
-  ): ID
+  ): ID @cacheControl(scope: PRIVATE)
   removeFromList(id: ID!, shopperId: String!, name: String): Boolean
+    @cacheControl(scope: PRIVATE)
 }

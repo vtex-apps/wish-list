@@ -15,10 +15,12 @@ base:
   twilio:
     enabled: true
   jira:
-    enabled: false
-    account: config-dev
-    board: jira-key
-    issueType: task
+    enabled: true
+    account: vtex-dev
+    board: WISHLIST
+    issueType: Bug
+    priority: High
+    testing: true
   slack:
     enabled: false
     channel: some-channel
@@ -70,7 +72,16 @@ workspace:
     enabled: true
 
 strategy:
-  # Graphql and API Test case
+  # Graphql 
+  graphql:
+    enabled: true
+    sendDashboard: true
+    hardTries: 1
+    stopOnFail: false
+    parallel: false
+    specs:
+      - cypress/integration/2.1-graphql_testcases.spec.js
+  # API Test case
   api:
     enabled: true
     sendDashboard: true
@@ -78,7 +89,7 @@ strategy:
     stopOnFail: false
     parallel: false
     specs:
-      - cypress/integration/2.1-*
+      - cypress/integration/2.2-api_testcases.spec.js
   # Add Product to wishlist as anonymous_user,logged_in_user and order product
   wishlist:
     enabled: true
@@ -87,11 +98,11 @@ strategy:
     stopOnFail: false
     parallel: false
     specs:
-      - cypress/integration/2.2-*
-      - cypress/integration/2.3-*
-      - cypress/integration/2.4-*
+      - cypress/integration/2.3-add-product-in-wishlist-without-login.spec.js
+      - cypress/integration/2.4-add-product-in-wishlist-with-login.js
+      - cypress/integration/2.5-orderProduct-from-wishlist.js
     dependency:
-      - cypress/integration/2.1-*
+      - cypress/integration/2.2-api_testcases.spec.js
   download_wishlist:
     enabled: true
     sendDashboard: true
@@ -99,8 +110,8 @@ strategy:
     stopOnFail: false
     parallel: false
     specs:
-      - cypress/integration/2.5-*
+      - cypress/integration/2.6-download-wishlist.spec.js
     dependency:
-      - cypress/integration/2.2-*
-      - cypress/integration/2.3-*
-      - cypress/integration/2.4-*
+      - cypress/integration/2.3-add-product-in-wishlist-without-login.spec.js
+      - cypress/integration/2.4-add-product-in-wishlist-with-login.js
+      - cypress/integration/2.5-orderProduct-from-wishlist.js

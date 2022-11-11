@@ -1,6 +1,6 @@
 import selectors from './common/selectors.js'
 import wishListSelectors from './selectors.js'
-import { scroll } from './utils.js'
+import { scroll, MESSAGES } from './utils.js'
 
 const wishlistJson = '.wishlist.json'
 
@@ -63,7 +63,7 @@ function clickWishListIcon(productLink = '', login = '') {
           .click({ force: true })
         if (!login) {
           cy.get(selectors.ToastMsgInB2B, { timeout: 10000 })
-            .contains('added')
+            .contains(MESSAGES.AddedToWishList)
             .should('be.visible')
           cy.get(wishListFillSelector, { timeout: 10000 }).should('be.visible')
           cy.wait(`@${addWishListOperation}`, { timeout: 20000 }).then(req => {
@@ -71,7 +71,7 @@ function clickWishListIcon(productLink = '', login = '') {
           })
         } else {
           cy.get(selectors.ToastMsgInB2B, { timeout: 10000 })
-            .contains('login')
+            .contains(MESSAGES.NotLoggedInUser)
             .should('be.visible')
         }
       } else {
@@ -87,7 +87,7 @@ Cypress.Commands.add('addProductToWishList', (productLink, login = false) => {
   // eslint-disable-next-line vtex/prefer-early-return
   if (login) {
     cy.get(selectors.ToastMsgInB2B, { timeout: 15000 }).contains(
-      'You need to login'
+      MESSAGES.NotLoggedInUser
     )
     cy.get(wishListSelectors.ToastButton)
       .should('be.visible')
@@ -175,7 +175,9 @@ Cypress.Commands.add('verifyWishlistProduct', productLink => {
     .should('have.contain', `Hello,`)
 
   scroll()
-  cy.get(selectors.ToastMsgInB2B, { timeout: 60000 }).contains('Product added')
+  cy.get(selectors.ToastMsgInB2B, { timeout: 60000 }).contains(
+    MESSAGES.AddedToWishList
+  )
   cy.get(wishListSelectors.ToastButton)
     .should('be.visible')
     .click()
