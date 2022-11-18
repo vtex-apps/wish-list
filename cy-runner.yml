@@ -33,8 +33,8 @@ base:
     maxJobs: 3
     quiet: true
     video: true
-    videoCompression: false
-    videoUploadOnPasses: false
+    videoCompression: true
+    videoUploadOnPasses: true
     screenshotOnRunFailure: true
     trashAssetsBeforeRuns: false
     viewportWidth: 1440
