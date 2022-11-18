@@ -29,7 +29,7 @@ describe(`${prefix} - Testing order Product from wishlist`, () => {
     }
   )
 
-  it(`${prefix} - Updating Shipping Information`, updateRetry(3), () => {
+  it(`${prefix} - Updating Shipping Information`, updateRetry(4), () => {
     // Update Shipping Section
     cy.get(selectors.CartTimeline).click({ force: true })
     cy.updateShippingInformation(orderProduct)
