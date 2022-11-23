@@ -346,7 +346,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         (item: any) => item.productId === productId && item.sku === sku
       ) === undefined
     ) {
-      addWishlisted(productId, sku)
+      if (productId && sku) {
+        addWishlisted(productId, sku)
+      }
     }
   }
 
