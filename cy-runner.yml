@@ -8,12 +8,6 @@ base:
     id: 2001459804
     domain: myvtex.com
     vtexIdUrl: https://vtexid.vtex.com.br/api/vtexid/pub/authenticate/default
-    deployCli:
-      enabled: true
-      git: https://github.com/vtex/toolbelt.git
-      branch: qe/cypress
-  twilio:
-    enabled: true
   jira:
     enabled: true
     account: vtex-dev
@@ -45,7 +39,6 @@ base:
     pageLoadTimeout: 45000
     browser: chrome
     chromeWebSecurity: false
-    sorry: false
   stateFiles: [.wishlist.json]
 
 workspace:
