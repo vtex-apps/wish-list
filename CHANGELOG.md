@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Cypress code improvements
+
 ## [1.15.4] - 2022-11-23
 
 ## [1.15.3] - 2022-11-14
