@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.15.5] - 2023-01-25
+
 ### Fixed
 
 - Change export-list Api to private for preventing data leak
