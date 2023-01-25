@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Added exportList graphql and set the export Api to private to prevent data leak
+
 ### Changed
 
 - Cypress code improvements

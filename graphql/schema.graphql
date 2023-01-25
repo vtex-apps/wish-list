@@ -40,6 +40,8 @@ type Query {
   checkList(shopperId: String!, productId: String!, sku: String): CheckListType
     @cacheControl(scope: PRIVATE)
   listNames(shopperId: String!): [String]
+  exportList: [String] @cacheControl(scope: PRIVATE)
+    @checkAdminAccess
 }
 
 type Mutation {

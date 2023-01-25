@@ -1,0 +1,3 @@
+query ExportList {
+  exportList @context(provider: "vtex.wish-list")
+}

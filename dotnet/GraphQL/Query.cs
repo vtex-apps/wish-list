@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using WishList.GraphQL.Types;
 using WishList.Models;
 using WishList.Services;
@@ -211,6 +212,27 @@ namespace WishList.GraphQL
                     var listName = distinctListNames.Select(n => n.Name);
 
                     return listName.ToArray();
+                }
+            );
+
+            FieldAsync<StringGraphType>(
+                "exportList",
+                resolve: async context =>
+                {
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+                        
+                        return null;
+                    }
+
+                    WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishLists();
+                    return wishListsWrapper.WishLists;
+
                 }
             );
         }

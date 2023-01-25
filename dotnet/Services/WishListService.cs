@@ -265,5 +265,11 @@ namespace WishList.Services
 
             return HttpStatusCode.OK;
         }
+
+        public async Task<WishListsWrapper> ExportAllWishLists()
+        {
+            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();
+            return wishListsWrapper;
+        }
     }
 }
