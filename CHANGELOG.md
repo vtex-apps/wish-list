@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Change export-list Api to private for preventing data leak
+
 ### Changed
 
 - Cypress code improvements

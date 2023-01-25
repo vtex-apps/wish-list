@@ -8,7 +8,13 @@
   "routes": {
     "ExportAllLists": {
       "path": "/_v/wishlist/export-lists",
-      "public": true
+      "public": false,
+      "policies": [
+        {
+          "effect": "allow",
+          "actions": ["get"]
+        }
+      ]
     }
   },
   "events": {
