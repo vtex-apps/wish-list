@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react'
 import { injectIntl, defineMessages } from 'react-intl'
+import { useQuery } from 'react-apollo'
 import {
   Layout,
   PageBlock,
@@ -8,6 +9,8 @@ import {
   IconDownload,
 } from 'vtex.styleguide'
 import XLSX from 'xlsx'
+
+import exportList from './queries/exportList.gql'
 
 const WishlistAdmin: FC<any> = ({ intl }) => {
   const [state, setState] = useState<any>({
@@ -43,15 +46,17 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
     XLSX.writeFile(wb, exportFileName)
   }
 
-  const getAllWishlists = async () => {
+  const { data, loading: queryLoading } = useQuery(exportList, {
+    fetchPolicy: 'no-cache',
+  })
+
+  const GetAllWishlists = async () => {
     setState({ ...state, loading: true })
 
-    const data: any = await fetch(`/_v/wishlist/export-lists`).then(response =>
-      response.json()
-    )
-    const wishlistArr = data.wishLists
-
-    downloadWishlist(wishlistArr)
+    if (!queryLoading) {
+      const parsedData = data?.exportList
+      downloadWishlist(parsedData)
+    }
     setState({ ...state, loading: false })
   }
 
@@ -81,7 +86,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
           icon={download}
           isLoading={loading}
           onClick={() => {
-            getAllWishlists()
+            GetAllWishlists()
           }}
         >
           {intl.formatMessage(messages.download)}
