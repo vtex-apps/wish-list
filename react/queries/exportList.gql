@@ -1,0 +1,13 @@
+query ExportList {
+   exportList @context(provider: "vtex.wish-list") {
+      email
+      listItemsWrapper {
+         listItems {
+            id
+            productId
+            sku
+            title
+         }
+      }
+   }
+}

@@ -15,5 +15,6 @@ namespace WishList.Services
         Task<IList<ListItem>> LimitList(IList<ListItem> listItems, int from, int to);
         Task<HttpStatusCode> IsValidAuthUser();
         Task<ValidatedUser> ValidateUserToken(string token);
+        Task<WishListsWrapper> ExportAllWishLists();
     }
 }

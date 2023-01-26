@@ -32,6 +32,16 @@ input ListItemInputType {
   title: String
 }
 
+type WishListWrapperType {
+  email: String
+  listItemsWrapper: [ListItems]
+}
+
+type ListItems {
+  listItems: [ListItem]
+  isPublic: Boolean
+}
+
 type Query {
   viewList(shopperId: String!, name: String!, from: Int, to: Int): WishList
     @cacheControl(scope: PRIVATE, maxAge: ZERO)
@@ -40,6 +50,8 @@ type Query {
   checkList(shopperId: String!, productId: String!, sku: String): CheckListType
     @cacheControl(scope: PRIVATE)
   listNames(shopperId: String!): [String]
+  exportList: [WishListWrapperType]
+    @cacheControl(scope: PRIVATE)
 }
 
 type Mutation {
