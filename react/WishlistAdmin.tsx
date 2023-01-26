@@ -46,8 +46,8 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
     XLSX.writeFile(wb, exportFileName)
   }
 
-  const { data, loading: queryLoading } = useQuery(exportList,{ 
-    fetchPolicy: 'no-cache'
+  const { data, loading: queryLoading } = useQuery(exportList, {
+    fetchPolicy: 'no-cache',
   })
 
   const GetAllWishlists = async () => {
