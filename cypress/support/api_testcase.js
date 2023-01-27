@@ -24,18 +24,6 @@ export function readWishListSchema() {
   })
 }
 
-export function readWishListdata() {
-  it(`${PREFIX} -Read all wishlist data`, updateRetry(3), () => {
-    cy.addDelayBetweenRetries(2000)
-    cy.getVtexItems().then(vtex => {
-      cy.getAPI(wishlistDataAPI(vtex.baseUrl)).then(response => {
-        expect(response.status).to.have.equal(200)
-        expect(response.body).to.have.property('wishLists')
-      })
-    })
-  })
-}
-
 export function readwishlistByEmail(shopperId, validate = true) {
   it(
     `${PREFIX} - Read the wishlist data by using ${shopperId}`,

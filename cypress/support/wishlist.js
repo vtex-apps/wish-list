@@ -8,13 +8,15 @@ export function downloadWishlistFile(prefix) {
     () => {
       cy.visit('admin/app/wishlist')
       cy.getVtexItems().then(vtex => {
-        cy.intercept('GET', `${vtex.baseUrl}/_v/wishlist/export-lists`).as(
-          'Export'
-        )
+        cy.intercept('POST', `${vtex.baseUrl}/**`, req => {
+          if (req.body.operationName === 'ExportList') {
+            req.continue()
+          }
+        }).as('ExportList')
         cy.get(wishListSelectors.WishlistDownloadButton)
           .should('be.visible')
           .click()
-        cy.wait('@Export', { timeout: 40000 })
+        cy.wait('@ExportList', { timeout: 40000 })
       })
     }
   )
