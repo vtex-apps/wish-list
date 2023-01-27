@@ -2,7 +2,6 @@ import { VTEX_AUTH_HEADER, FAIL_ON_STATUS_CODE } from './common/constants'
 import { updateRetry } from './common/support'
 import {
   wishlistSchemaAPI,
-  wishlistDataAPI,
   wishlistEmailAPI,
   updateWishlistAPI,
   deleteWishlistAPI,
