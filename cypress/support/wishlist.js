@@ -7,12 +7,14 @@ export function downloadWishlistFile(prefix) {
     updateRetry(2),
     () => {
       cy.visit('admin/app/wishlist')
+      cy.contains('Wishlist').should('be.visible')
       cy.getVtexItems().then(vtex => {
         cy.intercept('POST', `${vtex.baseUrl}/**`, req => {
           if (req.body.operationName === 'ExportList') {
             req.continue()
           }
         }).as('ExportList')
+
         cy.get(wishListSelectors.WishlistDownloadButton)
           .should('be.visible')
           .click()
