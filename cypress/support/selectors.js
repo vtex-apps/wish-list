@@ -7,7 +7,6 @@ export default {
   LoginButton: 'div[class*=sendButton] > button',
   ProductSummaryContainer: 'section[class*=vtex-product-summary]',
   AccounPage: '.vtex-account__page',
-  WishlistDownloadButton: '.nr2 > :nth-child(2)',
   WishListOutLine: 'span[class*=outline]',
   WishListFill: 'span[class*=fill]',
   ThumbnailSwiper: '[data-testid=thumbnail-swiper]',
