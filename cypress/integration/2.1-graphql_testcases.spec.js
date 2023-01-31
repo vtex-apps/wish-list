@@ -6,6 +6,7 @@ import {
   validateaddToListResponse,
   validateGetlistNamesResponse,
   validateRemoveFromListResponse,
+  validateexportListResponse,
   version,
   viewList,
   viewLists,
@@ -13,6 +14,7 @@ import {
   listNames,
   addToList,
   removeFromList,
+  exportList,
 } from '../support/graphql_testcase.js'
 import { loginViaCookies, updateRetry } from '../support/common/support.js'
 import { restAndGraphqlAPI } from '../support/outputvalidation.js'
@@ -65,5 +67,9 @@ describe('Graphql Testcase', () => {
         validateRemoveFromListResponse
       )
     })
+  })
+
+  it('Query - exportLists', updateRetry(3), () => {
+    graphql(wishList, exportList(payload.shopperId), validateexportListResponse)
   })
 })

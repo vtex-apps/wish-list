@@ -80,6 +80,24 @@ export function removeFromList(productId, { shopperId, name }) {
   }
 }
 
+export function exportList(email) {
+  return {
+    query:
+      'query' +
+      '{ exportList{email,listItemsWrapper{listItems{id,productId,sku,title},isPublic}}}',
+    queryVariables: {
+      email,
+    },
+  }
+}
+
+export function validateexportListResponse(response) {
+  expect(response.body.data).to.not.equal(null)
+  expect(response.body.data.exportList[0].email).to.be.equal(
+    'saravananvenkatesan@bitcot.com'
+  )
+}
+
 export function validateGetVersionResponse(response) {
   expect(response.body.data).to.not.equal(null)
 }
