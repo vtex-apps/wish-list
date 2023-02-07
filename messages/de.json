@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Zur Liste hinzufügen",
+  "store/wishlist-see-lists": "Liste anzeigen",
+  "store/wishlist-product-added-to-list": "Produkt zur Liste hinzugefügt",
+  "store/wishlist-add-product-fail": "Produkt konnte nicht zur Liste hinzugefügt werden",
+  "store/wishlist-default-list-name": "Wunschliste",
+  "store/myaccount-menu": "Wunschliste",
+  "store/myaccount-empty-list": "Diese Liste ist leer",
+  "store/wishlist-login": "Anmelden",
+  "store/wishlist-not-logged": "Sie müssen sich anmelden, bevor Sie es zur Liste hinzufügen",
+  "admin/wishlist.menu.label": "Wunschliste",
+  "admin/settings.title": "Wunschliste-Export",
+  "admin/settings.download": "Wunschlisten herunterladen"
+}
