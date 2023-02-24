@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- [ENGINEERS-1127] Standardization of file names for Cypress tests
+
 ### Added
 
 - Added export graphql testcase and removed readwishlistdata api
