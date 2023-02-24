@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.15.7] - 2023-02-24
+
 ### Fixed
 
 - [ENGINEERS-1127] Standardization of file names for Cypress tests
