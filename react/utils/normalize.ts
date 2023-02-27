@@ -81,6 +81,7 @@ export function mapCatalogProductToProductSummary(
   if (!product) return null
   const normalizedProduct = {
     ...product,
+    skuSpecifications: product.skuSpecifications ?? [],
     wishlistPage: true,
     wishlistId,
   }
