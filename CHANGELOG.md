@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.15.8] - 2023-02-27
+
 ### Fixed
 - `skuSpecifications` to empty array if **null**
 
