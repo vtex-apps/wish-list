@@ -1,0 +1,110 @@
+---
+base:
+  secrets:
+    enabled: true
+    name: VTEX_QE
+  vtex:
+    account: productusqa
+    id: 2001459804
+    domain: myvtex.com
+    vtexIdUrl: https://vtexid.vtex.com.br/api/vtexid/pub/authenticate/default
+  jira:
+    enabled: true
+    account: vtex-dev
+    board: WISHLIST
+    issueType: Bug
+    priority: High
+    testing: true
+  slack:
+    enabled: false
+    channel: some-channel
+  cypress:
+    devMode: false
+    runHeaded: false
+    enabled: false
+    projectId: i2n638
+    getCookies: true
+    maxJobs: 3
+    quiet: true
+    video: false
+    videoCompression: false
+    videoUploadOnPasses: false
+    screenshotOnRunFailure: true
+    trashAssetsBeforeRuns: false
+    viewportWidth: 1440
+    viewportHeight: 1500
+    defaultCommandTimeout: 25000
+    requestTimeout: 25000
+    watchForFileChanges: false
+    pageLoadTimeout: 45000
+    browser: chrome
+    chromeWebSecurity: false
+  stateFiles: [.wishlist.json]
+
+workspace:
+  name: random
+  prefix: wishlist
+  linkApp:
+    enabled: true
+    logOutput:
+      enabled: false
+  installApps: 
+    # wish-list theme will work only when its peer dependency wish-list is added in the workspace
+    # So, installing wish-list@1.x version
+    - vtex.wish-list@1.x
+    # Published a new theme for wishlist E2E test
+    - vtex.wishlist-qa-theme@0.0.2
+  removeApps: 
+   - vtex.bitcot-qa-theme
+  wipe:
+    enabled: true
+    stopOnFail: false
+    specs: 
+    - cypress/integration/wipe.spec.js
+  teardown:
+    enabled: true
+
+strategy:
+  # Graphql 
+  graphql:
+    enabled: true
+    sendDashboard: true
+    hardTries: 1
+    stopOnFail: false
+    parallel: false
+    specs:
+      - cypress/integration/2.1-graphql_testcases.spec.js
+  # API Test case
+  api:
+    enabled: true
+    sendDashboard: true
+    hardTries: 1
+    stopOnFail: false
+    parallel: false
+    specs:
+      - cypress/integration/2.2-api_testcases.spec.js
+  # Add Product to wishlist as anonymous_user,logged_in_user and order product
+  wishlist:
+    enabled: true
+    sendDashboard: true
+    hardTries: 2
+    stopOnFail: false
+    parallel: false
+    specs:
+      - cypress/integration/2.3-add-product-in-wishlist-without-login.spec.js
+      - cypress/integration/2.4-add-product-in-wishlist-with-login.spec.js
+      - cypress/integration/2.5-orderProduct-from-wishlist.spec.js
+    dependency:
+      - cypress/integration/2.2-api_testcases.spec.js
+  download_wishlist:
+    enabled: true
+    sendDashboard: true
+    hardTries: 1
+    stopOnFail: false
+    parallel: false
+    specs:
+      - cypress/integration/2.6-download-wishlist.spec.js
+    dependency:
+      - cypress/integration/2.3-add-product-in-wishlist-without-login.spec.js
+      - cypress/integration/2.4-add-product-in-wishlist-with-login.spec.js
+      - cypress/integration/2.5-orderProduct-from-wishlist.spec.js
