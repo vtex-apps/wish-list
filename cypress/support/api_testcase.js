@@ -2,7 +2,6 @@ import { VTEX_AUTH_HEADER } from './common/constants'
 import { updateRetry } from './common/support'
 import {
   wishlistSchemaAPI,
-  wishlistDataAPI,
   wishlistEmailAPI,
   updateWishlistAPI,
   deleteWishlistAPI,
@@ -19,18 +18,6 @@ export function readWishListSchema() {
         expect(response.status).to.equal(200)
         expect(response.body).to.have.property('properties')
         expect(response.body).to.have.property('name')
-      })
-    })
-  })
-}
-
-export function readWishListdata() {
-  it(`${PREFIX} -Read all wishlist data`, updateRetry(3), () => {
-    cy.addDelayBetweenRetries(2000)
-    cy.getVtexItems().then(vtex => {
-      cy.getAPI(wishlistDataAPI(vtex.baseUrl)).then(response => {
-        expect(response.status).to.have.equal(200)
-        expect(response.body).to.have.property('wishLists')
       })
     })
   })

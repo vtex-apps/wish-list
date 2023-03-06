@@ -4,7 +4,6 @@ import {
   readwishlistByEmail,
   updateMasterdata,
   deleteWishlistdata,
-  readWishListdata,
   readWishListSchema,
 } from '../support/api_testcase.js'
 
@@ -16,7 +15,6 @@ describe('REST API Testcase', () => {
   readwishlistByEmail(payload.shopperId)
   updateMasterdata(payload.shopperId, newShopperId)
   readWishListSchema()
-  readWishListdata()
   readwishlistByEmail(newShopperId)
   deleteWishlistdata(newShopperId)
 })

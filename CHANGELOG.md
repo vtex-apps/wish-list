@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Added logs for debugging purpose
+## [1.15.8] - 2023-02-27
+
+### Fixed
+- `skuSpecifications` to empty array if **null**
+
+## [1.15.7] - 2023-02-24
+
+### Fixed
+
+- [ENGINEERS-1127] Standardization of file names for Cypress tests
+
+### Added
+
+- Added export graphql testcase and removed readwishlistdata api
 
 
 ## [1.15.6] - 2023-01-26
