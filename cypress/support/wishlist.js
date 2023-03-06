@@ -1,5 +1,5 @@
 import { updateRetry } from './common/support'
-import wishListSelectors from './selectors.js'
+import { MESSAGES } from './utils.js'
 
 export function downloadWishlistFile(prefix) {
   it(
@@ -8,10 +8,22 @@ export function downloadWishlistFile(prefix) {
     () => {
       cy.visit('admin/app/wishlist')
       cy.getVtexItems().then(vtex => {
-        cy.intercept('GET', `${vtex.baseUrl}/_v/wishlist/export-lists`).as(
-          'Export'
+        cy.qe(`Adding intercept for ExportList`)
+        cy.intercept('POST', `${vtex.baseUrl}/**`, req => {
+          if (req.body.operationName === 'ExportList') {
+            req.continue()
+          }
+        }).as('ExportList')
+        cy.qe(`Visiting admin/app/wishlist page`)
+        cy.visit('admin/app/wishlist')
+        cy.wait('@ExportList', { timeout: 40000 }).wait('@ExportList', {
+          timeout: 40000,
+        })
+        cy.qe(
+          `Verifying the ${MESSAGES.DownloadWishList} should be visible and enabled`
         )
-        cy.get(wishListSelectors.WishlistDownloadButton)
+        cy.get('div')
+          .contains(MESSAGES.DownloadWishList)
           .should('be.visible')
           .click()
         cy.wait('@Export', { timeout: 40000 })

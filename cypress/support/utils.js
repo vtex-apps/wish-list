@@ -32,4 +32,5 @@ export function addToCart(productLink) {
 export const MESSAGES = {
   NotLoggedInUser: messages['store/wishlist-not-logged'],
   AddedToWishList: messages['store/wishlist-product-added-to-list'],
+  DownloadWishList: messages['admin/settings.download'],
 }

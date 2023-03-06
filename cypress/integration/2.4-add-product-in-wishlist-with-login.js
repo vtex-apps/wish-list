@@ -64,18 +64,25 @@ describe(`${prefix} - Testing wishlist with logged in user`, () => {
 
   it(`${prefix} - Re add the product onion to wishlist`, updateRetry(1), () => {
     const searchKey = wishlistProducts.onion.name
+    cy.qe(`Verifying the searchbar should be visible and searching the product`)
     cy.get(selectors.Search)
       .should('be.visible')
       .type(searchKey)
       .type('{enter}')
     // Page should load successfully now searchResult & Filter should be visible
+    cy.qe(
+      `Verifying the searchbar should have text ${searchKey.toLocaleLowerCase()}`
+    )
     cy.get(selectors.searchResult).should('have.text', searchKey.toLowerCase())
+    cy.qe(`Verifying the filter heading should be visible`)
     cy.get(selectors.FilterHeading).should('be.visible')
-
+    cy.qe(
+      `Verifying the ${wishlistProducts.onion.link} should be visible and clicking on it`
+    )
     cy.get(wishlistProducts.onion.link)
       .should('be.visible')
       .click()
-
+    cy.qe(`Clicking on wishlist icon of the product`)
     cy.get(wishListSelectors.WishListIcon)
       .should('be.visible')
       .click()

@@ -1,4 +1,4 @@
-import { VTEX_AUTH_HEADER, FAIL_ON_STATUS_CODE } from './common/constants'
+import { VTEX_AUTH_HEADER } from './common/constants'
 import { updateRetry } from './common/support'
 import {
   wishlistSchemaAPI,
@@ -78,15 +78,13 @@ export function updateMasterdata(shopperId, newShopperId) {
       data.email = newShopperId
 
       cy.getVtexItems().then(vtex => {
-        cy.request({
+        cy.addLogsForRestAPI({
           method: 'PATCH',
           url: updateWishlistAPI(vtex.baseUrl),
-
           headers: {
             ...VTEX_AUTH_HEADER(vtex.apiKey, vtex.apiToken),
           },
           body: data,
-          ...FAIL_ON_STATUS_CODE,
         }).then(response => {
           expect(response.status).to.have.equal(200)
           expect(response.body).to.have.property('DocumentId')
@@ -107,13 +105,12 @@ export function deleteWishlistdata(env) {
           const arr = wishListId[env]
 
           for (const { id } of arr) {
-            cy.request({
+            cy.addLogsForRestAPI({
               method: 'DELETE',
               url: deleteWishlistAPI(vtex.baseUrl, id),
               headers: {
                 ...VTEX_AUTH_HEADER(vtex.apiKey, vtex.apiToken),
               },
-              ...FAIL_ON_STATUS_CODE,
             }).then(response => {
               expect(response.status).to.equal(204)
               expect(response.body).to.have.oneOf([null, ''])
