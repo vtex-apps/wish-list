@@ -92,8 +92,8 @@ strategy:
     parallel: false
     specs:
       - cypress/integration/2.3-add-product-in-wishlist-without-login.spec.js
-      - cypress/integration/2.4-add-product-in-wishlist-with-login.js
-      - cypress/integration/2.5-orderProduct-from-wishlist.js
+      - cypress/integration/2.4-add-product-in-wishlist-with-login.spec.js
+      - cypress/integration/2.5-orderProduct-from-wishlist.spec.js
     dependency:
       - cypress/integration/2.2-api_testcases.spec.js
   download_wishlist:
@@ -106,5 +106,5 @@ strategy:
       - cypress/integration/2.6-download-wishlist.spec.js
     dependency:
       - cypress/integration/2.3-add-product-in-wishlist-without-login.spec.js
-      - cypress/integration/2.4-add-product-in-wishlist-with-login.js
-      - cypress/integration/2.5-orderProduct-from-wishlist.js
+      - cypress/integration/2.4-add-product-in-wishlist-with-login.spec.js
+      - cypress/integration/2.5-orderProduct-from-wishlist.spec.js
