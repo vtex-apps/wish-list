@@ -382,6 +382,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
             className={`${handles.wishlistIcon} ${
               checkFill() ? styles.fill : styles.outline
             } ${styles.iconSize}`}
+            role="img"
           />
         </Button>
       </div>
