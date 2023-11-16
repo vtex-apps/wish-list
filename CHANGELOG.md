@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- GA event error due to undefined selectedItem
+
 ## [1.16.1] - 2023-04-25
 ### Fixed
 - Updated readme.md according to task LOC-10496.
