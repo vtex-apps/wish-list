@@ -162,6 +162,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const sku = product?.items[0].itemId
   wishListed = JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
+  const productContextScoped = useProduct()
+
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
     if (messsageKey === 'notLogged') {
@@ -195,13 +197,13 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   }
 
   const [addProduct, { loading: addLoading, error: addError }] = useMutation(
-    addToList, 
+    addToList,
     {
       onCompleted: (res: any) => {
         productCheck[productId] = {
           wishListId: res.addToList,
           isWishlisted: true,
-          sku: sku,
+          sku,
         }
         addWishlisted(productId, sku)
         toastMessage('productAddedToList', toastURL)
@@ -305,15 +307,14 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         })
         pixelEvent.event = 'removeToWishlist'
       } else {
-        const productContextScoped = useProduct()
-        const { selectedItem } = productContextScoped
+        const { selectedItem: selectedItemScoped } = productContextScoped
 
         addProduct({
           variables: {
             listItem: {
               productId,
               title: product.productName,
-              sku: selectedItem.itemId,
+              sku: selectedItemScoped.itemId,
             },
             shopperId,
             name: defaultValues.LIST_NAME,
