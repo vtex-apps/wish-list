@@ -1,0 +1,2 @@
+directive @checkUserAccess on FIELD | FIELD_DEFINITION
+directive @checkAdminAccess on FIELD | FIELD_DEFINITION

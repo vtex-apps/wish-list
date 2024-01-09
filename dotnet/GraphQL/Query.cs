@@ -84,6 +84,14 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
+                    // check accesusing @checkUserAccess
+                    bool hasAccess = false;
+
+                    if (!hasAccess)
+                    {
+                        throw new ExecutionError("Unauthorized! Access denied.");
+                    }
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
@@ -136,6 +144,7 @@ namespace WishList.GraphQL
 
                     return resultLists;
                 }
+                
             );
 
             FieldAsync<CheckListType>(

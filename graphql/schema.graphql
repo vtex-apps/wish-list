@@ -47,6 +47,7 @@ type Query {
     @cacheControl(scope: PRIVATE, maxAge: ZERO)
   viewLists(shopperId: String!, from: Int, to: Int): [WishList]
     @cacheControl(scope: PRIVATE, maxAge: ZERO)
+    @checkUserAccess
   checkList(shopperId: String!, productId: String!, sku: String): CheckListType
     @cacheControl(scope: PRIVATE)
   listNames(shopperId: String!): [String]
