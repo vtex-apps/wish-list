@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+-Fix null pointer exception
+
+### Fixed
+
 - GA event error due to undefined selectedItem
 
 ## [1.16.1] - 2023-04-25
