@@ -159,7 +159,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
   const [productId] = String(product?.productId).split('-')
-  const sku = product?.items[0].itemId
+  const sku = product?.items[0]?.itemId
   wishListed = JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
   const productContextScoped = useProduct()
