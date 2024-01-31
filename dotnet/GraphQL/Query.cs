@@ -28,6 +28,18 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
+
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
@@ -84,12 +96,16 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    // check accesusing @checkUserAccess
-                    bool hasAccess = false;
-
-                    if (!hasAccess)
+                    
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
                     {
-                        throw new ExecutionError("Unauthorized! Access denied.");
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
                     }
 
                     string shopperId = context.GetArgument<string>("shopperId");
@@ -156,6 +172,18 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
+
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
@@ -214,6 +242,16 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
                     string shopperId = context.GetArgument<string>("shopperId");
                     ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
                     IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;

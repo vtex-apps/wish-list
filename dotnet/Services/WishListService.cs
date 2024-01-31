@@ -237,7 +237,8 @@ namespace WishList.Services
 
         public async Task<HttpStatusCode> IsValidAuthUser()
         {
-            if (string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken))
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
             {
                 return HttpStatusCode.Unauthorized;
             }
@@ -245,7 +246,7 @@ namespace WishList.Services
             ValidatedUser validatedUser = null;
 
             try {
-                validatedUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
             }
             catch (Exception ex)
             {
