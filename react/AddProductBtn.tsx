@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
-import { useProduct } from 'vtex.product-context'
+import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
 import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
@@ -153,16 +153,13 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const { push } = usePixel()
   const handles = useCssHandles(CSS_HANDLES)
   const { showToast } = useContext(ToastContext)
-  const productContext = useProduct()
-  const { selectedItem, product } = productContext
+  const { selectedItem, product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
   const [productId] = String(product?.productId).split('-')
-  const sku = product?.items?.[0]?.itemId
+  const sku = product?.sku?.itemId
   wishListed = JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
-
-  const productContextScoped = useProduct()
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -307,14 +304,12 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
         })
         pixelEvent.event = 'removeToWishlist'
       } else {
-        const { selectedItem: selectedItemScoped } = productContextScoped
-
         addProduct({
           variables: {
             listItem: {
               productId,
               title: product.productName,
-              sku: selectedItemScoped.itemId,
+              sku: selectedItem.itemId,
             },
             shopperId,
             name: defaultValues.LIST_NAME,
