@@ -102,81 +102,150 @@ namespace WishList.Services
 
         public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
         {
-            IList<ListItem> listItemsToSave = null;
 
-            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
-            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
-            if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
             {
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
-                listItemsToSave = listItemsWrapper.ListItems;
-                foreach (ListItem item in listItemsToSave)
+                return null;
+            }
+
+            ValidatedUser validatedUser = null;
+
+            try {
+                validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+
+                return null;
+            }
+
+            bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+
+            if (!hasPermission)
+            {
+                _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
+
+                return null;
+            }
+
+            if(hasPermission) {
+
+                IList<ListItem> listItemsToSave = null;
+
+                WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+                ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
+                if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
                 {
-                    if (listItem.ProductId ==  item.ProductId)
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
+                    listItemsToSave = listItemsWrapper.ListItems;
+                    foreach (ListItem item in listItemsToSave)
                     {
-                        listItem.Id = item.Id;
+                        if (listItem.ProductId ==  item.ProductId)
+                        {
+                            listItem.Id = item.Id;
+                        }
                     }
-                }
-                if(listItem.Id == null)
-                {
-                    int maxId = 0;
-                    if (listItemsToSave.Count > 0)
+                    if(listItem.Id == null)
                     {
-                        maxId = listItemsToSave.Max(t => t.Id ?? 0);
+                        int maxId = 0;
+                        if (listItemsToSave.Count > 0)
+                        {
+                            maxId = listItemsToSave.Max(t => t.Id ?? 0);
+                        }
+
+                        listItem.Id = ++maxId;
+                        _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Setting Id: {listItem.Id}");
+                    }
+                    else
+                    {
+                        // If an Id has been specified, remove existing item
+                        ListItem itemToRemove = listItemsToSave.Where(r => r.Id == listItem.Id).FirstOrDefault();
+                        if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
+                        {
+                            _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Removing {listItem.Id}");
+                            listItemsToSave.Remove(itemToRemove);
+                        }
                     }
 
-                    listItem.Id = ++maxId;
-                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Setting Id: {listItem.Id}");
+                    listItemsToSave.Add(listItem);
                 }
                 else
                 {
-                    // If an Id has been specified, remove existing item
-                    ListItem itemToRemove = listItemsToSave.Where(r => r.Id == listItem.Id).FirstOrDefault();
-                    if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
-                    {
-                        _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Removing {listItem.Id}");
-                        listItemsToSave.Remove(itemToRemove);
-                    }
+                    listItem.Id = listItem.Id ?? 0;
+                    listItemsToSave = new List<ListItem> { listItem };
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' First Item: {listItem.Id}");
                 }
 
-                listItemsToSave.Add(listItem);
-            }
-            else
-            {
-                listItem.Id = listItem.Id ?? 0;
-                listItemsToSave = new List<ListItem> { listItem };
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' First Item: {listItem.Id}");
+                if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
+                {
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Saved: {listItem.Id}");
+                }
+                else
+                {
+                    _context.Vtex.Logger.Warn("SaveItem", null, $"Saving '{shopperId}' '{listName}' Failed to save: {listItem.Id}");
+                }
+
+                return listItem.Id;
+                
+            } else {
+                return null;
             }
 
-            if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
-            {
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Saved: {listItem.Id}");
-            }
-            else
-            {
-                _context.Vtex.Logger.Warn("SaveItem", null, $"Saving '{shopperId}' '{listName}' Failed to save: {listItem.Id}");
-            }
 
-            return listItem.Id;
         }
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
-            bool wasRemoved = false;
-            IList<ListItem> listItemsToSave = null;
-            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
-            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
-            if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
             {
-                listItemsToSave = listItemsWrapper.ListItems;
-                ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
-                if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
-                {
-                    wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
-                }
+                return false;
             }
 
-            return wasRemoved;
+            ValidatedUser validatedUser = null;
+
+            try {
+                validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+
+                return false;
+            }
+
+            bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+
+            if (!hasPermission)
+            {
+                _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
+
+                return false;
+            }
+
+            if(hasPermission) {
+
+                bool wasRemoved = false;
+                IList<ListItem> listItemsToSave = null;
+                WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+                ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
+                if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+                {
+                    listItemsToSave = listItemsWrapper.ListItems;
+                    ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
+                    if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
+                    {
+                        wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
+                    }
+                }
+
+                return wasRemoved;
+
+            } else {
+                return false;
+            }
+
         }
 
         public async Task<IList<ListItem>> LimitList(IList<ListItem> listItems, int from, int to)
