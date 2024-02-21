@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Authentication to queries and mutation fixed
+
 ### Added
 - Authentication yo queries and mutation added
 
