@@ -339,6 +339,13 @@ namespace WishList.Services
             return HttpStatusCode.OK;
         }
 
+        public async Task<int> GetListSizeBase()
+        {
+
+            int wishListAllSize = await _wishListRepository.GetListsSize();
+            return wishListAllSize;
+        }
+
         public async Task<WishListsWrapper> ExportAllWishLists()
         {
             WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();

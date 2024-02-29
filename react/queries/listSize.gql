@@ -1,0 +1,3 @@
+query ListSise {
+   listSise @context(provider: "vtex.wish-list") 
+}

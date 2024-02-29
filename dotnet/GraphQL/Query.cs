@@ -262,6 +262,27 @@ namespace WishList.GraphQL
                 }
             );
 
+            FieldAsync<IntGraphType>(
+                 "listSize",
+                 resolve: async context =>
+                 {
+                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     if (isValidAuthUser != HttpStatusCode.OK)
+                     {
+                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         {
+                             Code = isValidAuthUser.ToString()
+                         });
+
+                         return null;
+                     }
+
+                     int AllListSize = await wishListService.GetListSizeBase();
+                     
+                     return AllListSize;
+                 }
+             );
+
             FieldAsync<ListGraphType<WishListWrapperType>>(
                  "exportList",
                  resolve: async context =>

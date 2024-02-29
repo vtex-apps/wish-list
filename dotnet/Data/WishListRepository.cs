@@ -309,6 +309,38 @@
             return responseContent;
         }
 
+        private async Task<string> CountList()
+        {
+            string countList = string.Empty;
+
+            try
+            {
+                var client = _clientFactory.CreateClient();
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=email")
+                };
+
+                string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+                if (authToken != null)
+                {
+                    request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                    request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                    request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
+                }
+                request.Headers.Add("Cache-Control", "no-cache");
+                var response = await client.SendAsync(request);
+                countList = response.Headers.GetValues("REST-Content-Range").FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("First Scroll to Get The Lists", null, "Error: ", ex);
+            }
+
+            return countList;
+        }
+
         private async Task<string> SubScroll()
         {
             string responseContent = string.Empty;
@@ -339,6 +371,17 @@
             }
 
             return responseContent;
+        }
+
+        public async Task<int> GetListsSize() {
+
+            await this.VerifySchema();
+            JArray searchResult = new JArray();
+            var res = await CountList();
+
+            string[] subs = res.Split('/');
+
+            return Int32.Parse(subs[1]);
         }
 
         public async Task<WishListsWrapper> GetAllLists()
