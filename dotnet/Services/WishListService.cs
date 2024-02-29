@@ -307,15 +307,17 @@ namespace WishList.Services
         public async Task<HttpStatusCode> IsValidAuthUser()
         {
 
-            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken))
             {
                 return HttpStatusCode.Unauthorized;
             }
 
             ValidatedUser validatedUser = null;
+            ValidatedUser validatedAdminUser = null;
 
             try {
                 validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+                validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
             }
             catch (Exception ex)
             {
@@ -325,8 +327,9 @@ namespace WishList.Services
             }
 
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+            bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
 
-            if (!hasPermission)
+            if (!hasPermission && !hasAdminPermission)
             {
                 _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
 
@@ -334,6 +337,13 @@ namespace WishList.Services
             }
 
             return HttpStatusCode.OK;
+        }
+
+        public async Task<int> GetListSizeBase()
+        {
+
+            int wishListAllSize = await _wishListRepository.GetListsSize();
+            return wishListAllSize;
         }
 
         public async Task<WishListsWrapper> ExportAllWishLists()

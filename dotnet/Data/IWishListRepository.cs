@@ -10,6 +10,7 @@
         Task<ResponseListWrapper> GetWishList(string shopperId);
         Task<bool> DeleteWishList(string documentId);
         Task VerifySchema();
+        Task <int> GetListsSize();
         Task <WishListsWrapper> GetAllLists();
     }
 }

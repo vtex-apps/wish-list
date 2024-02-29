@@ -41,6 +41,9 @@ type ListItems {
   listItems: [ListItem]
   isPublic: Boolean
 }
+type SizeLength {
+  lengthList: Int
+}
 
 type Query {
   viewList(shopperId: String!, name: String!, from: Int, to: Int): WishList
@@ -50,6 +53,8 @@ type Query {
   checkList(shopperId: String!, productId: String!, sku: String): CheckListType
     @cacheControl(scope: PRIVATE)
   listNames(shopperId: String!): [String]
+  listSize: Int
+    @cacheControl(scope: PRIVATE)
   exportList: [WishListWrapperType]
     @cacheControl(scope: PRIVATE)
 }
