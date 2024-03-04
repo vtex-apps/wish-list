@@ -10,5 +10,6 @@
   "store/wishlist-not-logged": "You need to log in before adding it to the list",
   "admin/wishlist.menu.label": "Wishlist",
   "admin/settings.title": "Wishlist Export",
-  "admin/settings.download": "Download Wishlists"
+  "admin/settings.download": "Download Wishlists",
+  "admin/settings.page": "Page"
 }

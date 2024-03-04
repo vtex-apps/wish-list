@@ -12,5 +12,6 @@
         Task VerifySchema();
         Task <int> GetListsSize();
         Task <WishListsWrapper> GetAllLists();
+        Task <WishListsWrapper> GetAllListsPaged(int pageSize);
     }
 }

@@ -1,0 +1,15 @@
+query ExportListPaged(
+  $pageList: Int!
+) {
+   exportListPaged(pageList: $pageList) @context(provider: "vtex.wish-list") {
+      email
+      listItemsWrapper {
+         listItems {
+            id
+            productId
+            sku
+            title
+         }
+      }
+   }
+}

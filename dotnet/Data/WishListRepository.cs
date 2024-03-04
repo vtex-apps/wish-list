@@ -438,5 +438,60 @@
 
             return wishListsWrapper;
         }
+
+        public async Task<WishListsWrapper> GetAllListsPaged(int pageList)
+        {
+            await this.VerifySchema();
+            var i = 0;
+            var status = true;
+            JArray searchResult = new JArray();
+
+            while (status)
+            {
+                if( i == 0)
+                {
+                    var res = await FirstScroll();
+                    JArray resArray = JArray.Parse(res);
+                    searchResult.Merge(resArray);
+                }
+                else
+                {
+                    var res = await SubScroll();
+                    JArray resArray = JArray.Parse(res);
+                    if (resArray.Count < 200) 
+                    {
+                        status = false;
+                    }
+                    searchResult.Merge(resArray);
+                }
+                i++;
+            }
+            
+            WishListsWrapper wishListsWrapper = new WishListsWrapper();
+            wishListsWrapper.WishLists = new List<WishListWrapper>();
+            WishListWrapper responseListWrapper = new WishListWrapper();
+
+            try
+            {
+                for (int l = (pageList - 1) * 5000; l < pageList * 5000; l++)
+                {
+                    JToken listWrapper = searchResult[l];
+                    if (listWrapper != null)
+                    {
+                        responseListWrapper = JsonConvert.DeserializeObject<WishListWrapper>(listWrapper.ToString());
+                        if (responseListWrapper != null)
+                        {
+                            wishListsWrapper.WishLists.Add(responseListWrapper);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("GetAllLists", null, "Error getting lists", ex);
+            }
+
+            return wishListsWrapper;
+        }
     }
 }
