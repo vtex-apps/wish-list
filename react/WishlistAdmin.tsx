@@ -45,11 +45,18 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
       }
     }
 
+    
     const ws = XLSX.utils.json_to_sheet(data, { header })
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
-    const exportFileName = `wishlists_page_${selected1}.xls`
-    XLSX.writeFile(wb, exportFileName)
+    if(selected1 != null) {
+      const exportFileName = `wishlists_page_${selected1}.xls`
+      XLSX.writeFile(wb, exportFileName)
+    } else {
+      const exportFileName = `wishlists.xls`
+      XLSX.writeFile(wb, exportFileName)
+
+    }
   }
 
   const { data, loading: queryLoading } = useQuery(exportList, {
