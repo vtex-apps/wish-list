@@ -281,6 +281,7 @@
             string responseContent = string.Empty;
             try
             {
+
                 var client = _clientFactory.CreateClient();
                 var request = new HttpRequestMessage
                 {
@@ -289,6 +290,7 @@
                 };
 
                 string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+
                 if (authToken != null)
                 {
                     request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
@@ -297,6 +299,8 @@
                 }
                 request.Headers.Add("Cache-Control", "no-cache");
                 var response = await client.SendAsync(request);
+                
+                Console.WriteLine(response.Headers);
                 tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
 
                 responseContent = await response.Content.ReadAsStringAsync();
