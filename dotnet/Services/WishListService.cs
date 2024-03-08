@@ -351,5 +351,11 @@ namespace WishList.Services
             WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();
             return wishListsWrapper;
         }
+
+        public async Task<WishListsWrapper> ExportAllWishListsPaged(int pageList)
+        {
+            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllListsPaged(pageList);
+            return wishListsWrapper;
+        }
     }
 }

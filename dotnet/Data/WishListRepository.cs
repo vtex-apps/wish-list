@@ -281,6 +281,7 @@
             string responseContent = string.Empty;
             try
             {
+
                 var client = _clientFactory.CreateClient();
                 var request = new HttpRequestMessage
                 {
@@ -289,6 +290,7 @@
                 };
 
                 string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+
                 if (authToken != null)
                 {
                     request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
@@ -297,6 +299,8 @@
                 }
                 request.Headers.Add("Cache-Control", "no-cache");
                 var response = await client.SendAsync(request);
+                
+                Console.WriteLine(response.Headers);
                 tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
 
                 responseContent = await response.Content.ReadAsStringAsync();
@@ -419,6 +423,61 @@
             try
             {
                 for (int l = 0; l < searchResult.Count; l++)
+                {
+                    JToken listWrapper = searchResult[l];
+                    if (listWrapper != null)
+                    {
+                        responseListWrapper = JsonConvert.DeserializeObject<WishListWrapper>(listWrapper.ToString());
+                        if (responseListWrapper != null)
+                        {
+                            wishListsWrapper.WishLists.Add(responseListWrapper);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("GetAllLists", null, "Error getting lists", ex);
+            }
+
+            return wishListsWrapper;
+        }
+
+        public async Task<WishListsWrapper> GetAllListsPaged(int pageList)
+        {
+            await this.VerifySchema();
+            var i = 0;
+            var status = true;
+            JArray searchResult = new JArray();
+
+            while (status)
+            {
+                if( i == 0)
+                {
+                    var res = await FirstScroll();
+                    JArray resArray = JArray.Parse(res);
+                    searchResult.Merge(resArray);
+                }
+                else
+                {
+                    var res = await SubScroll();
+                    JArray resArray = JArray.Parse(res);
+                    if (resArray.Count < 200) 
+                    {
+                        status = false;
+                    }
+                    searchResult.Merge(resArray);
+                }
+                i++;
+            }
+            
+            WishListsWrapper wishListsWrapper = new WishListsWrapper();
+            wishListsWrapper.WishLists = new List<WishListWrapper>();
+            WishListWrapper responseListWrapper = new WishListWrapper();
+
+            try
+            {
+                for (int l = (pageList - 1) * 5000; l < pageList * 5000; l++)
                 {
                     JToken listWrapper = searchResult[l];
                     if (listWrapper != null)

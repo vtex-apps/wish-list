@@ -10,5 +10,6 @@
   "store/wishlist-not-logged": "Você precisa entrar antes de adicionar um produto à sua lista",
   "admin/wishlist.menu.label": "Lista de desejos",
   "admin/settings.title": "Exportar lista de desejos",
-  "admin/settings.download": "Baixar lista de desejos"
+  "admin/settings.download": "Baixar lista de desejos",
+  "admin/settings.page": "Página"
 }

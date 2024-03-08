@@ -17,5 +17,6 @@ namespace WishList.Services
         Task<ValidatedUser> ValidateUserToken(string token);
         Task<int> GetListSizeBase();
         Task<WishListsWrapper> ExportAllWishLists();
+        Task<WishListsWrapper> ExportAllWishListsPaged(int pageList);
     }
 }

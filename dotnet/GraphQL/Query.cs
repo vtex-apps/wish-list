@@ -302,6 +302,31 @@ namespace WishList.GraphQL
                      return wishListsWrapper.WishLists;
                  }
              );
+
+            FieldAsync<ListGraphType<WishListWrapperType>>(
+                 "exportListPaged",
+                 arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageList", Description = "page list" }
+                 ),
+                 resolve: async context =>
+                 {
+                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     if (isValidAuthUser != HttpStatusCode.OK)
+                     {
+                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         {
+                             Code = isValidAuthUser.ToString()
+                         });
+
+                         return null;
+                     }
+
+                     int pageList = context.GetArgument<int>("pageList");
+
+                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishListsPaged(pageList);
+                     return wishListsWrapper.WishLists;
+                 }
+             );
         }
     }
 }
