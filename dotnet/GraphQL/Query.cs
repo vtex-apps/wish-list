@@ -29,6 +29,8 @@ namespace WishList.GraphQL
                 resolve: async context =>
                 {
 
+                    Console.WriteLine("viewList");
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
