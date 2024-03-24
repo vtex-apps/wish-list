@@ -77,7 +77,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
   if (sessionResponse) {
     isAuthenticated =
       sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
-    shopperId = sessionResponse?.namespaces?.profile?.email?.value ?? null
+    shopperId = sessionResponse?.namespaces?.profile?.id?.value ?? null
 
     localStore.setItem(
       'wishlist_isAuthenticated',
