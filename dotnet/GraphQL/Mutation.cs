@@ -35,7 +35,26 @@ namespace WishList.GraphQL
                     string listName = context.GetArgument<string>("name");
                     bool isPublic = context.GetArgument<bool>("public");
 
-                    return wishListService.SaveItem(listItem, shopperId, listName, isPublic);
+                    return wishListService.SaveItem(listItem, shopperId, listName, isPublic, isMultipleSKUs: false);
+                });
+
+            Field<IntGraphType>(
+                "addToListWithMultipleSKUs",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<ListItemInputType>> { Name = "listItem" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId" },
+                    new QueryArgument<StringGraphType> { Name = "name" },
+                    new QueryArgument<BooleanGraphType> { Name = "public" }
+                ),
+                resolve: context =>
+                {
+                    
+                    var listItem = context.GetArgument<ListItem>("listItem");
+                    string shopperId = context.GetArgument<string>("shopperId");
+                    string listName = context.GetArgument<string>("name");
+                    bool isPublic = context.GetArgument<bool>("public");
+
+                    return wishListService.SaveItem(listItem, shopperId, listName, isPublic, isMultipleSKUs: true);
                 });
 
             Field<BooleanGraphType>(

@@ -100,7 +100,7 @@ namespace WishList.Services
             return await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, documentId);
         }
 
-        public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
+        public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic, bool isMultipleSKUs)
         {
 
             if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
@@ -139,13 +139,17 @@ namespace WishList.Services
                 {
                     _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
                     listItemsToSave = listItemsWrapper.ListItems;
-                    foreach (ListItem item in listItemsToSave)
-                    {
-                        if (listItem.ProductId ==  item.ProductId)
+
+                    if (isMultipleSKUs == false) {
+                        foreach (ListItem item in listItemsToSave)
                         {
-                            listItem.Id = item.Id;
+                            if (listItem.ProductId ==  item.ProductId)
+                            {
+                                listItem.Id = item.Id;
+                            }
                         }
                     }
+                    
                     if(listItem.Id == null)
                     {
                         int maxId = 0;

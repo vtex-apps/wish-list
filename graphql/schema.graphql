@@ -68,6 +68,12 @@ type Mutation {
     name: String!
     public: Boolean
   ): ID @cacheControl(scope: PRIVATE)
+  addToListWithMultipleSKUs(
+    listItem: ListItemInputType!
+    shopperId: String!
+    name: String!
+    public: Boolean
+  ): ID @cacheControl(scope: PRIVATE)
   removeFromList(id: ID!, shopperId: String!, name: String): Boolean
     @cacheControl(scope: PRIVATE)
 }
