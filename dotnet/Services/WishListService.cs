@@ -307,17 +307,21 @@ namespace WishList.Services
         public async Task<HttpStatusCode> IsValidAuthUser()
         {
 
-            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken))
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
             {
                 return HttpStatusCode.Unauthorized;
             }
-
+            
             ValidatedUser validatedUser = null;
             ValidatedUser validatedAdminUser = null;
+            ValidatedUser validatedKeyApp = null;
 
             try {
                 validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
                 validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
             }
             catch (Exception ex)
             {
@@ -326,10 +330,12 @@ namespace WishList.Services
                 return HttpStatusCode.BadRequest;
             }
 
+
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
             bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
+            bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
 
-            if (!hasPermission && !hasAdminPermission)
+            if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
             {
                 _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
 

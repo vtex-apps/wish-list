@@ -29,7 +29,16 @@ namespace WishList.GraphQL
                 resolve: async context =>
                 {
 
-                    Console.WriteLine("viewList");
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
 
                     string shopperId = context.GetArgument<string>("shopperId");
                     string name = context.GetArgument<string>("name");
