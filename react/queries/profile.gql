@@ -1,0 +1,5 @@
+query Profile {
+  profile @context(provider: "vtex.store-graphql") {
+    pii
+  }
+}

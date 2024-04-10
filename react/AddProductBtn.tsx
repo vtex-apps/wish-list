@@ -6,7 +6,7 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from 'react'
-import { useMutation, useLazyQuery } from 'react-apollo'
+import { useMutation, useLazyQuery, useQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
 import { Button, ToastContext } from 'vtex.styleguide'
@@ -18,6 +18,7 @@ import { getSession } from './modules/session'
 import storageFactory from './utils/storage'
 import checkItem from './queries/checkItem.gql'
 import addToList from './queries/addToList.gql'
+import profile from './queries/profile.gql'
 import removeFromList from './queries/removeFromList.gql'
 import styles from './styles.css'
 
@@ -156,6 +157,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const { selectedItem, product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
+  const { data: profileData } = useQuery(profile, {
+    fetchPolicy: 'no-cache'
+  })
 
   const [productId] = String(product?.productId).split('-')
   const sku = product?.sku?.itemId
@@ -215,7 +219,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   if (sessionResponse) {
     isAuthenticated =
       sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
-    shopperId = sessionResponse?.namespaces?.profile?.id?.value ?? null
+
+    shopperId = !profileData?.profile?.pii? sessionResponse?.namespaces?.profile?.email?.value : sessionResponse?.namespaces?.profile?.id?.value?? null
 
     localStore.setItem(
       'wishlist_isAuthenticated',
@@ -353,7 +358,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   }
 
   if (
-    data?.checkList?.inList !== true &&
+    data?.checkList &&
+    data.checkList.inList !== true &&
     productCheck[productId] === undefined &&
     wishListed.find(
       (item: any) => item.productId === productId && item.sku === sku

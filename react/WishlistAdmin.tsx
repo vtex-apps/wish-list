@@ -26,7 +26,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
   const { loading } = state
 
   const downloadWishlist = (allWishlists: any) => {
-    const header = ['Email', 'Product ID', 'SKU', 'Title']
+    const header = ['Shopper ID', 'Product ID', 'SKU', 'Title']
     const data: any = []
 
     for (const shopper of allWishlists) {
@@ -34,7 +34,7 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
       for (const wishlist of wishlists) {
         for (const wishlistItem of wishlist.listItems) {
           const shopperData = {
-            Email: shopper.email,
+            'Shopper ID': shopper.email,
             'Product ID': wishlistItem.productId,
             SKU: wishlistItem.sku,
             Title: wishlistItem.title,
