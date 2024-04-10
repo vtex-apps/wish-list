@@ -74,53 +74,63 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       fetchPolicy: 'network-only',
     }
   )
-  const { data: profileData } = useQuery(profile, {
-    fetchPolicy: 'no-cache'
-  })
+  const { data: profileData } = useQuery(profile)
 
-  if (sessionResponse) {
-    isAuthenticated =
-      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
+  useEffect(() => {
+    if (sessionResponse) {
+      isAuthenticated =
+        sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
 
-    if (profileData) {
-      shopperId = profileData.profile.pii? sessionResponse?.namespaces?.profile?.id?.value : sessionResponse?.namespaces?.profile?.email?.value
+      if (profileData) {
+        shopperId = profileData.profile.pii? sessionResponse?.namespaces?.profile?.id?.value : sessionResponse?.namespaces?.profile?.email?.value
+      }
+      else {
+        shopperId = null
+      }
+
+      localStore.setItem(
+        'wishlist_isAuthenticated',
+        JSON.stringify(isAuthenticated)
+      )
+      localStore.setItem('wishlist_shopperId', String(shopperId))
+      if (!listCalled && !!shopperId) {
+        loadLists({
+          variables: {
+            shopperId,
+          },
+        })
+      }
     }
-    else {
-      shopperId = null
-    }
+  }, [sessionResponse, profileData, listCalled, shopperId])
 
-    localStore.setItem(
-      'wishlist_isAuthenticated',
-      JSON.stringify(isAuthenticated)
+  const [productList, setProductList] = useState<any[]>([])
+
+  useEffect(() => {
+    console.log('setProductList useEffect')
+    setProductList(
+      dataLists?.viewLists[0]?.data.map((item: any) => {
+        const [id] = item.productId.split('-')
+        return {
+          productId: id,
+          sku: item.sku,
+        }
+      }) ?? []
     )
-    localStore.setItem('wishlist_shopperId', String(shopperId))
-    if (!listCalled && !!shopperId) {
-      loadLists({
+  }, [dataLists])
+
+  useEffect(() => {
+    console.log('loadProducts useEffect')
+    if (!called && dataLists && productList) {
+      const ids = productList.map((item: any) => item.productId)
+      localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
+      loadProducts({
         variables: {
-          shopperId,
+          ids,
         },
       })
     }
-  }
-  let productList = [] as any
-  productList =
-    dataLists?.viewLists[0]?.data.map((item: any) => {
-      const [id] = item.productId.split('-')
-      return {
-        productId: id,
-        sku: item.sku,
-      }
-    }) ?? []
-  if (!called && dataLists && productList) {
-    const ids = productList.map((item: any) => item.productId)
-    localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
-    loadProducts({
-      variables: {
-        ids,
-      },
-    })
-  }
-
+  }, [called, dataLists, productList])
+  
   const { productsByIdentifier: products } = data || {}
 
   const newListContextValue = useMemo(() => {

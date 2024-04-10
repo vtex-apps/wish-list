@@ -153,13 +153,11 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const { navigate, history, route, account } = useRuntime()
   const { push } = usePixel()
   const handles = useCssHandles(CSS_HANDLES)
-  const { showToast } = useContext(ToastContext)
+  const { showToast } = useContext(ToastContext) as any
   const { selectedItem, product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
-  const { data: profileData } = useQuery(profile, {
-    fetchPolicy: 'no-cache'
-  })
+  const { data: profileData } = useQuery(profile)
 
   const [productId] = String(product?.productId).split('-')
   const sku = product?.sku?.itemId
@@ -216,23 +214,25 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     toastMessage('addProductFail', toastURL)
   }
 
-  if (sessionResponse) {
-    isAuthenticated =
-      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
+  useEffect(() => {
+    if (sessionResponse) {
+      isAuthenticated =
+        sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
 
-    shopperId = !profileData?.profile?.pii? sessionResponse?.namespaces?.profile?.email?.value : sessionResponse?.namespaces?.profile?.id?.value?? null
+      shopperId = !profileData?.profile?.pii? sessionResponse?.namespaces?.profile?.email?.value : sessionResponse?.namespaces?.profile?.id?.value?? null
 
-    localStore.setItem(
-      'wishlist_isAuthenticated',
-      JSON.stringify(isAuthenticated)
-    )
-    localStore.setItem('wishlist_shopperId', String(shopperId))
-    if (!isAuthenticated && !shopperId) {
-      if (localStore.getItem('wishlist_wishlisted')) {
-        localStore.removeItem('wishlist_wishlisted')
+      localStore.setItem(
+        'wishlist_isAuthenticated',
+        JSON.stringify(isAuthenticated)
+      )
+      localStore.setItem('wishlist_shopperId', String(shopperId))
+      if (!isAuthenticated && !shopperId) {
+        if (localStore.getItem('wishlist_wishlisted')) {
+          localStore.removeItem('wishlist_wishlisted')
+        }
       }
     }
-  }
+  }, [sessionResponse, profileData])
 
   const { isWishlistPage } = state
 
