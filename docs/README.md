@@ -288,6 +288,12 @@ To apply CSS customizations to this and other blocks, follow the instructions in
 | `wishlistIconContainer` |
 | `emptyMessage`          |
 
+## PII Compliance
+
+This app can be used in a Personal Identifiable Information (PII) compliant account. In this case, shopperId is the Profile ID.
+
+**Note**: If you are changing type of the account from regular to PII, you must replace the email values with profile ID values in the WishList data entity!
+
 <!-- DOCS-IGNORE:start -->
 
 ## Contributors ✨

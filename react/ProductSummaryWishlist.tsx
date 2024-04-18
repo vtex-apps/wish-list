@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, FC } from 'react'
-import { useLazyQuery } from 'react-apollo'
+import { useLazyQuery, useQuery } from 'react-apollo'
 // @ts-expect-error - useTreePath is a private API
 import { ExtensionPoint, useRuntime, useTreePath } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
@@ -14,6 +14,7 @@ import productsQuery from './queries/productById.gql'
 import ViewLists from './queries/viewLists.gql'
 import { getSession } from './modules/session'
 import storageFactory from './utils/storage'
+import profile from './queries/profile.gql'
 
 const localStore = storageFactory(() => sessionStorage)
 
@@ -73,11 +74,20 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       fetchPolicy: 'network-only',
     }
   )
+  const { data: profileData } = useQuery(profile, {
+    ssr: false
+  })
 
   if (sessionResponse) {
     isAuthenticated =
       sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
-    shopperId = sessionResponse?.namespaces?.profile?.email?.value ?? null
+
+    if (profileData) {
+      shopperId = profileData.profile.pii? sessionResponse?.namespaces?.profile?.id?.value : sessionResponse?.namespaces?.profile?.email?.value
+    }
+    else {
+      shopperId = null
+    }
 
     localStore.setItem(
       'wishlist_isAuthenticated',
