@@ -157,7 +157,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const { selectedItem, product } = useContext(ProductContext) as any
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
-  const { data: profileData } = useQuery(profile)
+  const { data: profileData } = useQuery(profile, {
+    ssr: false
+  })
 
   const [productId] = String(product?.productId).split('-')
   const sku = product?.sku?.itemId
@@ -214,25 +216,23 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     toastMessage('addProductFail', toastURL)
   }
 
-  useEffect(() => {
-    if (sessionResponse) {
-      isAuthenticated =
-        sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
+  if (sessionResponse) {
+    isAuthenticated =
+      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
 
-      shopperId = !profileData?.profile?.pii? sessionResponse?.namespaces?.profile?.email?.value : sessionResponse?.namespaces?.profile?.id?.value?? null
+    shopperId = !profileData?.profile?.pii? sessionResponse?.namespaces?.profile?.email?.value : sessionResponse?.namespaces?.profile?.id?.value?? null
 
-      localStore.setItem(
-        'wishlist_isAuthenticated',
-        JSON.stringify(isAuthenticated)
-      )
-      localStore.setItem('wishlist_shopperId', String(shopperId))
-      if (!isAuthenticated && !shopperId) {
-        if (localStore.getItem('wishlist_wishlisted')) {
-          localStore.removeItem('wishlist_wishlisted')
-        }
+    localStore.setItem(
+      'wishlist_isAuthenticated',
+      JSON.stringify(isAuthenticated)
+    )
+    localStore.setItem('wishlist_shopperId', String(shopperId))
+    if (!isAuthenticated && !shopperId) {
+      if (localStore.getItem('wishlist_wishlisted')) {
+        localStore.removeItem('wishlist_wishlisted')
       }
     }
-  }, [sessionResponse, profileData])
+  }
 
   const { isWishlistPage } = state
 

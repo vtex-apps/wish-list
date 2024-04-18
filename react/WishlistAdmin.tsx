@@ -108,7 +108,6 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
 
   const GetAllWishlists = async () => {
     setState({ ...state, loading: true })
-    console.log(loading)
 
     if (!queryLoading) {
       const parsedData = data?.exportList
@@ -152,7 +151,6 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
                 options={options}
                 value={selected1}
                 onChange={(event: any) => {
-                  console.log(event.target.value)
                   setSelected1(event.target.value)
                   setTimeout(()=>{refetch()},500)
                   
