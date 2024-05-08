@@ -103,33 +103,39 @@ namespace WishList.Services
         public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
         {
 
-            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
             {
                 return null;
             }
 
             ValidatedUser validatedUser = null;
+            ValidatedUser validatedAdminUser = null;
+            ValidatedUser validatedKeyApp = null;
 
             try {
                 validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+                validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
-
                 return null;
             }
 
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+            bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
+            bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
 
-            if (!hasPermission)
+            if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
             {
                 _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
-
                 return null;
             }
 
-            if(hasPermission) {
+            if (hasPermission || hasAdminPermission || hasPermissionToken) {
 
                 IList<ListItem> listItemsToSave = null;
 
@@ -189,6 +195,7 @@ namespace WishList.Services
                 return listItem.Id;
                 
             } else {
+
                 return null;
             }
 
@@ -198,33 +205,40 @@ namespace WishList.Services
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
 
-            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken))
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
             {
                 return false;
             }
 
             ValidatedUser validatedUser = null;
+            ValidatedUser validatedAdminUser = null;
+            ValidatedUser validatedKeyApp = null;
 
             try {
                 validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+                validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
-
                 return false;
             }
 
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+            bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
+            bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
 
-            if (!hasPermission)
+
+            if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
             {
                 _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
-
                 return false;
             }
 
-            if(hasPermission) {
+            if (hasPermission || hasAdminPermission || hasPermissionToken) {
 
                 bool wasRemoved = false;
                 IList<ListItem> listItemsToSave = null;
