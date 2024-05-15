@@ -1,0 +1,16 @@
+{
+    "store/wishlist.addButton": "Listához ad",
+    "store/wishlist-see-lists": "Listák megtekintése",
+    "store/wishlist-product-added-to-list": "A termék hozzáadva a listához",
+    "store/wishlist-add-product-fail": "Nem sikerült hozzáadni a terméket a listához",
+    "store/wishlist-default-list-name": "Kívánság lista",
+    "store/myaccount-menu": "Kívánság lista",
+    "store/myaccount-empty-list": "Ez a lista üres",
+    "store/wishlist-login": "Belépés",
+    "store/wishlist-not-logged": "Mielőtt hozzáadnád a listához, be kell jelentkezned",
+    "admin/wishlist.menu.label": "Kívánság lista",
+    "admin/settings.title": "Kívánságlista exportálása",
+    "admin/settings.download": "Kívánságlista letöltéses",
+    "admin/settings.page": "oldal"
+  }
+  
