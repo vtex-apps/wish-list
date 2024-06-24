@@ -50,6 +50,10 @@ const messages: {
     defaultMessage: '',
     id: 'store/wishlist.addButton',
   },
+  removeButton: {
+    defaultMessage: '',
+    id: 'store/wishlist.removeButton',
+  },
   seeLists: {
     defaultMessage: '',
     id: 'store/wishlist-see-lists',
@@ -158,7 +162,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
   const sessionResponse: any = useSessionResponse()
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
   const { data: profileData } = useQuery(profile, {
-    ssr: false
+    ssr: false,
   })
 
   const [productId] = String(product?.productId).split('-')
@@ -220,7 +224,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     isAuthenticated =
       sessionResponse?.namespaces?.profile?.isAuthenticated?.value === 'true'
 
-    shopperId = !profileData?.profile?.pii? sessionResponse?.namespaces?.profile?.email?.value : sessionResponse?.namespaces?.profile?.id?.value?? null
+    shopperId = !profileData?.profile?.pii
+      ? sessionResponse?.namespaces?.profile?.email?.value
+      : sessionResponse?.namespaces?.profile?.id?.value ?? null
 
     localStore.setItem(
       'wishlist_isAuthenticated',
@@ -387,7 +393,11 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
             className={`${handles.wishlistIcon} ${
               checkFill() ? styles.fill : styles.outline
             } ${styles.iconSize}`}
-          />
+          >
+            {checkFill()
+              ? intl.formatMessage({ id: 'store/wishlist.removeButton' })
+              : intl.formatMessage({ id: 'store/wishlist.addButton' })}
+          </span>
         </Button>
       </div>
     </NoSSR>

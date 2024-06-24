@@ -1,5 +1,6 @@
 {
   "store/wishlist.addButton": "Agregar a la lista",
+  "store/wishlist.removeButton": "Quitar de la lista",
   "store/wishlist-see-lists": "Ver listas",
   "store/wishlist-product-added-to-list": "Producto agregado a la lista",
   "store/wishlist-add-product-fail": "No se pudo agregar el producto a la lista",
