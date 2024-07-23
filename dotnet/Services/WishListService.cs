@@ -118,12 +118,34 @@ namespace WishList.Services
                 validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
                 validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
                 validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
+
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
                 return null;
             }
+
+            if(VtexIdclientAutCookieKey != null) {
+                ValidatedEmailToken responseValidateEmailAuthToken = null;
+
+                try {
+                    responseValidateEmailAuthToken = await ValidateEmailAuthToken(VtexIdclientAutCookieKey);
+                } catch (Exception ex)
+                {
+                    _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                    return null;
+                }   
+
+                bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
+
+                if (!hasValidateEmail)
+                {
+                    _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                    return null;
+                }
+            }
+
 
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
             bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
@@ -284,6 +306,7 @@ namespace WishList.Services
             };
 
             var jsonSerializedToken = JsonConvert.SerializeObject(validateToken);
+
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
@@ -308,6 +331,35 @@ namespace WishList.Services
                 if (response.IsSuccessStatusCode)
                 {
                     validatedUser = JsonConvert.DeserializeObject<ValidatedUser>(responseContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("ValidateUserToken", null, $"Error validating user token", ex);
+            }
+
+            return validatedUser;
+        }
+        public async Task<ValidatedEmailToken> ValidateEmailAuthToken(string token)
+        {
+            ValidatedEmailToken validatedUser = null;
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.myvtex.com/api/vtexid/pub/authenticated/user?authToken={token}")
+            };
+
+            var client = _clientFactory.CreateClient();
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    validatedUser = JsonConvert.DeserializeObject<ValidatedEmailToken>(responseContent);
                 }
             }
             catch (Exception ex)
