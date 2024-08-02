@@ -300,7 +300,6 @@
                 request.Headers.Add("Cache-Control", "no-cache");
                 var response = await client.SendAsync(request);
                 
-                Console.WriteLine(response.Headers);
                 tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
 
                 responseContent = await response.Content.ReadAsStringAsync();

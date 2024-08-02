@@ -146,10 +146,51 @@ namespace WishList.Services
                 }
             }
 
+            if(_context.Vtex.AdminUserAuthToken != null) {
+                ValidatedEmailToken responseValidateEmailAuthToken = null;
+
+                try {
+                    responseValidateEmailAuthToken = await ValidateEmailAuthToken(_context.Vtex.AdminUserAuthToken);
+                } catch (Exception ex)
+                {
+                    _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                    return null;
+                }   
+
+                bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
+
+                if (!hasValidateEmail)
+                {
+                    _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                    return null;
+                }
+            }
+
+            if(_context.Vtex.StoreUserAuthToken != null) {
+                ValidatedEmailToken responseValidateEmailAuthToken = null;
+
+                try {
+                    responseValidateEmailAuthToken = await ValidateEmailAuthToken(_context.Vtex.StoreUserAuthToken);
+                } catch (Exception ex)
+                {
+                    _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                    return null;
+                }   
+
+                bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
+
+                if (!hasValidateEmail)
+                {
+                    _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                    return null;
+                }
+            }
+
 
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
             bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
             bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
+
 
             if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
             {
