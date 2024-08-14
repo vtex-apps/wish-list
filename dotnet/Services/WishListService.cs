@@ -103,7 +103,7 @@ namespace WishList.Services
         public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
         {
 
-            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];            
 
             if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
             {
@@ -126,63 +126,47 @@ namespace WishList.Services
                 return null;
             }
 
-            if(VtexIdclientAutCookieKey != null) {
-                ValidatedEmailToken responseValidateEmailAuthToken = null;
+            // Validation for PII
+            if (shopperId.ToLower().Contains('@')) {
+                
+                if(_context.Vtex.StoreUserAuthToken != null) {
+                    ValidatedEmailToken responseValidateEmailAuthToken = null;
 
-                try {
-                    responseValidateEmailAuthToken = await ValidateEmailAuthToken(VtexIdclientAutCookieKey);
-                } catch (Exception ex)
-                {
-                    _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
-                    return null;
-                }   
+                    try {
+                        responseValidateEmailAuthToken = await ValidateEmailAuthToken(_context.Vtex.StoreUserAuthToken);
+                    } catch (Exception ex)
+                    {
+                        _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                        return null;
+                    }   
 
-                bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
+                    bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
 
-                if (!hasValidateEmail)
-                {
-                    _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
-                    return null;
+                    if (!hasValidateEmail)
+                    {
+                        _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                        return null;
+                    }
                 }
-            }
+                
+                if(VtexIdclientAutCookieKey != null) {
+                    ValidatedEmailToken responseValidateEmailAuthToken = null;
 
-            if(_context.Vtex.AdminUserAuthToken != null) {
-                ValidatedEmailToken responseValidateEmailAuthToken = null;
+                    try {
+                        responseValidateEmailAuthToken = await ValidateEmailAuthToken(VtexIdclientAutCookieKey);
+                    } catch (Exception ex)
+                    {
+                        _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                        return null;
+                    }   
 
-                try {
-                    responseValidateEmailAuthToken = await ValidateEmailAuthToken(_context.Vtex.AdminUserAuthToken);
-                } catch (Exception ex)
-                {
-                    _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
-                    return null;
-                }   
+                    bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
 
-                bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
-
-                if (!hasValidateEmail)
-                {
-                    _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
-                    return null;
-                }
-            }
-
-            if(_context.Vtex.StoreUserAuthToken != null) {
-                ValidatedEmailToken responseValidateEmailAuthToken = null;
-
-                try {
-                    responseValidateEmailAuthToken = await ValidateEmailAuthToken(_context.Vtex.StoreUserAuthToken);
-                } catch (Exception ex)
-                {
-                    _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
-                    return null;
-                }   
-
-                bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
-
-                if (!hasValidateEmail)
-                {
-                    _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
-                    return null;
+                    if (!hasValidateEmail)
+                    {
+                        _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                        return null;
+                    }
                 }
             }
 
@@ -190,7 +174,6 @@ namespace WishList.Services
             bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
             bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
             bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
-
 
             if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
             {
