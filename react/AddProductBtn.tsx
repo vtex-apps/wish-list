@@ -252,7 +252,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
     return item.listIds[pos]
   }
 
-  if (isAuthenticated && product && !called && !!shopperId) {
+  if (isAuthenticated && product && !called && !!shopperId && !!profileData && !!sessionResponse) {
     if (isAuthenticated && addAfterLogin && addAfterLogin === productId) {
       addProduct({
         variables: {
