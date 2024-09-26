@@ -171,13 +171,11 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist' }) => {
       action = {
         label: intl.formatMessage(messages.login),
         onClick: () =>
-          navigate({
-            page: 'store.login',
-            query: `returnUrl=${encodeURIComponent(
+          window.location.assign(`/login?returnUrl=${encodeURIComponent(
               String(history?.location?.pathname) +
                 String(history?.location?.search)
             )}`,
-          }),
+          ),
       }
     }
     if (messsageKey === 'productAddedToList') {
