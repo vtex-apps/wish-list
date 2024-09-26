@@ -6,6 +6,7 @@ type MyAccountWishlistPageProps = {
   children: FC
   title?: string
   namespace?: string
+  
 }
 const MyAccountWishlistPage = ({
   children,
