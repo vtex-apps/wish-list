@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.18.4] - 2024-09-26
+
 ### Fix
 
 - change redirection method of the login button click event
