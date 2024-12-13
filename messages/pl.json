@@ -1,0 +1,15 @@
+{
+  "store/wishlist.addButton": "Dodaj do listy",
+  "store/wishlist-see-lists": "Wyświetl listy",
+  "store/wishlist-product-added-to-list": "Produkt dodano do listy",
+  "store/wishlist-add-product-fail": "Nie udało się dodać produktu do listy",
+  "store/wishlist-default-list-name": "Lista życzeń",
+  "store/myaccount-menu": "Lista życzeń",
+  "store/myaccount-empty-list": "Lista jest pusta",
+  "store/wishlist-login": "Zaloguj",
+  "store/wishlist-not-logged": "Musisz się zalogować przed dodaniem do listy",
+  "admin/wishlist.menu.label": "Lista życzeń",
+  "admin/settings.title": "Eksport listy życzeń",
+  "admin/settings.download": "Pobierz listy życzeń",
+  "admin/settings.page": "Strona"
+}
