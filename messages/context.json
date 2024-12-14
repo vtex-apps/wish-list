@@ -1,5 +1,6 @@
 {
   "store/wishlist.addButton": "store/wishlist.addButton",
+  "store/wishlist.removeButton": "store/wishlist.removeButton",
   "store/wishlist-see-lists": "store/wishlist-see-lists",
   "store/wishlist-product-added-to-list": "store/wishlist-product-added-to-list",
   "store/wishlist-add-product-fail": "store/wishlist-add-product-fail",
