@@ -4,12 +4,6 @@
 
 [<i class="fa-brands fa-github"></i> Source code](https://github.com/vtex-apps/wish-list)
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
-[![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
-
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 > ⚠️ This app is no longer maintained by VTEX. This means support and maintenance are no longer provided.
 
 Designed for **B2C** stores, the Wishlist app adds a heart icon to digital shelves and product details pages, allowing users to add their desired products to a wishlist.
@@ -18,11 +12,11 @@ Designed for **B2C** stores, the Wishlist app adds a heart icon to digital shelv
 
 ![wish-list-pdp](https://cdn.jsdelivr.net/gh/vtexdocs/dev-portal-content@main/images/vtex-wish-list-1.png) _Example of a heart icon on a product details page._
 
-In addition, it generates a brand-new route called `/wishlist` under the My Account menu, creating a page with the items users added to the wishlist.
+In addition, it generates a new route, `/wishlist`, under the My Account menu, creating a page that displays the items users added to the wishlist.
 
 ![wishlist-my-account](https://cdn.jsdelivr.net/gh/vtexdocs/dev-portal-content@main/images/vtex-wish-list-2.png) _Example of a wishlist page._
 
-## Configurating the wishlist
+## Configuring the wishlist
 
 1. [Install](https://developers.vtex.com/docs/guides/vtex-io-documentation-installing-an-app/) the Wishlist app in the desired VTEX account by running `vtex install vtex.wish-list` in your terminal.
 2. Open your Store Theme app directory in the code editor.
@@ -34,7 +28,7 @@ In addition, it generates a brand-new route called `/wishlist` under the My Acco
  }
 ```
 
-> ℹ️ _The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. These are responsible for adding the heart icon to other theme blocks and providing product data to build the `/wishlist`, which is also shared with the My Account page._
+> ℹ️ The Wishlist app can export two theme blocks when added as a dependency: `add-to-list-btn` and `list-context.wishlist`. These are responsible for adding the heart icon to other theme blocks and providing product data to build the `/wishlist`, which is also shared with the My Account page.
 
 4. Add the `add-to-list-btn` block in the `store.product` template's children block list. For example:
 
@@ -63,7 +57,7 @@ In addition, it generates a brand-new route called `/wishlist` under the My Acco
   }
 ```
 
-> ℹ️ _The new route called `/wishlist`, which creates the Wishlist custom page containing the products added to the wishlist, already has a default template and is rendered under the My Account menu. No further action is required. However, you can **customize the Wishlist page by overwriting the template**. To do so, you have to create a brand new one as you wish. See more details in the **Advanced configurations** section below._
+> ℹ️ The new route called `/wishlist`, which creates the Wishlist custom page containing the products added to the wishlist, already has a default template and is rendered under the My Account menu. No further action is required. However, you can **customize the Wishlist page by overwriting the template**. To do so, you have to create a brand new one as you wish. See more details in the **Advanced configurations** section below.
 
 ## Advanced configurations
 
@@ -146,7 +140,7 @@ Add the `plugins.json` file to your theme's `/store/` folder. This will add the 
 }
 ```
 
-By "default implementation" we mean that, by installing the Wishlist app in your store, you're using the `json` above behind the scenes to build the new page template (`/wishlist`), as shown in the third image displayed above.
+By "default implementation," we mean that when you install the Wishlist app in your store, you're using the `json` above behind the scenes to build the new page template (`/wishlist`), as shown in the third image above.
 
 Therefore, to customize the `/wishlist` page configuration, you need to:
 
@@ -165,7 +159,7 @@ If you want to configure the layout without the `slider-layout` dependency, you 
 
 ## Usages
 
-There are a couple of URLs to read, search and change data for the app:
+There are a couple of URLs to read, search, and change data for the app:
 
 To read the schema of the Wishlist app:
 
@@ -296,7 +290,7 @@ To apply CSS customizations to this and other blocks, follow the instructions in
 
 This app can be used in a Personal Identifiable Information (PII) compliant account. In this case, shopperId is the Profile ID.
 
-**Note**: If you are changing type of the account from regular to PII, you must replace the email values with profile ID values in the WishList data entity!
+> If you are changing the type of the account from regular to PII, you must replace the email values with profile ID values in the WishList data entity.
 
 <!-- DOCS-IGNORE:start -->
 
