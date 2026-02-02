@@ -2,16 +2,15 @@
 
 # Wishlist
 
-##  ⚠️ Maintenance ⚠️
-*Starting June 1st 2023, this application will no longer be maintained by VTEX.*
-
----
+[<i class="fa-brands fa-github"></i> Source code](https://github.com/vtex-apps/wish-list)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+> ⚠️ This app is no longer maintained by VTEX. This means support and maintenance are no longer provided.
 
 Designed for **B2C** stores, the Wishlist app adds a heart icon to digital shelves and product details pages, allowing users to add their desired products to a wishlist.
 
