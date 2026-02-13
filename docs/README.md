@@ -16,7 +16,7 @@ In addition, it generates a new route, `/wishlist`, under the My Account menu, c
 
 ![wishlist-my-account](https://cdn.jsdelivr.net/gh/vtexdocs/dev-portal-content@main/images/vtex-wish-list-2.png) _Example of a wishlist page._
 
-## Configuring the wishlist
+## Configuration
 
 1. [Install](https://developers.vtex.com/docs/guides/vtex-io-documentation-installing-an-app/) the Wishlist app in the desired VTEX account by running `vtex install vtex.wish-list` in your terminal.
 2. Open your Store Theme app directory in the code editor.
@@ -57,17 +57,13 @@ In addition, it generates a new route, `/wishlist`, under the My Account menu, c
   }
 ```
 
-> ℹ️ The new route called `/wishlist`, which creates the Wishlist custom page containing the products added to the wishlist, already has a default template and is rendered under the My Account menu. No further action is required. However, you can **customize the Wishlist page by overwriting the template**. To do so, you have to create a brand new one as you wish. See more details in the **Advanced configurations** section below.
+6. Define the layout of the wishlist page
 
-## Advanced configurations
+To define the wishlist page layout, add the `wishlist.jsonc` to your `/store/blocks` folder.
 
-The Wishlist app architecture allows you to customize the `/wishlist` page using other blocks. Currently, its default implementation is as follows:
+The `wishlist.jsonc` is a configuration file that defines how the `store.wishlist` interface for the `/wishlist` route is composed. See the example below:
 
-`store.wishlist` interface for the route `/wishlist` and `my-account-page.wishlist-page` along with `my-account-link.wishlist-link` for the Wishlist section under My Account.
-
-**wishlist.jsonc**
-
-```json
+```json store/blocks/wishlist.jsonc
 {
   "my-account-link.wishlist-link": {
     "props": {
@@ -129,29 +125,24 @@ The Wishlist app architecture allows you to customize the `/wishlist` page using
 }
 ```
 
-Add the `plugins.json` file to your theme's `/store/` folder. This will add the Wishlist to My Account.
+> ℹ️ You can use the example above in your project or customize it using other blocks.
 
-**plugins.json**
+7. Display the wishlist in My Account
 
-```json
+To display the wishlist in My Account, add the `plugins.json` file to your theme's `/store` folder as follows:
+
+```json store/plugins.json
 {
   "my-account-pages > my-account-page": "my-account-page.wishlist-page",
   "my-account-menu > my-account-link": "my-account-link.wishlist-link"
 }
 ```
 
-By "default implementation," we mean that when you install the Wishlist app in your store, you're using the `json` above behind the scenes to build the new page template (`/wishlist`), as shown in the third image above.
-
-Therefore, to customize the `/wishlist` page configuration, you need to:
-
-1. Create a `wishlist.jsonc` file under `store/blocks`.
-2. Create a `plugins.json` file under `store/`.
-3. Copy the code above, paste it in the new file, and change it as you wish.
-4. Deploy your changes.
+8. Deploy your changes by following the instructions in the guide [Deploying a new app version]https://developers.vtex.com/docs/guides/vtex-io-documentation-making-your-new-app-version-publicly-available).
 
 If you want to configure the layout without the `slider-layout` dependency, you can use the `list-context-renderer` to wrap the `product-summary.shelf`. Learn more [here](https://github.com/vtex-apps/list-context#list-context-renderer).
 
-#### `my-account-link.wishlist-link` props
+### `my-account-link.wishlist-link` props
 
 | Prop name |   Type   |                      Description                      | Default value |
 |:---------:|:--------:|:-----------------------------------------------------:|:-------------:|
@@ -258,7 +249,7 @@ To show a custom view if no product has been added to the wishlist:
 }
 ```
 
-#### `list-context.wishlist` props
+### `list-context.wishlist` props
 
 |      Prop name      |   Type    |                           Description                            | Default value |
 |:-------------------:|:---------:|:----------------------------------------------------------------:|:-------------:|
