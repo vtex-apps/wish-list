@@ -5,7 +5,23 @@
   "title": "Wish List",
   "description": "The Wishlist a  pp is designed for B2C. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at /wishlist",
   "categories": [],
-  "settingsSchema": {},
+  "settingsSchema": {
+    "title": "Wish List",
+    "type": "object",
+    "properties": {
+      "scopeMode": {
+        "title": "Wishlist scoping mode",
+        "description": "Controls how wishlists are scoped. 'none' = per user (B2C default). 'organization' = per user + organization. 'organization-and-cost-center' = per user + organization + cost center.",
+        "type": "string",
+        "enum": [
+          "none",
+          "organization",
+          "organization-and-cost-center"
+        ],
+        "default": "none"
+      }
+    }
+  },
   "builders": {
     "docs": "0.x",
     "dotnet": "2.x",
@@ -51,6 +67,20 @@
       "attrs": {
         "host": "{{account}}.vtexcommercestable.com.br",
         "path": "/api/dataentities/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/sessions*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/vtexid/*"
       }
     },
     {

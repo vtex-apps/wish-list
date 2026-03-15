@@ -11,6 +11,21 @@
     "admin/wishlist.menu.label": "Kívánság lista",
     "admin/settings.title": "Kívánságlista exportálása",
     "admin/settings.download": "Kívánságlista letöltéses",
-    "admin/settings.page": "oldal"
+    "admin/settings.page": "oldal",
+    "admin/settings.email": "Email",
+    "admin/settings.organizationId": "Szervezet ID",
+    "admin/settings.costCenterId": "Költséghely ID",
+    "admin/settings.applyFilters": "Szűrők alkalmazása",
+    "admin/settings.productId": "Product ID",
+    "admin/settings.productTitle": "Title",
+    "admin/settings.totalWishlists": "Total wishlists",
+    "admin/settings.totalItems": "Total items",
+    "admin/settings.emptyState": "No wishlists found.",
+    "admin/settings.density": "Line density",
+    "admin/settings.densityLow": "Low",
+    "admin/settings.densityMedium": "Medium",
+    "admin/settings.densityHigh": "High",
+    "admin/settings.showRows": "Show rows",
+    "admin/settings.of": "of"
   }
   

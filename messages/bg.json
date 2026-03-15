@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "Трябва да влезете, преди да добавяте към списъка",
   "admin/wishlist.menu.label": "Списък с желания",
   "admin/settings.title": "Експортиране на списък с желания",
-  "admin/settings.download": "Изтегляне на списъци с желания"
+  "admin/settings.download": "Изтегляне на списъци с желания",
+  "admin/settings.page": "Страница",
+  "admin/settings.email": "Имейл",
+  "admin/settings.organizationId": "ID на организация",
+  "admin/settings.costCenterId": "ID на разходен център",
+  "admin/settings.applyFilters": "Приложи филтри",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }

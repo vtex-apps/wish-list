@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "Trebuie să te autentifici pentru a adăuga produsul în listă",
   "admin/wishlist.menu.label": "Wishlist",
   "admin/settings.title": "Wishlist Export",
-  "admin/settings.download": "Download Wishlists"
+  "admin/settings.download": "Download Wishlists",
+  "admin/settings.page": "Pagină",
+  "admin/settings.email": "Email",
+  "admin/settings.organizationId": "ID Organizație",
+  "admin/settings.costCenterId": "ID Centru de Cost",
+  "admin/settings.applyFilters": "Aplică filtre",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }

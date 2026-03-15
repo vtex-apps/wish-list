@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "تحتاج إلى تسجيل الدخول قبل إضافته إلى القائمة",
   "admin/wishlist.menu.label": "قائمة الامنيات",
   "admin/settings.title": "تصدير قائمة الأمنيات",
-  "admin/settings.download": "تحميل قوائم الأمنيات"
+  "admin/settings.download": "تحميل قوائم الأمنيات",
+  "admin/settings.page": "صفحة",
+  "admin/settings.email": "البريد الإلكتروني",
+  "admin/settings.organizationId": "معرف المنظمة",
+  "admin/settings.costCenterId": "معرف مركز التكلفة",
+  "admin/settings.applyFilters": "تطبيق الفلاتر",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }

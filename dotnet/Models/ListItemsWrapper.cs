@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +17,10 @@ namespace WishList.Models
         [JsonProperty("email")]
         public string Email { get; set; }
         public List<ListItemsWrapper> ListItemsWrapper { get; set; }
+        [JsonProperty("organizationId")]
+        public string OrganizationId { get; set; }
+        [JsonProperty("costCenterId")]
+        public string CostCenterId { get; set; }
     }
 
     public class ListItemsWrapper

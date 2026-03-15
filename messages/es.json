@@ -11,5 +11,20 @@
   "admin/wishlist.menu.label": "Lista de deseos",
   "admin/settings.title": "Exportar lista de deseos",
   "admin/settings.download": "Descargar listas de deseos",
-  "admin/settings.page": "Página"
+  "admin/settings.page": "Página",
+  "admin/settings.email": "Email",
+  "admin/settings.organizationId": "ID de Organización",
+  "admin/settings.costCenterId": "ID de Centro de Costo",
+  "admin/settings.applyFilters": "Aplicar Filtros",
+  "admin/settings.productId": "ID del Producto",
+  "admin/settings.productTitle": "Título",
+  "admin/settings.totalWishlists": "Total de listas",
+  "admin/settings.totalItems": "Total de artículos",
+  "admin/settings.emptyState": "No se encontraron listas de deseos.",
+  "admin/settings.density": "Densidad de línea",
+  "admin/settings.densityLow": "Baja",
+  "admin/settings.densityMedium": "Media",
+  "admin/settings.densityHigh": "Alta",
+  "admin/settings.showRows": "Mostrar filas",
+  "admin/settings.of": "de"
 }

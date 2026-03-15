@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้าลงในรายการ",
   "admin/wishlist.menu.label": "รายการที่อยากได้",
   "admin/settings.title": "ส่งออกรายการที่อยากได้",
-  "admin/settings.download": "ดาวน์โหลดรายการที่อยากได้"
+  "admin/settings.download": "ดาวน์โหลดรายการที่อยากได้",
+  "admin/settings.page": "หน้า",
+  "admin/settings.email": "อีเมล",
+  "admin/settings.organizationId": "รหัสองค์กร",
+  "admin/settings.costCenterId": "รหัสศูนย์ต้นทุน",
+  "admin/settings.applyFilters": "ใช้ตัวกรอง",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }

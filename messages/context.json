@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "store/wishlist-not-logged",
   "admin/wishlist.menu.label": "admin/wishlist.menu.label",
   "admin/settings.title": "admin/settings.title",
-  "admin/settings.download": "admin/settings.download"
+  "admin/settings.download": "admin/settings.download",
+  "admin/settings.page": "admin/settings.page",
+  "admin/settings.email": "admin/settings.email",
+  "admin/settings.organizationId": "admin/settings.organizationId",
+  "admin/settings.costCenterId": "admin/settings.costCenterId",
+  "admin/settings.applyFilters": "admin/settings.applyFilters",
+  "admin/settings.productId": "admin/settings.productId",
+  "admin/settings.productTitle": "admin/settings.productTitle",
+  "admin/settings.totalWishlists": "admin/settings.totalWishlists",
+  "admin/settings.totalItems": "admin/settings.totalItems",
+  "admin/settings.emptyState": "admin/settings.emptyState",
+  "admin/settings.density": "admin/settings.density",
+  "admin/settings.densityLow": "admin/settings.densityLow",
+  "admin/settings.densityMedium": "admin/settings.densityMedium",
+  "admin/settings.densityHigh": "admin/settings.densityHigh",
+  "admin/settings.showRows": "admin/settings.showRows",
+  "admin/settings.of": "admin/settings.of"
 }

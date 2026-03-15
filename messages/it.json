@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "Devi effettuare l'accesso prima di poter aggiungere un prodotto a una lista",
   "admin/wishlist.menu.label": "Wishlist",
   "admin/settings.title": "Esporta wishlist",
-  "admin/settings.download": "Scarica wishlist"
+  "admin/settings.download": "Scarica wishlist",
+  "admin/settings.page": "Pagina",
+  "admin/settings.email": "Email",
+  "admin/settings.organizationId": "ID Organizzazione",
+  "admin/settings.costCenterId": "ID Centro di Costo",
+  "admin/settings.applyFilters": "Applica filtri",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }

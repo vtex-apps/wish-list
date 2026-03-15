@@ -1,4 +1,4 @@
-﻿namespace WishList.Data
+namespace WishList.Data
 {
     using System;
     using System.Collections.Generic;
@@ -54,12 +54,12 @@
             this._applicationName =
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
 
-            this.VerifySchema().Wait();
+            this.VerifySchema(WishListConstants.SCHEMA_BASE).Wait();
         }
 
-        public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId)
+        public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId, string scopeMode, string organizationId = null, string costCenterId = null)
         {
-            await this.VerifySchema();
+            await this.VerifySchema(WishListConstants.GetSchemaForScopeMode(scopeMode));
             if (listItems == null)
             {
                 listItems = new List<ListItem>();
@@ -76,7 +76,9 @@
             {
                 Id = documentId,
                 Email = shopperId,
-                ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper }
+                ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper },
+                OrganizationId = organizationId,
+                CostCenterId = costCenterId
             };
 
             var jsonSerializedListItems = JsonConvert.SerializeObject(wishListWrapper);
@@ -115,7 +117,7 @@
             return isSuccessStatusCode;
         }
 
-        public async Task<ResponseListWrapper> GetWishList(string shopperId)
+        public async Task<ResponseListWrapper> GetWishList(string shopperId, string scopeMode, string organizationId = null, string costCenterId = null)
         {
             ResponseListWrapper responseListWrapper = new ResponseListWrapper();
             if (string.IsNullOrEmpty(shopperId)) {
@@ -123,11 +125,22 @@
                 return responseListWrapper;
             }
 
-            await this.VerifySchema();
+            await this.VerifySchema(WishListConstants.GetSchemaForScopeMode(scopeMode));
+
+            string searchUrl = $"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=id,email,ListItemsWrapper,organizationId,costCenterId&_schema={WishListConstants.SCHEMA}&email={HttpUtility.UrlEncode(shopperId)}";
+            if (!string.IsNullOrEmpty(organizationId))
+            {
+                searchUrl += $"&organizationId={HttpUtility.UrlEncode(organizationId)}";
+            }
+            if (!string.IsNullOrEmpty(costCenterId))
+            {
+                searchUrl += $"&costCenterId={HttpUtility.UrlEncode(costCenterId)}";
+            }
+
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=id,email,ListItemsWrapper&_schema={WishListConstants.SCHEMA}&email={HttpUtility.UrlEncode(shopperId)}")
+                RequestUri = new Uri(searchUrl)
             };
 
             string authToken = _context.Vtex.AuthToken;
@@ -181,7 +194,6 @@
 
         public async Task<bool> DeleteWishList(string documentId)
         {
-            await this.VerifySchema();
             bool isSuccessStatusCode = false;
             try
             {
@@ -212,7 +224,7 @@
             return isSuccessStatusCode;
         }
 
-        public async Task VerifySchema()
+        public async Task VerifySchema(string schemaJson)
         {
             try
             {
@@ -235,23 +247,27 @@
                 string responseContent = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
                 {
-                    _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
+                    _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Verifying Schema [{response.StatusCode}]");
                 }
             
                 if (response.IsSuccessStatusCode)
                 {
-                    if (responseContent.Equals(WishListConstants.SCHEMA_JSON))
+                    var existingSchema = JObject.Parse(responseContent);
+                    var expectedSchema = JObject.Parse(schemaJson);
+
+                    if (JToken.DeepEquals(existingSchema, expectedSchema))
                     {
                         _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
                     }
                     else
                     {
                         _context.Vtex.Logger.Warn("VerifySchema", null, $"Schema does not match.\n{responseContent}");
+                        string compactSchema = expectedSchema.ToString(Newtonsoft.Json.Formatting.None);
                         request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Put,
                             RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}"),
-                            Content = new StringContent(WishListConstants.SCHEMA_JSON, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
+                            Content = new StringContent(compactSchema, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
                         };
                         
                         if (authToken != null)
@@ -276,17 +292,40 @@
             }
         }
 
-        private async Task<string> FirstScroll()
+        private string BuildWhereClause(string email, string organizationId, string costCenterId)
+        {
+            var filters = new List<string>();
+            if (!string.IsNullOrEmpty(email))
+            {
+                filters.Add($"email={HttpUtility.UrlEncode(email)}");
+            }
+            if (!string.IsNullOrEmpty(organizationId))
+            {
+                filters.Add($"organizationId={HttpUtility.UrlEncode(organizationId)}");
+            }
+            if (!string.IsNullOrEmpty(costCenterId))
+            {
+                filters.Add($"costCenterId={HttpUtility.UrlEncode(costCenterId)}");
+            }
+
+            return filters.Count > 0
+                ? "&_where=" + string.Join(" AND ", filters)
+                : string.Empty;
+        }
+
+        private async Task<string> FirstScroll(string email = null, string organizationId = null, string costCenterId = null)
         {
             string responseContent = string.Empty;
             try
             {
+                string whereClause = BuildWhereClause(email, organizationId, costCenterId);
+                string schemaParam = !string.IsNullOrEmpty(whereClause) ? $"&_schema={WishListConstants.SCHEMA}" : string.Empty;
 
                 var client = _clientFactory.CreateClient();
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_size=200&_fields=email,ListItemsWrapper")
+                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_size=200&_fields=email,ListItemsWrapper,organizationId,costCenterId{schemaParam}{whereClause}")
                 };
 
                 string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
@@ -299,8 +338,11 @@
                 }
                 request.Headers.Add("Cache-Control", "no-cache");
                 var response = await client.SendAsync(request);
-                
-                tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
+
+                if (response.Headers.Contains("X-VTEX-MD-TOKEN"))
+                {
+                    tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
+                }
 
                 responseContent = await response.Content.ReadAsStringAsync();
             }
@@ -312,17 +354,20 @@
             return responseContent;
         }
 
-        private async Task<string> CountList()
+        private async Task<string> CountList(string email = null, string organizationId = null, string costCenterId = null)
         {
             string countList = string.Empty;
 
             try
             {
+                string whereClause = BuildWhereClause(email, organizationId, costCenterId);
+                string schemaParam = !string.IsNullOrEmpty(whereClause) ? $"&_schema={WishListConstants.SCHEMA}" : string.Empty;
+
                 var client = _clientFactory.CreateClient();
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=email")
+                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/search?_fields=email{schemaParam}{whereClause}")
                 };
 
                 string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
@@ -334,11 +379,14 @@
                 }
                 request.Headers.Add("Cache-Control", "no-cache");
                 var response = await client.SendAsync(request);
-                countList = response.Headers.GetValues("REST-Content-Range").FirstOrDefault();
+                if (response.Headers.Contains("REST-Content-Range"))
+                {
+                    countList = response.Headers.GetValues("REST-Content-Range").FirstOrDefault();
+                }
             }
             catch (Exception ex)
             {
-                _context.Vtex.Logger.Error("First Scroll to Get The Lists", null, "Error: ", ex);
+                _context.Vtex.Logger.Error("CountList", null, "Error: ", ex);
             }
 
             return countList;
@@ -376,20 +424,26 @@
             return responseContent;
         }
 
-        public async Task<int> GetListsSize() {
+        public async Task<int> GetListsSize(string scopeMode, string email = null, string organizationId = null, string costCenterId = null)
+        {
+            await this.VerifySchema(WishListConstants.GetSchemaForScopeMode(scopeMode));
+            var res = await CountList(email, organizationId, costCenterId);
 
-            await this.VerifySchema();
-            JArray searchResult = new JArray();
-            var res = await CountList();
+            if (!string.IsNullOrEmpty(res) && res.Contains("/"))
+            {
+                string[] subs = res.Split('/');
+                if (subs.Length > 1 && Int32.TryParse(subs[1], out int count))
+                {
+                    return count;
+                }
+            }
 
-            string[] subs = res.Split('/');
-
-            return Int32.Parse(subs[1]);
+            return 0;
         }
 
-        public async Task<WishListsWrapper> GetAllLists()
+        public async Task<WishListsWrapper> GetAllLists(string scopeMode, string email = null, string organizationId = null, string costCenterId = null)
         {
-            await this.VerifySchema();
+            await this.VerifySchema(WishListConstants.GetSchemaForScopeMode(scopeMode));
             var i = 0;
             var status = true;
             JArray searchResult = new JArray();
@@ -398,13 +452,24 @@
             {
                 if( i == 0)
                 {
-                    var res = await FirstScroll();
+                    var res = await FirstScroll(email, organizationId, costCenterId);
+                    if (string.IsNullOrEmpty(res))
+                    {
+                        status = false;
+                        break;
+                    }
                     JArray resArray = JArray.Parse(res);
                     searchResult.Merge(resArray);
+                    if (resArray.Count < 200) status = false;
                 }
                 else
                 {
                     var res = await SubScroll();
+                    if (string.IsNullOrEmpty(res))
+                    {
+                        status = false;
+                        break;
+                    }
                     JArray resArray = JArray.Parse(res);
                     if (resArray.Count < 200) 
                     {
@@ -442,9 +507,9 @@
             return wishListsWrapper;
         }
 
-        public async Task<WishListsWrapper> GetAllListsPaged(int pageList)
+        public async Task<WishListsWrapper> GetAllListsPaged(int pageList, string scopeMode, string email = null, string organizationId = null, string costCenterId = null)
         {
-            await this.VerifySchema();
+            await this.VerifySchema(WishListConstants.GetSchemaForScopeMode(scopeMode));
             var i = 0;
             var status = true;
             JArray searchResult = new JArray();
@@ -453,13 +518,24 @@
             {
                 if( i == 0)
                 {
-                    var res = await FirstScroll();
+                    var res = await FirstScroll(email, organizationId, costCenterId);
+                    if (string.IsNullOrEmpty(res))
+                    {
+                        status = false;
+                        break;
+                    }
                     JArray resArray = JArray.Parse(res);
                     searchResult.Merge(resArray);
+                    if (resArray.Count < 200) status = false;
                 }
                 else
                 {
                     var res = await SubScroll();
+                    if (string.IsNullOrEmpty(res))
+                    {
+                        status = false;
+                        break;
+                    }
                     JArray resArray = JArray.Parse(res);
                     if (resArray.Count < 200) 
                     {
@@ -476,7 +552,10 @@
 
             try
             {
-                for (int l = (pageList - 1) * 5000; l < pageList * 5000; l++)
+                int start = (pageList - 1) * 5000;
+                int end = Math.Min(pageList * 5000, searchResult.Count);
+
+                for (int l = start; l < end; l++)
                 {
                     JToken listWrapper = searchResult[l];
                     if (listWrapper != null)
@@ -491,7 +570,7 @@
             }
             catch (Exception ex)
             {
-                _context.Vtex.Logger.Error("GetAllLists", null, "Error getting lists", ex);
+                _context.Vtex.Logger.Error("GetAllListsPaged", null, "Error getting lists", ex);
             }
 
             return wishListsWrapper;

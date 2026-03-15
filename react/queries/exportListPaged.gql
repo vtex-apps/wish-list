@@ -1,8 +1,8 @@
-query ExportListPaged(
-  $pageList: Int!
-) {
-   exportListPaged(pageList: $pageList) @context(provider: "vtex.wish-list") {
+query ExportListPaged($pageList: Int!, $email: String, $organizationId: String, $costCenterId: String) {
+   exportListPaged(pageList: $pageList, email: $email, organizationId: $organizationId, costCenterId: $costCenterId) @context(provider: "vtex.wish-list") {
       email
+      organizationId
+      costCenterId
       listItemsWrapper {
          listItems {
             id

@@ -1,4 +1,4 @@
-﻿using GraphQL;
+using GraphQL;
 using GraphQL.Types;
 using Newtonsoft.Json;
 using System;
@@ -28,15 +28,10 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-
-                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                    if (isValidAuthUser != HttpStatusCode.OK)
+                    SessionContext sessionContext = await wishListService.GetSessionContext();
+                    if (!sessionContext.IsAuthenticated)
                     {
-                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
-                        {
-                            Code = isValidAuthUser.ToString()
-                        });
-
+                        context.Errors.Add(new ExecutionError("Unauthorized") { Code = "Unauthorized" });
                         return null;
                     }
 
@@ -46,7 +41,7 @@ namespace WishList.GraphQL
                     int to = context.GetArgument<int>("to");
                     IList<ListItem> resultList = new List<ListItem>();
                     int totalCount = 0;
-                    var resultListsWrapper = await wishListService.GetList(shopperId, name);
+                    var resultListsWrapper = await wishListService.GetList(shopperId, name, sessionContext.OrganizationId, sessionContext.CostCenterId);
                     var resultListWrapper = resultListsWrapper.ListItemsWrapper.FirstOrDefault();
                     if (resultListWrapper != null)
                     {
@@ -60,7 +55,6 @@ namespace WishList.GraphQL
                                 resultList = await wishListService.LimitList(resultList, from, to);
                             }
 
-                            // Normalize Title field
                             foreach (ListItem listItem in resultList)
                             {
                                 if (string.IsNullOrWhiteSpace(listItem.Title))
@@ -96,15 +90,10 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    
-                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                    if (isValidAuthUser != HttpStatusCode.OK)
+                    SessionContext sessionContext = await wishListService.GetSessionContext();
+                    if (!sessionContext.IsAuthenticated)
                     {
-                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
-                        {
-                            Code = isValidAuthUser.ToString()
-                        });
-
+                        context.Errors.Add(new ExecutionError("Unauthorized") { Code = "Unauthorized" });
                         return null;
                     }
 
@@ -114,7 +103,7 @@ namespace WishList.GraphQL
                     IList<ListItem> resultList = new List<ListItem>();
                     IList<ListResponse> resultLists = new List<ListResponse>();
                     int totalCount = 0;
-                    var resultListsWrapper = await wishListService.GetLists(shopperId);
+                    var resultListsWrapper = await wishListService.GetLists(shopperId, sessionContext.OrganizationId, sessionContext.CostCenterId);
                     if (resultListsWrapper != null && resultListsWrapper.ListItemsWrapper != null)
                     {
                         foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
@@ -131,7 +120,6 @@ namespace WishList.GraphQL
                                         resultList = await wishListService.LimitList(resultList, from, to);
                                     }
 
-                                    // Normalize Title field
                                     foreach (ListItem listItem in resultList)
                                     {
                                         if (string.IsNullOrWhiteSpace(listItem.Title))
@@ -172,22 +160,17 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-
-                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                    if (isValidAuthUser != HttpStatusCode.OK)
+                    SessionContext sessionContext = await wishListService.GetSessionContext();
+                    if (!sessionContext.IsAuthenticated)
                     {
-                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
-                        {
-                            Code = isValidAuthUser.ToString()
-                        });
-
+                        context.Errors.Add(new ExecutionError("Unauthorized") { Code = "Unauthorized" });
                         return null;
                     }
 
                     string shopperId = context.GetArgument<string>("shopperId");
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
-                    ResponseListWrapper resultListWrapper = await wishListService.GetLists(shopperId);
+                    ResponseListWrapper resultListWrapper = await wishListService.GetLists(shopperId, sessionContext.OrganizationId, sessionContext.CostCenterId);
                     List<string> namesList = new List<string>();
                     List<int> idsList = new List<int>();
                     CheckListResponse checkListResponse = null;
@@ -242,18 +225,15 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                    if (isValidAuthUser != HttpStatusCode.OK)
+                    SessionContext sessionContext = await wishListService.GetSessionContext();
+                    if (!sessionContext.IsAuthenticated)
                     {
-                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
-                        {
-                            Code = isValidAuthUser.ToString()
-                        });
-
+                        context.Errors.Add(new ExecutionError("Unauthorized") { Code = "Unauthorized" });
                         return null;
                     }
+
                     string shopperId = context.GetArgument<string>("shopperId");
-                    ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
+                    ResponseListWrapper allLists = await wishListService.GetLists(shopperId, sessionContext.OrganizationId, sessionContext.CostCenterId);
                     IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;
                     var distinctListNames = listItemsWrappers.GroupBy(elem => elem.Name).Select(group => group.First());
                     var listName = distinctListNames.Select(n => n.Name);
@@ -264,41 +244,59 @@ namespace WishList.GraphQL
 
             FieldAsync<IntGraphType>(
                  "listSize",
+                 arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "email", Description = "Filter by email" },
+                    new QueryArgument<StringGraphType> { Name = "organizationId", Description = "Filter by Organization Id" },
+                    new QueryArgument<StringGraphType> { Name = "costCenterId", Description = "Filter by Cost Center Id" }
+                 ),
                  resolve: async context =>
                  {
-                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                     if (isValidAuthUser != HttpStatusCode.OK)
+                     SessionContext sessionContext = await wishListService.GetSessionContext();
+                     if (!sessionContext.IsAuthenticated)
                      {
-                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         HttpStatusCode adminAuth = await wishListService.IsValidAdminAuthUser();
+                         if (adminAuth != HttpStatusCode.OK)
                          {
-                             Code = isValidAuthUser.ToString()
-                         });
-
-                         return null;
+                             context.Errors.Add(new ExecutionError(adminAuth.ToString()) { Code = adminAuth.ToString() });
+                             return null;
+                         }
                      }
 
-                     int AllListSize = await wishListService.GetListSizeBase();
-                     
-                     return AllListSize;
+                     string email = context.GetArgument<string>("email");
+                     string organizationId = context.GetArgument<string>("organizationId");
+                     string costCenterId = context.GetArgument<string>("costCenterId");
+
+                     int allListSize = await wishListService.GetListSizeBase(email, organizationId, costCenterId);
+
+                     return allListSize;
                  }
              );
 
             FieldAsync<ListGraphType<WishListWrapperType>>(
                  "exportList",
+                 arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "email", Description = "Filter by email" },
+                    new QueryArgument<StringGraphType> { Name = "organizationId", Description = "Filter by Organization Id" },
+                    new QueryArgument<StringGraphType> { Name = "costCenterId", Description = "Filter by Cost Center Id" }
+                 ),
                  resolve: async context =>
                  {
-                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                     if (isValidAuthUser != HttpStatusCode.OK)
+                     SessionContext sessionContext = await wishListService.GetSessionContext();
+                     if (!sessionContext.IsAuthenticated)
                      {
-                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         HttpStatusCode adminAuth = await wishListService.IsValidAdminAuthUser();
+                         if (adminAuth != HttpStatusCode.OK)
                          {
-                             Code = isValidAuthUser.ToString()
-                         });
-
-                         return null;
+                             context.Errors.Add(new ExecutionError(adminAuth.ToString()) { Code = adminAuth.ToString() });
+                             return null;
+                         }
                      }
 
-                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishLists();
+                     string email = context.GetArgument<string>("email");
+                     string organizationId = context.GetArgument<string>("organizationId");
+                     string costCenterId = context.GetArgument<string>("costCenterId");
+
+                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishLists(email, organizationId, costCenterId);
                      return wishListsWrapper.WishLists;
                  }
              );
@@ -306,27 +304,41 @@ namespace WishList.GraphQL
             FieldAsync<ListGraphType<WishListWrapperType>>(
                  "exportListPaged",
                  arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageList", Description = "page list" }
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageList", Description = "page list" },
+                    new QueryArgument<StringGraphType> { Name = "email", Description = "Filter by email" },
+                    new QueryArgument<StringGraphType> { Name = "organizationId", Description = "Filter by Organization Id" },
+                    new QueryArgument<StringGraphType> { Name = "costCenterId", Description = "Filter by Cost Center Id" }
                  ),
                  resolve: async context =>
                  {
-                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
-                     if (isValidAuthUser != HttpStatusCode.OK)
+                     SessionContext sessionContext = await wishListService.GetSessionContext();
+                     if (!sessionContext.IsAuthenticated)
                      {
-                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         HttpStatusCode adminAuth = await wishListService.IsValidAdminAuthUser();
+                         if (adminAuth != HttpStatusCode.OK)
                          {
-                             Code = isValidAuthUser.ToString()
-                         });
-
-                         return null;
+                             context.Errors.Add(new ExecutionError(adminAuth.ToString()) { Code = adminAuth.ToString() });
+                             return null;
+                         }
                      }
 
                      int pageList = context.GetArgument<int>("pageList");
+                     string email = context.GetArgument<string>("email");
+                     string organizationId = context.GetArgument<string>("organizationId");
+                     string costCenterId = context.GetArgument<string>("costCenterId");
 
-                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishListsPaged(pageList);
+                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishListsPaged(pageList, email, organizationId, costCenterId);
                      return wishListsWrapper.WishLists;
                  }
              );
+
+            FieldAsync<StringGraphType>(
+                "scopeMode",
+                resolve: async context =>
+                {
+                    return await wishListService.GetScopeMode();
+                }
+            );
         }
     }
 }

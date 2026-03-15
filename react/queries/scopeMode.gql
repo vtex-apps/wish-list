@@ -1,0 +1,3 @@
+query ScopeMode {
+  scopeMode @context(provider: "vtex.wish-list")
+}

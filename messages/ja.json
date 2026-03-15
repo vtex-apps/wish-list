@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "リストに追加する前にログインする必要があります",
   "admin/wishlist.menu.label": "ウィッシュリスト",
   "admin/settings.title": "ウィッシュリストのエクスポート",
-  "admin/settings.download": "ウィッシュリストをダウンロード"
+  "admin/settings.download": "ウィッシュリストをダウンロード",
+  "admin/settings.page": "ページ",
+  "admin/settings.email": "メール",
+  "admin/settings.organizationId": "組織ID",
+  "admin/settings.costCenterId": "コストセンターID",
+  "admin/settings.applyFilters": "フィルターを適用",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }

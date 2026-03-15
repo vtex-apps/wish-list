@@ -19,6 +19,7 @@ namespace Vtex
             services.AddSingleton<IVtexEnvironmentVariableProvider, VtexEnvironmentVariableProvider>();
             services.AddTransient<IWishListRepository, WishListRepository>();
             services.AddTransient<IWishListService, WishListService>();
+            services.AddMemoryCache();
             services.AddHttpContextAccessor();
             services.AddHttpClient();
         }

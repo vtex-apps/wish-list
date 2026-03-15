@@ -35,6 +35,8 @@ input ListItemInputType {
 type WishListWrapperType {
   email: String
   listItemsWrapper: [ListItems]
+  organizationId: String
+  costCenterId: String
 }
 
 type ListItems {
@@ -53,11 +55,13 @@ type Query {
   checkList(shopperId: String!, productId: String!, sku: String): CheckListType
     @cacheControl(scope: PRIVATE)
   listNames(shopperId: String!): [String]
-  listSize: Int
+  listSize(email: String, organizationId: String, costCenterId: String): Int
     @cacheControl(scope: PRIVATE)
-  exportList: [WishListWrapperType]
+  exportList(email: String, organizationId: String, costCenterId: String): [WishListWrapperType]
     @cacheControl(scope: PRIVATE)
-  exportListPaged(pageList: Int!): [WishListWrapperType]
+  exportListPaged(pageList: Int!, email: String, organizationId: String, costCenterId: String): [WishListWrapperType]
+    @cacheControl(scope: PRIVATE)
+  scopeMode: String
     @cacheControl(scope: PRIVATE)
 }
 

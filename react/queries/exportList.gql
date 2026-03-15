@@ -1,6 +1,8 @@
-query ExportList {
-   exportList @context(provider: "vtex.wish-list") {
+query ExportList($email: String, $organizationId: String, $costCenterId: String) {
+   exportList(email: $email, organizationId: $organizationId, costCenterId: $costCenterId) @context(provider: "vtex.wish-list") {
       email
+      organizationId
+      costCenterId
       listItemsWrapper {
          listItems {
             id

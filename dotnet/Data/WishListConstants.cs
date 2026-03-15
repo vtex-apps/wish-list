@@ -1,4 +1,4 @@
-﻿namespace WishList.Data
+namespace WishList.Data
 {
     public class WishListConstants
     {
@@ -20,6 +20,73 @@
         public const string DATA_ENTITY = "wishlist";
         public const string SCHEMA = "wishlist";
 
-        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]},\"v-immediate-indexing\":true}";
+        public const string SCHEMA_BASE = @"{
+            ""name"": ""wishlist"",
+            ""properties"": {
+                ""email"": {
+                    ""type"": ""string"",
+                    ""title"": ""Shopper ID"",
+                    ""description"": """"
+                },
+                ""ListItemsWrapper"": {
+                    ""type"": ""array"",
+                    ""title"": ""The ListItemsWrapper schema"",
+                    ""description"": ""An explanation about the purpose of this instance.""
+                }
+            },
+            ""required"": [""email""],
+            ""v-indexed"": [""email""],
+            ""v-default-fields"": [""email"", ""ListItemsWrapper""],
+            ""v-cache"": false,
+            ""v-security"": {
+                ""allowGetAll"": false,
+                ""publicRead"": [""email"", ""ListItemsWrapper"", ""id""],
+                ""publicWrite"": [""email"", ""ListItemsWrapper""],
+                ""publicFilter"": [""email"", ""ListItemsWrapper""]
+            },
+            ""v-immediate-indexing"": true
+        }";
+
+        public const string SCHEMA_B2B = @"{
+            ""name"": ""wishlist"",
+            ""properties"": {
+                ""email"": {
+                    ""type"": ""string"",
+                    ""title"": ""Shopper ID"",
+                    ""description"": """"
+                },
+                ""ListItemsWrapper"": {
+                    ""type"": ""array"",
+                    ""title"": ""The ListItemsWrapper schema"",
+                    ""description"": ""An explanation about the purpose of this instance.""
+                },
+                ""organizationId"": {
+                    ""type"": [""string"", ""null""],
+                    ""title"": ""Organization ID"",
+                    ""description"": ""B2B Organization ID""
+                },
+                ""costCenterId"": {
+                    ""type"": [""string"", ""null""],
+                    ""title"": ""Cost Center ID"",
+                    ""description"": ""B2B Cost Center ID""
+                }
+            },
+            ""required"": [""email""],
+            ""v-indexed"": [""email"", ""organizationId"", ""costCenterId""],
+            ""v-default-fields"": [""email"", ""ListItemsWrapper"", ""organizationId"", ""costCenterId""],
+            ""v-cache"": false,
+            ""v-security"": {
+                ""allowGetAll"": false,
+                ""publicRead"": [""email"", ""ListItemsWrapper"", ""id"", ""organizationId"", ""costCenterId""],
+                ""publicWrite"": [""email"", ""ListItemsWrapper"", ""organizationId"", ""costCenterId""],
+                ""publicFilter"": [""email"", ""ListItemsWrapper"", ""organizationId"", ""costCenterId""]
+            },
+            ""v-immediate-indexing"": true
+        }";
+
+        public static string GetSchemaForScopeMode(string scopeMode)
+        {
+            return scopeMode != null && scopeMode != "none" ? SCHEMA_B2B : SCHEMA_BASE;
+        }
     }
 }

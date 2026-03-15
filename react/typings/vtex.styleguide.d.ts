@@ -42,4 +42,8 @@ declare module 'vtex.styleguide' {
   export const Tabs
   export const Divider
   export const PageBlock
+  export const IconDownload: any
+  export const IconFilter: any
+  export const EXPERIMENTAL_Table: any
+  export const EXPERIMENTAL_useTableMeasures: any
 }

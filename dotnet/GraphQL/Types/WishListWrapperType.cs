@@ -16,8 +16,10 @@ namespace WishList.GraphQL.Types
             Name = "WishListWrapperType";
 
             Field(b => b.Id).Description("The wishlist Id");
-            Field(b => b.Email).Description("The shopper Id of the wishlist");
+            Field(b => b.Email, nullable: true).Description("The shopper Id of the wishlist");
             Field(b => b.ListItemsWrapper, type: typeof(ListGraphType<ListItemsType>)).Description("Wrapper of the list items");
+            Field(b => b.OrganizationId, nullable: true).Description("B2B Organization Id");
+            Field(b => b.CostCenterId, nullable: true).Description("B2B Cost Center Id");
         }
     }
 }

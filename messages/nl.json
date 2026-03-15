@@ -10,5 +10,21 @@
   "store/wishlist-not-logged": "U moet inloggen voordat u het aan de lijst kunt toevoegen",
   "admin/wishlist.menu.label": "Verlanglijst",
   "admin/settings.title": "Wishlist exporteren",
-  "admin/settings.download": "Wishlists downloaden"
+  "admin/settings.download": "Wishlists downloaden",
+  "admin/settings.page": "Pagina",
+  "admin/settings.email": "E-mail",
+  "admin/settings.organizationId": "Organisatie-ID",
+  "admin/settings.costCenterId": "Kostenplaats-ID",
+  "admin/settings.applyFilters": "Filters toepassen",
+  "admin/settings.productId": "Product ID",
+  "admin/settings.productTitle": "Title",
+  "admin/settings.totalWishlists": "Total wishlists",
+  "admin/settings.totalItems": "Total items",
+  "admin/settings.emptyState": "No wishlists found.",
+  "admin/settings.density": "Line density",
+  "admin/settings.densityLow": "Low",
+  "admin/settings.densityMedium": "Medium",
+  "admin/settings.densityHigh": "High",
+  "admin/settings.showRows": "Show rows",
+  "admin/settings.of": "of"
 }
