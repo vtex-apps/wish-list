@@ -19,7 +19,7 @@ namespace WishList.GraphQL
         {
             Name = "Mutation";
 
-            Field<IntGraphType>(
+            FieldAsync<IntGraphType>(
                 "addToList",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<ListItemInputType>> { Name = "listItem" },
@@ -27,32 +27,52 @@ namespace WishList.GraphQL
                     new QueryArgument<StringGraphType> { Name = "name" },
                     new QueryArgument<BooleanGraphType> { Name = "public" }
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
-                    
-                    var listItem = context.GetArgument<ListItem>("listItem");
                     string shopperId = context.GetArgument<string>("shopperId");
+                    HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
+                    if (accessStatus != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(accessStatus.ToString())
+                        {
+                            Code = accessStatus.ToString()
+                        });
+
+                        return null;
+                    }
+
+                    var listItem = context.GetArgument<ListItem>("listItem");
                     string listName = context.GetArgument<string>("name");
                     bool isPublic = context.GetArgument<bool>("public");
 
-                    return wishListService.SaveItem(listItem, shopperId, listName, isPublic);
+                    return await wishListService.SaveItem(listItem, shopperId, listName, isPublic);
                 });
 
-            Field<BooleanGraphType>(
+            FieldAsync<BooleanGraphType>(
                 "removeFromList",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId" },
                     new QueryArgument<StringGraphType> { Name = "name" }
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
+                    string shopperId = context.GetArgument<string>("shopperId");
+                    HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
+                    if (accessStatus != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(accessStatus.ToString())
+                        {
+                            Code = accessStatus.ToString()
+                        });
+
+                        return null;
+                    }
 
                     int id = context.GetArgument<int>("id");
-                    string shopperId = context.GetArgument<string>("shopperId");
                     string listName = context.GetArgument<string>("name");
 
-                    return wishListService.RemoveItem(id, shopperId, listName);
+                    return await wishListService.RemoveItem(id, shopperId, listName);
                 });
         }
     }

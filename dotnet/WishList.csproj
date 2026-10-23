@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <!-- Test project folder: without this the SDK would compile the tests into the app. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);WishList.Tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

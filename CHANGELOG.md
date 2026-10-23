@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Security
+
+- Fix broken access control (VSC-1265312) on GraphQL queries, mutations and the `export-lists` route. Callers are now identified from their VTEX ID token and authorized per request.
+  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email or user id of the shopper token) or an admin may access them.
+  - `exportList`, `exportListPaged`, `listSize` and the `/_v/wishlist/export-lists` route are now restricted to admin users (admin token validated in VTEX ID and granted in License Manager).
+  - Personal data (shopper ids and emails) is no longer written to logs.
+- The `wishlist` Master Data schema no longer has public fields (`publicRead`, `publicWrite` and `publicFilter` are empty). The app applies this schema when the account uses the wishlist; accounts with no wishlist traffic keep their previous schema until the app is used.
+
+### Fixed
+
+- Schema verification no longer sends a `GET` and a `PUT` to Master Data on every request. The schema is compared by content (fields, index and security), the result is cached per account for one hour, a missing schema is created, `429`/`423`/`5xx` responses are retried and the applied schema is confirmed.
+
+### Changed
+
+- **Breaking behaviour:** the `VtexIdclientAutCookie` request header is only accepted for admin access (token validated in VTEX ID and granted in License Manager); it is no longer accepted as a shopper identity.
+- **Breaking behaviour:** non-admin users can only access their own lists. Call-center/impersonation operators can no longer manage a customer's list unless they are admins.
+- **Breaking behaviour:** export queries and `listSize` now require an admin; other authenticated users receive `Forbidden`.
+- **Breaking behaviour:** integrations that read or write the `wishlist` Master Data entity directly must authenticate with an app key/token or user token that has Master Data permissions; unauthenticated requests receive `403`.
+
 ## [1.19.1] - 2026-02-13
 
 ### Fixed

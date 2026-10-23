@@ -4,3 +4,4 @@ dotnet/obj/
 dotnet/bin/
 yarn.lock
 .vs
+dotnet/WishList.Tests/
