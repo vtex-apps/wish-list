@@ -60,6 +60,16 @@
         /* Accounts whose schema was already checked; avoids a GET/PUT to Master Data on every request. */
         private static readonly ConcurrentDictionary<string, DateTime> _verifiedSchemas = new ConcurrentDictionary<string, DateTime>();
         private static readonly TimeSpan SchemaVerificationTtl = TimeSpan.FromHours(1);
+        private static readonly TimeSpan SchemaFailureTtl = TimeSpan.FromMinutes(2);
+
+        /* Stores the expiry instant; failures use a short TTL so Master Data isn't hammered while it's degraded. */
+        private static void MarkVerified(string account, TimeSpan ttl)
+        {
+            if (account != null)
+            {
+                _verifiedSchemas[account] = DateTime.UtcNow.Add(ttl);
+            }
+        }
 
         /* Master Data forces v-immediate-indexing to false for non-vtex.com callers, so it can't be compared. */
         private static bool SchemaMatches(string actualJson)
@@ -235,10 +245,11 @@
 
         public async Task VerifySchema()
         {
+            string account = null;
             try
             {
-                string account = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME];
-                if (account != null && _verifiedSchemas.TryGetValue(account, out DateTime verifiedAt) && DateTime.UtcNow - verifiedAt < SchemaVerificationTtl)
+                account = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME];
+                if (account != null && _verifiedSchemas.TryGetValue(account, out DateTime expiresAt) && DateTime.UtcNow < expiresAt)
                 {
                     return;
                 }
@@ -263,6 +274,7 @@
                 if (!response.IsSuccessStatusCode)
                 {
                     _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
+                    MarkVerified(account, SchemaFailureTtl);
                 }
             
                 if (response.IsSuccessStatusCode)
@@ -270,10 +282,7 @@
                     if (SchemaMatches(responseContent))
                     {
                         _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
-                        if (account != null)
-                        {
-                            _verifiedSchemas[account] = DateTime.UtcNow;
-                        }
+                        MarkVerified(account, SchemaVerificationTtl);
                     }
                     else
                     {
@@ -281,7 +290,7 @@
                         request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Put,
-                            RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}"),
+                            RequestUri = new Uri($"http://{account}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}"),
                             Content = new StringContent(WishListConstants.SCHEMA_JSON, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
                         };
                         
@@ -300,16 +309,14 @@
                         }
 
                         /* Cached even on failure so a schema the app can't fix doesn't retry on every request. */
-                        if (account != null)
-                        {
-                            _verifiedSchemas[account] = DateTime.UtcNow;
-                        }
+                        MarkVerified(account, SchemaVerificationTtl);
                     }
                 }
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("VerifySchema", null, "Error: ", ex);
+                MarkVerified(account, SchemaFailureTtl);
             }
         }
 
