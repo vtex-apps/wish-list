@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Increase `memory` from 256 to 512 to avoid OOM restarts: .NET Core 3.0 does not read cgroup v2 limits, so the GC sizes itself by node cores and exceeds the 563 MB limit.
+
 ## [1.19.2] - 2026-10-27
 
 ### Fixed
