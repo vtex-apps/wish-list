@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Stop the `VerifySchema` GET/PUT loop on every request, which caused OOM restarts: ignore `v-immediate-indexing` in the comparison, cache the verification per account and remove the blocking call from the constructor.
+
 ## [1.19.1] - 2026-02-13
 
 ### Fixed

@@ -1,6 +1,7 @@
 ﻿namespace WishList.Data
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
@@ -54,7 +55,27 @@
             this._applicationName =
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
 
-            this.VerifySchema().Wait();
+        }
+
+        /* Accounts whose schema was already checked; avoids a GET/PUT to Master Data on every request. */
+        private static readonly ConcurrentDictionary<string, DateTime> _verifiedSchemas = new ConcurrentDictionary<string, DateTime>();
+        private static readonly TimeSpan SchemaVerificationTtl = TimeSpan.FromHours(1);
+
+        /* Master Data forces v-immediate-indexing to false for non-vtex.com callers, so it can't be compared. */
+        private static bool SchemaMatches(string actualJson)
+        {
+            try
+            {
+                JObject actual = JObject.Parse(actualJson);
+                JObject expected = JObject.Parse(WishListConstants.SCHEMA_JSON);
+                actual.Remove("v-immediate-indexing");
+                expected.Remove("v-immediate-indexing");
+                return JToken.DeepEquals(actual, expected);
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId)
@@ -216,10 +237,16 @@
         {
             try
             {
+                string account = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME];
+                if (account != null && _verifiedSchemas.TryGetValue(account, out DateTime verifiedAt) && DateTime.UtcNow - verifiedAt < SchemaVerificationTtl)
+                {
+                    return;
+                }
+
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}")
+                    RequestUri = new Uri($"http://{account}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/schemas/{WishListConstants.SCHEMA}")
                 };
 
                 string authToken = _context.Vtex.AuthToken;
@@ -240,9 +267,13 @@
             
                 if (response.IsSuccessStatusCode)
                 {
-                    if (responseContent.Equals(WishListConstants.SCHEMA_JSON))
+                    if (SchemaMatches(responseContent))
                     {
                         _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
+                        if (account != null)
+                        {
+                            _verifiedSchemas[account] = DateTime.UtcNow;
+                        }
                     }
                     else
                     {
@@ -266,6 +297,12 @@
                         if (!response.IsSuccessStatusCode)
                         {
                             _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Apply Schema [{response.StatusCode}] {responseContent}");
+                        }
+
+                        /* Cached even on failure so a schema the app can't fix doesn't retry on every request. */
+                        if (account != null)
+                        {
+                            _verifiedSchemas[account] = DateTime.UtcNow;
                         }
                     }
                 }
