@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using WishList.Exporting;
 using WishList.GraphQL.Types;
 using WishList.Models;
 using WishList.Services;
@@ -298,8 +299,20 @@ namespace WishList.GraphQL
                          return null;
                      }
 
-                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishLists();
-                     return wishListsWrapper.WishLists;
+                     try
+                     {
+                         WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishLists(context.CancellationToken);
+                         return wishListsWrapper.WishLists;
+                     }
+                     catch (ExportBusyException)
+                     {
+                         context.Errors.Add(new ExecutionError("Another export is already running on this instance.")
+                         {
+                             Code = "EXPORT_IN_PROGRESS"
+                         });
+
+                         return null;
+                     }
                  }
              );
 
@@ -322,9 +335,30 @@ namespace WishList.GraphQL
                      }
 
                      int pageList = context.GetArgument<int>("pageList");
+                     if (pageList < 1)
+                     {
+                         context.Errors.Add(new ExecutionError("pageList must be greater than or equal to 1.")
+                         {
+                             Code = "INVALID_PAGE"
+                         });
 
-                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishListsPaged(pageList);
-                     return wishListsWrapper.WishLists;
+                         return null;
+                     }
+
+                     try
+                     {
+                         WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishListsPaged(pageList, context.CancellationToken);
+                         return wishListsWrapper.WishLists;
+                     }
+                     catch (ExportBusyException)
+                     {
+                         context.Errors.Add(new ExecutionError("Another export is already running on this instance.")
+                         {
+                             Code = "EXPORT_IN_PROGRESS"
+                         });
+
+                         return null;
+                     }
                  }
              );
         }

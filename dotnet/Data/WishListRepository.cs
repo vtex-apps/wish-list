@@ -6,7 +6,9 @@
     using System.Linq;
     using System.Net.Http;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
+    using WishList.Exporting;
     using WishList.Models;
     using WishList.Services;
     using Microsoft.AspNetCore.Http;
@@ -25,20 +27,9 @@
         private readonly IHttpClientFactory _clientFactory;
         private readonly IIOServiceContext _context;
         private readonly string _applicationName;
-        private static string _tokenResponse;
-        public static string tokenResponse 
-        {
-            get
-            {
-                return _tokenResponse;
-            }
-            set
-            {
-                _tokenResponse = value;
-            }
-        }
+        private readonly IWishListExportCoordinator _exportCoordinator;
 
-        public WishListRepository(IVtexEnvironmentVariableProvider environmentVariableProvider, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context)
+        public WishListRepository(IVtexEnvironmentVariableProvider environmentVariableProvider, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context, IWishListExportCoordinator exportCoordinator)
         {
             this._environmentVariableProvider = environmentVariableProvider ??
                                                 throw new ArgumentNullException(nameof(environmentVariableProvider));
@@ -51,6 +42,9 @@
 
             this._context = context ??
                                throw new ArgumentNullException(nameof(context));
+
+            this._exportCoordinator = exportCoordinator ??
+                               throw new ArgumentNullException(nameof(exportCoordinator));
 
             this._applicationName =
                 $"{this._environmentVariableProvider.ApplicationVendor}.{this._environmentVariableProvider.ApplicationName}";
@@ -243,7 +237,7 @@
             return isSuccessStatusCode;
         }
 
-        public async Task VerifySchema()
+        public async Task VerifySchema(CancellationToken cancellationToken = default)
         {
             string account = null;
             try
@@ -269,7 +263,7 @@
                 }
 
                 var client = _clientFactory.CreateClient();
-                var response = await client.SendAsync(request);
+                var response = await client.SendAsync(request, cancellationToken);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
                 {
@@ -301,7 +295,7 @@
                             request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
                         }
 
-                        response = await client.SendAsync(request);
+                        response = await client.SendAsync(request, cancellationToken);
                         responseContent = await response.Content.ReadAsStringAsync();
                         if (!response.IsSuccessStatusCode)
                         {
@@ -313,47 +307,15 @@
                     }
                 }
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("VerifySchema", null, "Error: ", ex);
                 MarkVerified(account, SchemaFailureTtl);
             }
-        }
-
-        private async Task<string> FirstScroll()
-        {
-            string responseContent = string.Empty;
-            try
-            {
-
-                var client = _clientFactory.CreateClient();
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_size=200&_fields=email,ListItemsWrapper")
-                };
-
-                string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
-
-                if (authToken != null)
-                {
-                    request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
-                    request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
-                    request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
-                }
-                request.Headers.Add("Cache-Control", "no-cache");
-                var response = await client.SendAsync(request);
-                
-                tokenResponse = response.Headers.GetValues("X-VTEX-MD-TOKEN").FirstOrDefault();
-
-                responseContent = await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception ex)
-            {
-                _context.Vtex.Logger.Error("First Scroll to Get The Lists", null, "Error: ", ex);
-            }
-
-            return responseContent;
         }
 
         private async Task<string> CountList()
@@ -388,38 +350,6 @@
             return countList;
         }
 
-        private async Task<string> SubScroll()
-        {
-            string responseContent = string.Empty;
-            try
-            {
-                var client = _clientFactory.CreateClient();
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/dataentities/{WishListConstants.DATA_ENTITY}/scroll?_token={tokenResponse}")
-                };
-
-                string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
-                if (authToken != null)
-                {
-                    request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
-                    request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
-                    request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
-                }
-                request.Headers.Add("Cache-Control", "no-cache");
-                var response = await client.SendAsync(request);
-
-                responseContent = await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception ex)
-            {
-                _context.Vtex.Logger.Error("Sub Scrolls to Get The ListsMerchantDefinedData", null, "Error: ", ex);
-            }
-
-            return responseContent;
-        }
-
         public async Task<int> GetListsSize() {
 
             await this.VerifySchema();
@@ -431,114 +361,15 @@
             return Int32.Parse(subs[1]);
         }
 
-        public async Task<WishListsWrapper> GetAllLists()
+        public async Task<WishListsWrapper> GetAllLists(CancellationToken cancellationToken = default)
         {
-            await this.VerifySchema();
-            var i = 0;
-            var status = true;
-            JArray searchResult = new JArray();
-
-            while (status)
-            {
-                if( i == 0)
-                {
-                    var res = await FirstScroll();
-                    JArray resArray = JArray.Parse(res);
-                    searchResult.Merge(resArray);
-                }
-                else
-                {
-                    var res = await SubScroll();
-                    JArray resArray = JArray.Parse(res);
-                    if (resArray.Count < 200) 
-                    {
-                        status = false;
-                    }
-                    searchResult.Merge(resArray);
-                }
-                i++;
-            }
-            
-            WishListsWrapper wishListsWrapper = new WishListsWrapper();
-            wishListsWrapper.WishLists = new List<WishListWrapper>();
-            WishListWrapper responseListWrapper = new WishListWrapper();
-
-            try
-            {
-                for (int l = 0; l < searchResult.Count; l++)
-                {
-                    JToken listWrapper = searchResult[l];
-                    if (listWrapper != null)
-                    {
-                        responseListWrapper = JsonConvert.DeserializeObject<WishListWrapper>(listWrapper.ToString());
-                        if (responseListWrapper != null)
-                        {
-                            wishListsWrapper.WishLists.Add(responseListWrapper);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _context.Vtex.Logger.Error("GetAllLists", null, "Error getting lists", ex);
-            }
-
-            return wishListsWrapper;
+            // Schema verification runs inside the export gate so a rejected export never touches Master Data.
+            return await _exportCoordinator.ExportAllAsync(this.VerifySchema, cancellationToken);
         }
 
-        public async Task<WishListsWrapper> GetAllListsPaged(int pageList)
+        public async Task<WishListsWrapper> GetAllListsPaged(int pageList, CancellationToken cancellationToken = default)
         {
-            await this.VerifySchema();
-            var i = 0;
-            var status = true;
-            JArray searchResult = new JArray();
-
-            while (status)
-            {
-                if( i == 0)
-                {
-                    var res = await FirstScroll();
-                    JArray resArray = JArray.Parse(res);
-                    searchResult.Merge(resArray);
-                }
-                else
-                {
-                    var res = await SubScroll();
-                    JArray resArray = JArray.Parse(res);
-                    if (resArray.Count < 200) 
-                    {
-                        status = false;
-                    }
-                    searchResult.Merge(resArray);
-                }
-                i++;
-            }
-            
-            WishListsWrapper wishListsWrapper = new WishListsWrapper();
-            wishListsWrapper.WishLists = new List<WishListWrapper>();
-            WishListWrapper responseListWrapper = new WishListWrapper();
-
-            try
-            {
-                for (int l = (pageList - 1) * 5000; l < pageList * 5000; l++)
-                {
-                    JToken listWrapper = searchResult[l];
-                    if (listWrapper != null)
-                    {
-                        responseListWrapper = JsonConvert.DeserializeObject<WishListWrapper>(listWrapper.ToString());
-                        if (responseListWrapper != null)
-                        {
-                            wishListsWrapper.WishLists.Add(responseListWrapper);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _context.Vtex.Logger.Error("GetAllLists", null, "Error getting lists", ex);
-            }
-
-            return wishListsWrapper;
+            return await _exportCoordinator.ExportPageAsync(pageList, this.VerifySchema, cancellationToken);
         }
     }
 }

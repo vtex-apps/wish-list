@@ -10,6 +10,7 @@
     using Newtonsoft.Json;
     using Vtex.Api.Context;
     using WishList.Data;
+    using WishList.Exporting;
     using WishList.Models;
 
     public class RoutesController : Controller
@@ -25,9 +26,21 @@
 
         public async Task<IActionResult> ExportAllLists()
         {
-            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();
-            
-            return Json(wishListsWrapper);
+            try
+            {
+                WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists(HttpContext.RequestAborted);
+                return Json(wishListsWrapper);
+            }
+            catch (ExportBusyException)
+            {
+                Response.Headers["Retry-After"] = "5";
+                return StatusCode(StatusCodes.Status429TooManyRequests, new
+                {
+                    code = "EXPORT_IN_PROGRESS",
+                    message = "Another export is already running on this instance.",
+                    retryable = true
+                });
+            }
         }
     }
 }
