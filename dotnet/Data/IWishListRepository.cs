@@ -2,6 +2,7 @@
 {
     using WishList.Models;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public interface IWishListRepository
@@ -9,9 +10,9 @@
         Task<bool> SaveWishList(IList<ListItem> listItems, string shopperId, string listName, bool? isPublic, string documentId);
         Task<ResponseListWrapper> GetWishList(string shopperId);
         Task<bool> DeleteWishList(string documentId);
-        Task VerifySchema();
+        Task VerifySchema(CancellationToken cancellationToken = default);
         Task <int> GetListsSize();
-        Task <WishListsWrapper> GetAllLists();
-        Task <WishListsWrapper> GetAllListsPaged(int pageSize);
+        Task<WishListsWrapper> GetAllLists(CancellationToken cancellationToken = default);
+        Task<WishListsWrapper> GetAllListsPaged(int pageList, CancellationToken cancellationToken = default);
     }
 }

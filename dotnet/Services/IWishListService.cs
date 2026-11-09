@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using WishList.Models;
 using System.Net;
@@ -16,7 +17,7 @@ namespace WishList.Services
         Task<HttpStatusCode> IsValidAuthUser();
         Task<ValidatedUser> ValidateUserToken(string token);
         Task<int> GetListSizeBase();
-        Task<WishListsWrapper> ExportAllWishLists();
-        Task<WishListsWrapper> ExportAllWishListsPaged(int pageList);
+        Task<WishListsWrapper> ExportAllWishLists(CancellationToken cancellationToken = default);
+        Task<WishListsWrapper> ExportAllWishListsPaged(int pageList, CancellationToken cancellationToken = default);
     }
 }

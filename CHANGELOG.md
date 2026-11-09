@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Bound the memory used by list exports (`/_v/wishlist/export-lists`, `exportList`, `exportListPaged`), which caused OOM restarts: read Master Data in streamed batches without keeping intermediate copies, stop `exportListPaged` once the requested page is filled, and keep the scroll token per request instead of in a static field shared across requests and accounts.
+- Allow only one export per process; a concurrent export gets `429` with `Retry-After` (REST) or `EXPORT_IN_PROGRESS` (GraphQL).
+- Propagate request cancellation to the export and stop when Master Data repeats a page.
+
+### Added
+
+- Export metrics (`wishlist_export_*`) and a structured log per export with operation, result, pages, records, bytes and duration.
+- Unit test project `dotnet.Tests`.
+
 ## [1.19.3] - 2026-10-27
 
 ### Changed

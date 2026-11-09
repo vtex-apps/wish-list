@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Vtex.Api.Context;
 using WishList.Data;
@@ -442,15 +443,15 @@ namespace WishList.Services
             return wishListAllSize;
         }
 
-        public async Task<WishListsWrapper> ExportAllWishLists()
+        public async Task<WishListsWrapper> ExportAllWishLists(CancellationToken cancellationToken = default)
         {
-            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();
+            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists(cancellationToken);
             return wishListsWrapper;
         }
 
-        public async Task<WishListsWrapper> ExportAllWishListsPaged(int pageList)
+        public async Task<WishListsWrapper> ExportAllWishListsPaged(int pageList, CancellationToken cancellationToken = default)
         {
-            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllListsPaged(pageList);
+            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllListsPaged(pageList, cancellationToken);
             return wishListsWrapper;
         }
     }
