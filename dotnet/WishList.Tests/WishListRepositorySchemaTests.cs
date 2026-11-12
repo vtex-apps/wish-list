@@ -275,6 +275,60 @@ namespace WishList.Tests
             Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
         }
 
+        private static TimeSpan CachedFor(string account = "testaccount")
+        {
+            DateTime? until = WishListRepository.GetSchemaCheckedUntil(account);
+            Assert.NotNull(until);
+            return until.Value - DateTime.UtcNow;
+        }
+
+        [Fact]
+        public async Task RetryableFailure_IsRetriedSoon()
+        {
+            var repository = CreateRepository((method, _) => method == HttpMethod.Put
+                ? TestHttpMessageHandler.Status(HttpStatusCode.TooManyRequests)
+                : TestHttpMessageHandler.Ok(LegacySchema));
+
+            await repository.VerifySchema();
+
+            Assert.InRange(CachedFor(), TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
+        public async Task NonRetryableFailure_IsNotRetriedForAnHour()
+        {
+            // A schema the app is not allowed to change must not be retried every minute on every pod
+            var repository = CreateRepository((method, _) => method == HttpMethod.Put
+                ? TestHttpMessageHandler.Status(HttpStatusCode.Forbidden)
+                : TestHttpMessageHandler.Ok(LegacySchema));
+
+            await repository.VerifySchema();
+
+            Assert.InRange(CachedFor(), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+        }
+
+        [Fact]
+        public async Task AppliedButNotConfirmed_IsNotRetriedForAnHour()
+        {
+            var repository = CreateRepository((method, _) => method == HttpMethod.Put
+                ? TestHttpMessageHandler.Ok()
+                : TestHttpMessageHandler.Ok(LegacySchema));
+
+            await repository.VerifySchema();
+
+            Assert.InRange(CachedFor(), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+        }
+
+        [Fact]
+        public async Task GetFailure_IsRetriedSoonOnlyWhenRetryable()
+        {
+            await CreateRepository((method, _) => TestHttpMessageHandler.Status(HttpStatusCode.InternalServerError), "account-500").VerifySchema();
+            await CreateRepository((method, _) => TestHttpMessageHandler.Status(HttpStatusCode.Forbidden), "account-403").VerifySchema();
+
+            Assert.InRange(CachedFor("account-500"), TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            Assert.InRange(CachedFor("account-403"), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+        }
+
         [Fact]
         public async Task Cache_IsPerAccount()
         {
