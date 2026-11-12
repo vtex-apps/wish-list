@@ -229,23 +229,37 @@
                 return;
             }
 
-            bool isVerified = false;
+            SchemaCheckResult result = SchemaCheckResult.TransientFailure;
             try
             {
-                isVerified = await this.EnsureSchema(account);
+                result = await this.EnsureSchema(account);
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("VerifySchema", null, "Error: ", ex);
             }
 
-            // A failed check is cached for a short time to avoid hammering Master Data on every request.
-            _schemaCheckedUntil[account] = DateTime.UtcNow.Add(isVerified ? SchemaVerifiedTtl : SchemaFailureTtl);
+            // A transient failure is retried after a short time. A schema the app cannot fix
+            // (rejected or not confirmed) is left alone for the full TTL, so it is not retried on every pod every minute.
+            TimeSpan ttl = result == SchemaCheckResult.TransientFailure ? SchemaFailureTtl : SchemaVerifiedTtl;
+            _schemaCheckedUntil[account] = DateTime.UtcNow.Add(ttl);
+        }
+
+        private enum SchemaCheckResult
+        {
+            Verified,
+            TransientFailure,
+            PermanentFailure
         }
 
         internal static void ResetSchemaCache()
         {
             _schemaCheckedUntil.Clear();
+        }
+
+        internal static DateTime? GetSchemaCheckedUntil(string account)
+        {
+            return _schemaCheckedUntil.TryGetValue(account, out DateTime checkedUntil) ? checkedUntil : (DateTime?)null;
         }
 
         /// <summary>
@@ -274,7 +288,7 @@
                 && JToken.DeepEquals(expected["v-security"], remote["v-security"]);
         }
 
-        private async Task<bool> EnsureSchema(string account)
+        private async Task<SchemaCheckResult> EnsureSchema(string account)
         {
             HttpResponseMessage response = await this.SendSchemaRequest(HttpMethod.Get, account);
             string responseContent = await response.Content.ReadAsStringAsync();
@@ -283,13 +297,13 @@
                 if (IsSchemaUpToDate(responseContent))
                 {
                     _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
-                    return true;
+                    return SchemaCheckResult.Verified;
                 }
             }
             else if (response.StatusCode != HttpStatusCode.NotFound)
             {
                 _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Verifying Schema [{response.StatusCode}]");
-                return false;
+                return IsRetryableStatus(response.StatusCode) ? SchemaCheckResult.TransientFailure : SchemaCheckResult.PermanentFailure;
             }
 
             _context.Vtex.Logger.Info("VerifySchema", null, $"Applying schema [{response.StatusCode}]");
@@ -313,13 +327,13 @@
             {
                 // Master Data already holds this exact schema
                 _context.Vtex.Logger.Debug("VerifySchema", null, "Schema not modified.");
-                return true;
+                return SchemaCheckResult.Verified;
             }
 
             if ((int)putStatusCode < 200 || (int)putStatusCode > 299)
             {
                 _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Apply Schema [{putStatusCode}]");
-                return false;
+                return IsRetryableStatus(putStatusCode) ? SchemaCheckResult.TransientFailure : SchemaCheckResult.PermanentFailure;
             }
 
             response = await this.SendSchemaRequest(HttpMethod.Get, account);
@@ -327,11 +341,14 @@
             if (response.IsSuccessStatusCode && IsSchemaUpToDate(responseContent))
             {
                 _context.Vtex.Logger.Info("VerifySchema", null, "Schema applied.");
-                return true;
+                return SchemaCheckResult.Verified;
             }
 
             _context.Vtex.Logger.Warn("VerifySchema", null, $"Schema applied but not confirmed [{response.StatusCode}]");
-            return false;
+            // A confirmed mismatch means Master Data stores something the app cannot change; a failed read is transient.
+            return !response.IsSuccessStatusCode && IsRetryableStatus(response.StatusCode)
+                ? SchemaCheckResult.TransientFailure
+                : SchemaCheckResult.PermanentFailure;
         }
 
         private static bool IsRetryableStatus(HttpStatusCode statusCode)
