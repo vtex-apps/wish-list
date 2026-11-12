@@ -65,14 +65,15 @@ namespace WishList.Services
                 if (!userResponse.IsSuccessStatusCode)
                 {
                     int code = (int)userResponse.StatusCode;
-                    if (code >= 500)
+                    if (code == 401 || code == 403)
                     {
-                        _context.Vtex.Logger.Error("CheckResource", null, $"VTEX ID returned {code}");
-                        return HttpStatusCode.BadGateway;
+                        _context.Vtex.Logger.Warn("CheckResource", null, $"VTEX ID rejected the token ({code})");
+                        return HttpStatusCode.Unauthorized;
                     }
 
-                    _context.Vtex.Logger.Warn("CheckResource", null, $"VTEX ID rejected the token ({code})");
-                    return HttpStatusCode.Unauthorized;
+                    // Timeouts, throttling and server errors are dependency failures, not a caller problem.
+                    _context.Vtex.Logger.Error("CheckResource", null, $"VTEX ID returned {code}");
+                    return HttpStatusCode.BadGateway;
                 }
 
                 string userBody = await userResponse.Content.ReadAsStringAsync();
