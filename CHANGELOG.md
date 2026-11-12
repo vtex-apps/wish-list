@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Security
+
+- The `listSize`, `exportList` and `exportListPaged` GraphQL queries and the `/_v/wishlist/export-lists` REST route now require the `storefront.wish-list.export` License Manager resource (Storefront IO). The REST route answers 401 without a valid session, 403 without the resource and 502 when VTEX ID or License Manager cannot be reached. The GraphQL queries return an error with code `Unauthorized`, `Forbidden` or `BadGateway` for the same cases. Merchants must grant the resource to the roles that export wish lists, including the logins used by integrations that call the REST route.
+
 ## [1.19.3] - 2026-10-27
 
 ### Changed

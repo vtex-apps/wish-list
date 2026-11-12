@@ -77,7 +77,9 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
      
     if(queryLoadingSize) return
 
-    let pages: number = dataSize.listSize/5000 + 1
+    // listSize is denied for users without the export resource; Apollo then returns no data.
+    const listSizeValue: number = dataSize?.listSize ?? 0
+    let pages: number = listSizeValue/5000 + 1
 
     for(let i=1; i <= pages; i++) {
     
