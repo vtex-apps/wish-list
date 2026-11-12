@@ -54,6 +54,20 @@
       }
     },
     {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "vtexid.vtex.com.br",
+        "path": "/api/vtexid/pub/authenticated/user"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/license-manager/pvt/accounts/*/products/*/logins/*/resources/*/granted"
+      }
+    },
+    {
       "name": "vbase-read-write"
     },
     {

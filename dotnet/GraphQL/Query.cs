@@ -14,7 +14,7 @@ namespace WishList.GraphQL
     [GraphQLMetadata("Query")]
     public class Query : ObjectGraphType<object>
     {
-        public Query(IWishListService wishListService)
+        public Query(IWishListService wishListService, IResourceAuthorizationService resourceAuthorizationService)
         {
             Name = "Query";
 
@@ -266,7 +266,7 @@ namespace WishList.GraphQL
                  "listSize",
                  resolve: async context =>
                  {
-                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     HttpStatusCode isValidAuthUser = await resourceAuthorizationService.HasExportResource();
                      if (isValidAuthUser != HttpStatusCode.OK)
                      {
                          context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
@@ -287,7 +287,7 @@ namespace WishList.GraphQL
                  "exportList",
                  resolve: async context =>
                  {
-                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     HttpStatusCode isValidAuthUser = await resourceAuthorizationService.HasExportResource();
                      if (isValidAuthUser != HttpStatusCode.OK)
                      {
                          context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
@@ -310,7 +310,7 @@ namespace WishList.GraphQL
                  ),
                  resolve: async context =>
                  {
-                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     HttpStatusCode isValidAuthUser = await resourceAuthorizationService.HasExportResource();
                      if (isValidAuthUser != HttpStatusCode.OK)
                      {
                          context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())

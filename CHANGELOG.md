@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Security
+
+- The `listSize`, `exportList` and `exportListPaged` GraphQL queries and the `/_v/wishlist/export-lists` REST route now require the `storefront.wish-list.export` License Manager resource (Storefront IO). Callers without a valid session get 401 and callers without the resource get 403. Merchants must grant the resource to the roles that export wish lists.
+
 ## [1.19.3] - 2026-10-27
 
 ### Changed
