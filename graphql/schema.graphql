@@ -38,12 +38,12 @@ type Query {
 	name: String!
     from: Int
     to: Int
-    ): WishList @cacheControl(scope: PRIVATE)
+    ): WishList @cacheControl(scope: PRIVATE, maxAge: ZERO)
   viewLists(
     shopperId: String!
     from: Int
     to: Int
-    ): [WishList] @cacheControl(scope: PRIVATE)
+    ): [WishList] @cacheControl(scope: PRIVATE, maxAge: ZERO)
   checkList(
     shopperId: String!
     productId: String!
@@ -51,7 +51,7 @@ type Query {
     ) : CheckListType @cacheControl(scope: PRIVATE)
   listNames(
     shopperId: String!
-	): [String]
+	): [String] @cacheControl(scope: PRIVATE)
 }
 
 type Mutation {
@@ -60,10 +60,10 @@ type Mutation {
 	shopperId: String!
 	name: String!
 	public: Boolean
-	): ID
+	): ID @cacheControl(scope: PRIVATE)
   removeFromList(
     id: ID!
 	shopperId: String!
 	name: String
-	): Boolean
+	): Boolean @cacheControl(scope: PRIVATE)
 }

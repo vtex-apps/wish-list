@@ -117,11 +117,17 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
   }
 
   const handleCheck = async variables => {
-    const { data } = await client.query({
-      query: checkItem,
-      variables,
-      fetchPolicy: 'no-cache',
-    })
+    let data: any
+    try {
+      ;({ data } = await client.query({
+        query: checkItem,
+        variables,
+        fetchPolicy: 'no-cache',
+      }))
+    } catch (e) {
+      // Denied or failed check: show the button as not wishlisted instead of loading forever
+      data = null
+    }
     if (data?.checkList?.inList) {
       setState({
         ...state,
@@ -170,6 +176,13 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         toastMessage('addProductFail')
       }
     },
+    onError: () => {
+      setState({
+        ...state,
+        isLoading: false,
+      })
+      toastMessage('addProductFail')
+    },
   })
 
   const [removeProduct] = useMutation(removeFromList, {
@@ -179,6 +192,12 @@ const AddBtn: FC<any & WrappedComponentProps> = ({
         isLoading: false,
         isWishlisted: !res.removeFromList,
         wishListId: res.removeFromList ? null : wishListId,
+      })
+    },
+    onError: () => {
+      setState({
+        ...state,
+        isLoading: false,
       })
     },
   })
