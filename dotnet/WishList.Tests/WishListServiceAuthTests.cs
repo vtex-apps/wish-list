@@ -33,6 +33,8 @@ namespace WishList.Tests
             public string GrantedBody = "true";
             public HttpRequestMessage LastGrantedRequest;
             public HttpStatusCode GrantedStatus = HttpStatusCode.OK;
+            public int ValidateCalls;
+            public int GrantedCalls;
         }
 
         private static WishListService CreateService(Scenario scenario, string adminToken, string storeToken, string headerToken = null)
@@ -42,6 +44,7 @@ namespace WishList.Tests
                 string url = req.RequestUri?.ToString() ?? string.Empty;
                 if (url.Contains("credential/validate", StringComparison.Ordinal))
                 {
+                    scenario.ValidateCalls++;
                     string body = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     var token = JsonConvert.DeserializeObject<ValidateToken>(body)?.Token;
                     if (token != null && scenario.Tokens.TryGetValue(token, out var user))
@@ -55,6 +58,7 @@ namespace WishList.Tests
                 if (url.Contains("/logins/", StringComparison.Ordinal) && url.Contains("/granted", StringComparison.Ordinal))
                 {
                     scenario.LastGrantedRequest = req;
+                    scenario.GrantedCalls++;
                     bool isGrantedLogin = scenario.GrantedLogins.Any(login => url.Contains($"/logins/{login}/", StringComparison.Ordinal));
                     return TestHttpMessageHandler.Status(scenario.GrantedStatus, isGrantedLogin ? scenario.GrantedBody : "false");
                 }
@@ -217,6 +221,30 @@ namespace WishList.Tests
             Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("victim@test.com"));
             Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("other-guid"));
             Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper(""));
+        }
+
+        [Fact]
+        public async Task Shopper_OwnList_IsResolvedWithoutAdminCheck()
+        {
+            // The browser may also send the generic VtexIdclientAutCookie (AdminUserAuthToken) with the shopper token
+            var scenario = ShopperScenario();
+            scenario.Tokens["shopper-cookie"] = Valid(ShopperId, ShopperEmail);
+            var service = CreateService(scenario, "shopper-cookie", StoreToken, "shopper-cookie");
+
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperEmail));
+            Assert.Equal(1, scenario.ValidateCalls);
+            Assert.Equal(0, scenario.GrantedCalls);
+        }
+
+        [Fact]
+        public async Task Shopper_AnotherShopper_FallsBackToAdminCheck()
+        {
+            var scenario = ShopperScenario();
+            scenario.Tokens[AdminToken] = Valid("admin-login", "admin@test.com");
+            var service = CreateService(scenario, AdminToken, StoreToken);
+
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("victim@test.com"));
+            Assert.Equal(1, scenario.GrantedCalls);
         }
 
         [Fact]

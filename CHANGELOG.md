@@ -16,13 +16,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Schema verification no longer runs in the repository constructor nor sends a `GET` and a `PUT` to Master Data on every request. The schema is compared by content (fields, index and security), the result is cached per account for one hour, a missing schema is created, `429`/`423`/`5xx` responses are retried and the applied schema is confirmed.
+- Schema verification no longer runs in the repository constructor nor sends a `GET` and a `PUT` to Master Data on every request. The schema is compared by content (fields, index and security), the result is cached per account for one hour, a missing schema is created, `429`/`423`/`5xx` responses are retried and the applied schema is confirmed. A transient failure is retried after one minute; a schema the app cannot change is left alone for one hour.
+- Added the `POWER_USER_DS` policy, required to apply the Master Data schema, and removed the unused `bnb.data.bl.uk` and `nuget.org` outbound policies.
+- The wishlist button no longer stays loading when a wishlist request returns an error (for example an expired session).
+- A shopper accessing their own list is authorized with a single VTEX ID call; the admin check (VTEX ID + License Manager) only runs when the caller is not the owner of the list.
+- `listNames` and the mutations are marked as private in the GraphQL cache, and `viewList`/`viewLists` are no longer cached by the browser, so a list is not served stale after `addToList`/`removeFromList`.
 - `viewList` no longer fails with a null reference when the requested list does not exist.
 
 ### Changed
 
 - **Breaking behaviour:** non-admin users can only access their own lists. Call-center/impersonation operators can no longer manage a customer's list unless they are admins. Requests without a valid token receive `Unauthorized` and requests for another shopper receive `Forbidden`.
 - **Breaking behaviour:** integrations that read or write the `wishlist` Master Data entity directly must authenticate with an app key/token or user token that has Master Data permissions; unauthenticated requests receive `403`.
+- The Master Data schema is account-wide: the first request served by this version on any workspace, including a non-master one, applies the private schema to the whole account. An unpatched version of the app (0.2.3 or older, or a 1.x version without this fix) linked or installed on any workspace of the account can restore the public schema on its next verification, which reopens the data exposure. Do not keep older versions linked or installed on other workspaces after the upgrade.
+- A list saved with `public: true` is not readable by other shoppers through the API; `public` is kept as data only.
 
 ## [0.2.3] - 2020-07-14
 
