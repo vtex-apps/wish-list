@@ -53,6 +53,7 @@ type Query {
   checkList(shopperId: String!, productId: String!, sku: String): CheckListType
     @cacheControl(scope: PRIVATE)
   listNames(shopperId: String!): [String]
+    @cacheControl(scope: PRIVATE)
   listSize: Int
     @cacheControl(scope: PRIVATE)
   exportList: [WishListWrapperType]
