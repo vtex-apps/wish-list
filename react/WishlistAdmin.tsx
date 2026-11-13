@@ -77,7 +77,8 @@ const WishlistAdmin: FC<any> = ({ intl }) => {
      
     if(queryLoadingSize) return
 
-    let pages: number = dataSize.listSize/5000 + 1
+    // listSize returns no data when the user is not allowed to export
+    let pages: number = (dataSize?.listSize ?? 0)/5000 + 1
 
     for(let i=1; i <= pages; i++) {
     

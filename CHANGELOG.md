@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Security
+
+- Fix broken access control (VSC-1265312) on GraphQL queries, mutations and the `export-lists` route. Callers are now identified from their VTEX ID token and authorized per request.
+  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email or user id of the shopper token) or an admin may access them.
+  - `exportList`, `exportListPaged`, `listSize` and the `/_v/wishlist/export-lists` route are now restricted to admin users (admin token validated in VTEX ID and granted in License Manager).
+  - Personal data (shopper ids and emails) is no longer written to logs.
+- The `wishlist` Master Data schema no longer has public fields (`publicRead`, `publicWrite` and `publicFilter` are empty). The app applies this schema when the account uses the wishlist; accounts with no wishlist traffic keep their previous schema until the app is used.
+
+### Fixed
+
+- Schema verification (reworked in 1.19.2) now compares the schema by content (fields, index and security), creates a missing schema, retries the schema PUT on `429`/`423`/`5xx` and reads the schema back to confirm it. A transient failure (`429`/`423`/`5xx`, a network error, or a failed read back after a successful PUT) is retried after one minute; a schema the app cannot change is left alone for one hour.
+- The admin export page no longer breaks when `listSize` is denied.
+- A shopper accessing their own list is authorized with a single VTEX ID call; the admin check (VTEX ID + License Manager) only runs when the caller is not the owner of the list.
+- `listNames` is marked as private in the GraphQL cache, like the other shopper queries.
+
+### Changed
+
+- **Breaking behaviour:** the `VtexIdclientAutCookie` request header is only accepted for admin access (token validated in VTEX ID and granted in License Manager); it is no longer accepted as a shopper identity.
+- **Breaking behaviour:** non-admin users can only access their own lists. Call-center/impersonation operators can no longer manage a customer's list unless they are admins.
+- **Breaking behaviour:** export queries and `listSize` now require an admin; other authenticated users receive `Forbidden`.
+- **Breaking behaviour:** integrations that read or write the `wishlist` Master Data entity directly must authenticate with an app key/token or user token that has Master Data permissions; unauthenticated requests receive `403`.
+- The Master Data schema is account-wide: the first authorized request that reaches Master Data through this version on any workspace, including a non-master one, applies the private schema to the whole account (each pod verifies once per hour). Rolling back to 1.19.3 or older restores the public schema on the next verification, which reopens the data exposure. Do not keep older versions linked or installed on other workspaces after the upgrade.
+- A list saved with `public: true` is not readable by other shoppers through the API; `public` is kept as data only.
+
 ## [1.19.3] - 2026-10-27
 
 ### Changed
