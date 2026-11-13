@@ -320,6 +320,30 @@ namespace WishList.Tests
         }
 
         [Fact]
+        public async Task AppliedButConfirmingGetFails_IsRetriedSoon()
+        {
+            // The PUT succeeded, so a failed read back says nothing about whether the app can change the schema
+            var repository = CreateRepository((method, count) => method == HttpMethod.Put
+                ? TestHttpMessageHandler.Ok()
+                : count == 1 ? TestHttpMessageHandler.Ok(LegacySchema) : TestHttpMessageHandler.Status(HttpStatusCode.NotFound));
+
+            await repository.VerifySchema();
+
+            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
+            Assert.InRange(CachedFor(), TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
+        public async Task Exception_IsRetriedSoon()
+        {
+            var repository = CreateRepository((method, _) => throw new HttpRequestException("connection reset"));
+
+            await repository.VerifySchema();
+
+            Assert.InRange(CachedFor(), TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
         public async Task GetFailure_IsRetriedSoonOnlyWhenRetryable()
         {
             await CreateRepository((method, _) => TestHttpMessageHandler.Status(HttpStatusCode.InternalServerError), "account-500").VerifySchema();

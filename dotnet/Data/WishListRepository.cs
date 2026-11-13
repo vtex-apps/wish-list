@@ -345,10 +345,9 @@
             }
 
             _context.Vtex.Logger.Warn("VerifySchema", null, $"Schema applied but not confirmed [{response.StatusCode}]");
-            // A confirmed mismatch means Master Data stores something the app cannot change; a failed read is transient.
-            return !response.IsSuccessStatusCode && IsRetryableStatus(response.StatusCode)
-                ? SchemaCheckResult.TransientFailure
-                : SchemaCheckResult.PermanentFailure;
+            // A confirmed mismatch means Master Data stores something the app cannot change.
+            // The PUT succeeded, so any failed read back is transient.
+            return response.IsSuccessStatusCode ? SchemaCheckResult.PermanentFailure : SchemaCheckResult.TransientFailure;
         }
 
         private static bool IsRetryableStatus(HttpStatusCode statusCode)
