@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Schema verification (reworked in 1.19.2) now compares the schema by content (fields, index and security), creates a missing schema, retries `429`/`423`/`5xx` responses and confirms the applied schema. A transient failure is retried after one minute; a schema the app cannot change is left alone for one hour.
 - The admin export page no longer breaks when `listSize` is denied.
+- A shopper accessing their own list is authorized with a single VTEX ID call; the admin check (VTEX ID + License Manager) only runs when the caller is not the owner of the list.
+- `listNames` is marked as private in the GraphQL cache, like the other shopper queries.
 
 ### Changed
 

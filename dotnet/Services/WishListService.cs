@@ -348,32 +348,19 @@ namespace WishList.Services
 
         public async Task<RequesterContext> GetRequesterAsync()
         {
-            RequesterContext requester = new RequesterContext();
-
             try
             {
+                RequesterContext requester = await GetShopperAsync();
                 requester.IsAdmin = await IsAdminAsync();
+                requester.IsAuthenticated = requester.IsAuthenticated || requester.IsAdmin;
 
-                string storeToken = _context.Vtex.StoreUserAuthToken;
-                if (!string.IsNullOrWhiteSpace(storeToken))
-                {
-                    ValidatedUser shopper = await ValidateUserToken(storeToken);
-                    if (shopper != null && "Success".Equals(shopper.AuthStatus, StringComparison.OrdinalIgnoreCase))
-                    {
-                        requester.UserId = string.IsNullOrWhiteSpace(shopper.Id) ? null : shopper.Id.Trim();
-                        requester.Email = string.IsNullOrWhiteSpace(shopper.User) ? null : shopper.User.Trim();
-                    }
-                }
+                return requester;
             }
             catch (Exception ex)
             {
                 _context.Vtex.Logger.Error("GetRequesterAsync", null, "Error resolving requester", ex);
                 return new RequesterContext();
             }
-
-            requester.IsAuthenticated = requester.IsAdmin || requester.UserId != null || requester.Email != null;
-
-            return requester;
         }
 
         public async Task<HttpStatusCode> EnsureAdmin()
@@ -396,9 +383,22 @@ namespace WishList.Services
 
         public async Task<HttpStatusCode> EnsureCanAccessShopper(string shopperId)
         {
-            RequesterContext requester = await GetRequesterAsync();
-            if (!requester.IsAuthenticated)
+            RequesterContext requester;
+            try
             {
+                // The owner check costs one VTEX ID call. The admin check (VTEX ID + License Manager)
+                // only runs when the caller is not the owner, so shopper requests never reach License Manager.
+                requester = await GetShopperAsync();
+                if (IsOwner(requester, shopperId))
+                {
+                    return HttpStatusCode.OK;
+                }
+
+                requester.IsAdmin = await IsAdminAsync();
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("EnsureCanAccessShopper", null, "Error resolving requester", ex);
                 return HttpStatusCode.Unauthorized;
             }
 
@@ -407,17 +407,46 @@ namespace WishList.Services
                 return HttpStatusCode.OK;
             }
 
-            string requested = shopperId == null ? null : shopperId.Trim();
-            if (!string.IsNullOrEmpty(requested)
-                && ((requester.Email != null && requested.Equals(requester.Email, StringComparison.OrdinalIgnoreCase))
-                    || (requester.UserId != null && requested.Equals(requester.UserId, StringComparison.OrdinalIgnoreCase))))
+            if (!requester.IsAuthenticated)
             {
-                return HttpStatusCode.OK;
+                return HttpStatusCode.Unauthorized;
             }
 
             _context.Vtex.Logger.Warn("EnsureCanAccessShopper", null, "Access denied: token does not match requested shopperId.");
 
             return HttpStatusCode.Forbidden;
+        }
+
+        /// <summary>
+        /// Identity of the shopper token (StoreUserAuthToken) validated in VTEX ID. Does not check admin.
+        /// </summary>
+        private async Task<RequesterContext> GetShopperAsync()
+        {
+            RequesterContext shopper = new RequesterContext();
+
+            string storeToken = _context.Vtex.StoreUserAuthToken;
+            if (!string.IsNullOrWhiteSpace(storeToken))
+            {
+                ValidatedUser user = await ValidateUserToken(storeToken);
+                if (user != null && "Success".Equals(user.AuthStatus, StringComparison.OrdinalIgnoreCase))
+                {
+                    shopper.UserId = string.IsNullOrWhiteSpace(user.Id) ? null : user.Id.Trim();
+                    shopper.Email = string.IsNullOrWhiteSpace(user.User) ? null : user.User.Trim();
+                }
+            }
+
+            shopper.IsAuthenticated = shopper.UserId != null || shopper.Email != null;
+
+            return shopper;
+        }
+
+        private static bool IsOwner(RequesterContext requester, string shopperId)
+        {
+            string requested = shopperId == null ? null : shopperId.Trim();
+
+            return !string.IsNullOrEmpty(requested)
+                && ((requester.Email != null && requested.Equals(requester.Email, StringComparison.OrdinalIgnoreCase))
+                    || (requester.UserId != null && requested.Equals(requester.UserId, StringComparison.OrdinalIgnoreCase)));
         }
 
         public async Task<int> GetListSizeBase()
