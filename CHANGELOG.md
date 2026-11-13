@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - **Breaking behaviour:** non-admin users can only access their own lists. Call-center/impersonation operators can no longer manage a customer's list unless they are admins. Requests without a valid token receive `Unauthorized` and requests for another shopper receive `Forbidden`.
 - **Breaking behaviour:** integrations that read or write the `wishlist` Master Data entity directly must authenticate with an app key/token or user token that has Master Data permissions; unauthenticated requests receive `403`.
-- The Master Data schema is account-wide: the first request served by this version on any workspace, including a non-master one, applies the private schema to the whole account. An unpatched version of the app (0.2.3 or older, or a 1.x version without this fix) linked or installed on any workspace of the account can restore the public schema on its next verification, which reopens the data exposure. Do not keep older versions linked or installed on other workspaces after the upgrade.
+- The Master Data schema is account-wide: the first request served by this version on any workspace, including a non-master one, applies the private schema to the whole account. A 1.x version without this fix (1.19.3 or older) can restore the public schema on its next verification, because it holds the `POWER_USER_DS` policy. 0.2.3 and older cannot: they lack that policy and their schema check is fire-and-forget. Do not keep a 1.x version without the fix linked or installed on other workspaces after the upgrade.
 - A list saved with `public: true` is not readable by other shoppers through the API; `public` is kept as data only.
 
 ## [0.2.3] - 2020-07-14
