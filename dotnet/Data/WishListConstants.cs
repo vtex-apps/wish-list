@@ -24,6 +24,8 @@
         public const string DATA_ENTITY = "wishlist";
         public const string SCHEMA = "wishlist";
 
-        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[],\"publicWrite\":[],\"publicFilter\":[]},\"v-immediate-indexing\":true}";
+        // Same security as the Master Data PII campaign: `email` (the shopper id) is no longer public.
+        // Making the whole entity private is tracked in STR-1393.
+        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"ListItemsWrapper\"],\"publicFilter\":[\"ListItemsWrapper\"]},\"v-immediate-indexing\":true}";
     }
 }

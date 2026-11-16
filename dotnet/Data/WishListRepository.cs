@@ -237,6 +237,9 @@
         /// <summary>
         /// Compares only what the app depends on (fields, index and security), ignoring formatting,
         /// key order and properties Master Data may add to the stored schema.
+        /// Security is "at least as private": a remote schema whose public lists are a subset of the
+        /// expected ones is up to date, so the app never makes a field public again on an account
+        /// where it was already made private (for example by the Master Data PII campaign).
         /// </summary>
         internal static bool IsSchemaUpToDate(string remoteSchema)
         {
@@ -257,7 +260,40 @@
 
             return hasProperties
                 && JToken.DeepEquals(expected["v-indexed"], remote["v-indexed"])
-                && JToken.DeepEquals(expected["v-security"], remote["v-security"]);
+                && IsAtLeastAsPrivate(expected["v-security"] as JObject, remote["v-security"] as JObject);
+        }
+
+        private static readonly string[] PublicSecurityLists = { "publicRead", "publicWrite", "publicFilter" };
+
+        private static bool IsAtLeastAsPrivate(JObject expected, JObject remote)
+        {
+            if (expected == null || remote == null)
+            {
+                return false;
+            }
+
+            if (remote.Value<bool?>("allowGetAll") == true && expected.Value<bool?>("allowGetAll") != true)
+            {
+                return false;
+            }
+
+            foreach (string list in PublicSecurityLists)
+            {
+                HashSet<string> allowed = new HashSet<string>(
+                    (expected[list] as JArray)?.Values<string>() ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
+                if (remote[list] != null && !(remote[list] is JArray))
+                {
+                    return false;
+                }
+
+                IEnumerable<string> remoteFields = (remote[list] as JArray)?.Values<string>() ?? Enumerable.Empty<string>();
+                if (!remoteFields.All(allowed.Contains))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private async Task<SchemaCheckResult> EnsureSchema(string account)

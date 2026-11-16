@@ -39,8 +39,20 @@ namespace WishList.Tests
     ""v-immediate-indexing"": true
 }";
 
+        // A schema with no public field at all (e.g. an account already made private)
+        private static readonly string PrivateSchema = WithSecurity(
+            "{\"allowGetAll\":false,\"publicRead\":[],\"publicWrite\":[],\"publicFilter\":[]}");
+
+        private static string WithSecurity(string security)
+        {
+            JObject schema = JObject.Parse(WishListConstants.SCHEMA_JSON);
+            schema["v-security"] = JToken.Parse(security);
+            return schema.ToString(Newtonsoft.Json.Formatting.Indented);
+        }
+
         private readonly List<HttpMethod> _calls = new List<HttpMethod>();
         private readonly List<string> _putBodies = new List<string>();
+        private readonly Mock<IIOLogger> _logger = new Mock<IIOLogger>(MockBehavior.Loose);
 
         private readonly TimeSpan[] _originalRetryDelays;
 
@@ -84,9 +96,8 @@ namespace WishList.Tests
             env.Setup(e => e.ApplicationVendor).Returns("vtex");
             env.Setup(e => e.ApplicationName).Returns("wish-list");
 
-            var logger = new Mock<IIOLogger>(MockBehavior.Loose);
             var vtex = new Mock<IIOContext>();
-            vtex.SetupGet(v => v.Logger).Returns(logger.Object);
+            vtex.SetupGet(v => v.Logger).Returns(_logger.Object);
 
             var io = new Mock<IIOServiceContext>();
             io.SetupGet(c => c.Vtex).Returns(vtex.Object);
@@ -109,9 +120,26 @@ namespace WishList.Tests
             Assert.True(WishListRepository.IsSchemaUpToDate(WishListConstants.SCHEMA_JSON));
             Assert.True(WishListRepository.IsSchemaUpToDate(ReformattedCurrentSchema()));
             Assert.False(WishListRepository.IsSchemaUpToDate(LegacySchema));
-            Assert.False(WishListRepository.IsSchemaUpToDate(CampaignSchema));
             Assert.False(WishListRepository.IsSchemaUpToDate("not json"));
             Assert.False(WishListRepository.IsSchemaUpToDate("[]"));
+        }
+
+        [Fact]
+        public void IsSchemaUpToDate_AcceptsAMorePrivateSchema()
+        {
+            // SCHEMA_JSON matches the PII campaign; a schema with fewer public fields is never made public again
+            Assert.True(WishListRepository.IsSchemaUpToDate(CampaignSchema));
+            Assert.True(WishListRepository.IsSchemaUpToDate(PrivateSchema));
+            Assert.True(WishListRepository.IsSchemaUpToDate(WithSecurity(
+                "{\"allowGetAll\":false,\"publicRead\":[\"id\"],\"publicWrite\":[],\"publicFilter\":[]}")));
+
+            // Any field public beyond SCHEMA_JSON, or allowGetAll, is not up to date
+            Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity(
+                "{\"allowGetAll\":false,\"publicRead\":[\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"ListItemsWrapper\"],\"publicFilter\":[\"ListItemsWrapper\",\"email\"]}")));
+            Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity(
+                "{\"allowGetAll\":true,\"publicRead\":[],\"publicWrite\":[],\"publicFilter\":[]}")));
+            Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity("{\"allowGetAll\":false,\"publicRead\":\"email\"}")));
+            Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity("null")));
         }
 
         [Fact]
@@ -156,23 +184,18 @@ namespace WishList.Tests
             Assert.Equal(WishListConstants.SCHEMA_JSON, _putBodies.Single());
         }
 
-        [Fact]
-        public async Task CampaignSchema_IsReplacedWithPrivateSchema()
+        [Theory]
+        [InlineData("campaign")]
+        [InlineData("private")]
+        public async Task MorePrivateSchema_IsNotMadePublicAgain(string kind)
         {
-            var repository = CreateRepository((method, count) =>
-            {
-                if (method == HttpMethod.Put)
-                {
-                    return TestHttpMessageHandler.Ok();
-                }
-
-                return TestHttpMessageHandler.Ok(count == 1 ? CampaignSchema : WishListConstants.SCHEMA_JSON);
-            });
+            string remote = kind == "campaign" ? CampaignSchema : PrivateSchema;
+            var repository = CreateRepository((method, _) => TestHttpMessageHandler.Ok(remote));
 
             await repository.VerifySchema();
 
-            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
-            Assert.Equal(WishListConstants.SCHEMA_JSON, _putBodies.Single());
+            Assert.Equal(new[] { HttpMethod.Get }, _calls);
+            Assert.Empty(_putBodies);
         }
 
         [Fact]
@@ -330,6 +353,24 @@ namespace WishList.Tests
             await repository.VerifySchema();
 
             Assert.InRange(CachedFor(), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+        }
+
+        [Fact]
+        public async Task UnprocessableEntity_IsLoggedOnceAndCachedForAnHour()
+        {
+            // Master Data answers 422 to a schema PUT that adds new public fields (INC-6677, STR-1393).
+            // It must not loop: one PUT (no retry), one Warn, and no new attempt while the failure is cached.
+            var repository = CreateRepository((method, _) => method == HttpMethod.Put
+                ? TestHttpMessageHandler.Status(HttpStatusCode.UnprocessableEntity)
+                : TestHttpMessageHandler.Ok(LegacySchema));
+
+            await repository.VerifySchema();
+            await repository.VerifySchema();
+            await repository.VerifySchema();
+
+            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put }, _calls);
+            Assert.InRange(CachedFor(), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+            _logger.Verify(l => l.Warn("VerifySchema", null, It.Is<string>(m => m.Contains("Failed to Apply Schema")), It.IsAny<(string, string)[]>()), Times.Once);
         }
 
         [Fact]
