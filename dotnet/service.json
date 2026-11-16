@@ -1,6 +1,6 @@
 {
   "stack": "dotnet",
-  "memory": 512,
+  "memory": 1024,
   "timeout": 60,
   "ttl": 60,
   "runtimeArgs": [

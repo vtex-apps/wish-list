@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Increase `memory` from 512 to 1024 (1 GB) in `dotnet/service.json` to avoid OOM restarts under load.
+
 ## [1.19.3] - 2026-10-27
 
 ### Changed
