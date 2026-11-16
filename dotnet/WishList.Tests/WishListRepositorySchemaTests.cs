@@ -17,7 +17,7 @@ namespace WishList.Tests
 {
     public class WishListRepositorySchemaTests : IDisposable
     {
-        // Legacy schema from v1.19.1, with public fields
+        // Schema written by v1.19.x (public `email`): the same security as the app's schema
         private const string LegacySchema = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]},\"v-immediate-indexing\":true}";
 
         // Shape returned by Master Data after the PII campaign: indented, with only `email` made private
@@ -49,6 +49,10 @@ namespace WishList.Tests
             schema["v-security"] = JToken.Parse(security);
             return schema.ToString(Newtonsoft.Json.Formatting.Indented);
         }
+
+        // More public than the app's schema (one extra public filter field): the app must apply its own
+        private static readonly string OutdatedSchema = WithSecurity(
+            "{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\",\"id\"]}");
 
         private readonly List<HttpMethod> _calls = new List<HttpMethod>();
         private readonly List<string> _putBodies = new List<string>();
@@ -119,7 +123,8 @@ namespace WishList.Tests
         {
             Assert.True(WishListRepository.IsSchemaUpToDate(WishListConstants.SCHEMA_JSON));
             Assert.True(WishListRepository.IsSchemaUpToDate(ReformattedCurrentSchema()));
-            Assert.False(WishListRepository.IsSchemaUpToDate(LegacySchema));
+            Assert.True(WishListRepository.IsSchemaUpToDate(LegacySchema));
+            Assert.False(WishListRepository.IsSchemaUpToDate(OutdatedSchema));
             Assert.False(WishListRepository.IsSchemaUpToDate("not json"));
             Assert.False(WishListRepository.IsSchemaUpToDate("[]"));
         }
@@ -127,15 +132,14 @@ namespace WishList.Tests
         [Fact]
         public void IsSchemaUpToDate_AcceptsAMorePrivateSchema()
         {
-            // SCHEMA_JSON matches the PII campaign; a schema with fewer public fields is never made public again
+            // A schema with fewer public fields (the Master Data PII campaign, or one made private by hand) is never made public again
             Assert.True(WishListRepository.IsSchemaUpToDate(CampaignSchema));
             Assert.True(WishListRepository.IsSchemaUpToDate(PrivateSchema));
             Assert.True(WishListRepository.IsSchemaUpToDate(WithSecurity(
                 "{\"allowGetAll\":false,\"publicRead\":[\"id\"],\"publicWrite\":[],\"publicFilter\":[]}")));
 
-            // Any field public beyond SCHEMA_JSON, or allowGetAll, is not up to date
-            Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity(
-                "{\"allowGetAll\":false,\"publicRead\":[\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"ListItemsWrapper\"],\"publicFilter\":[\"ListItemsWrapper\",\"email\"]}")));
+            // Any list public beyond the app's, or allowGetAll, is not up to date
+            Assert.False(WishListRepository.IsSchemaUpToDate(OutdatedSchema));
             Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity(
                 "{\"allowGetAll\":true,\"publicRead\":[],\"publicWrite\":[],\"publicFilter\":[]}")));
             Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity("{\"allowGetAll\":false,\"publicRead\":\"email\"}")));
@@ -165,7 +169,7 @@ namespace WishList.Tests
         }
 
         [Fact]
-        public async Task LegacySchema_IsReplacedAndConfirmed()
+        public async Task OutdatedSchema_IsReplacedAndConfirmed()
         {
             var repository = CreateRepository((method, count) =>
             {
@@ -174,7 +178,7 @@ namespace WishList.Tests
                     return TestHttpMessageHandler.Ok();
                 }
 
-                return TestHttpMessageHandler.Ok(count == 1 ? LegacySchema : WishListConstants.SCHEMA_JSON);
+                return TestHttpMessageHandler.Ok(count == 1 ? OutdatedSchema : WishListConstants.SCHEMA_JSON);
             });
 
             await repository.VerifySchema();
@@ -182,6 +186,18 @@ namespace WishList.Tests
 
             Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
             Assert.Equal(WishListConstants.SCHEMA_JSON, _putBodies.Single());
+        }
+
+        [Fact]
+        public async Task SchemaWrittenByThisAndPreviousVersions_IsNotChanged()
+        {
+            // The app's schema content is the same as 1.19.x, so nothing is rewritten on accounts that already have it
+            var repository = CreateRepository((method, _) => TestHttpMessageHandler.Ok(LegacySchema));
+
+            await repository.VerifySchema();
+
+            Assert.Equal(new[] { HttpMethod.Get }, _calls);
+            Assert.Empty(_putBodies);
         }
 
         [Theory]
@@ -231,7 +247,7 @@ namespace WishList.Tests
                     return count < 3 ? TestHttpMessageHandler.Status(retryableStatus) : TestHttpMessageHandler.Ok();
                 }
 
-                return TestHttpMessageHandler.Ok(count == 1 ? LegacySchema : WishListConstants.SCHEMA_JSON);
+                return TestHttpMessageHandler.Ok(count == 1 ? OutdatedSchema : WishListConstants.SCHEMA_JSON);
             });
 
             await repository.VerifySchema();
@@ -246,7 +262,7 @@ namespace WishList.Tests
         {
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.TooManyRequests)
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
             int callsAfterFirstCheck = _calls.Count;
@@ -261,7 +277,7 @@ namespace WishList.Tests
         {
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.Forbidden)
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
 
@@ -278,7 +294,7 @@ namespace WishList.Tests
                     return TestHttpMessageHandler.Status(HttpStatusCode.NotModified);
                 }
 
-                return TestHttpMessageHandler.Ok(count == 1 ? LegacySchema : WishListConstants.SCHEMA_JSON);
+                return TestHttpMessageHandler.Ok(count == 1 ? OutdatedSchema : WishListConstants.SCHEMA_JSON);
             });
 
             await repository.VerifySchema();
@@ -294,7 +310,7 @@ namespace WishList.Tests
             // A 304 while Master Data still serves another schema is not taken as proof
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.NotModified)
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
 
@@ -316,7 +332,7 @@ namespace WishList.Tests
         {
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Ok()
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
 
@@ -335,7 +351,7 @@ namespace WishList.Tests
         {
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.TooManyRequests)
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
 
@@ -348,7 +364,7 @@ namespace WishList.Tests
             // A schema the app is not allowed to change must not be retried every minute on every pod
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.Forbidden)
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
 
@@ -358,11 +374,11 @@ namespace WishList.Tests
         [Fact]
         public async Task UnprocessableEntity_IsLoggedOnceAndCachedForAnHour()
         {
-            // Master Data answers 422 to a schema PUT that adds new public fields (INC-6677, STR-1393).
+            // Master Data answers 422 to a schema PUT that adds new public fields (INC-6677).
             // It must not loop: one PUT (no retry), one Warn, and no new attempt while the failure is cached.
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.UnprocessableEntity)
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
             await repository.VerifySchema();
@@ -378,7 +394,7 @@ namespace WishList.Tests
         {
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Ok()
-                : TestHttpMessageHandler.Ok(LegacySchema));
+                : TestHttpMessageHandler.Ok(OutdatedSchema));
 
             await repository.VerifySchema();
 
@@ -391,7 +407,7 @@ namespace WishList.Tests
             // The PUT succeeded, so a failed read back says nothing about whether the app can change the schema
             var repository = CreateRepository((method, count) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Ok()
-                : count == 1 ? TestHttpMessageHandler.Ok(LegacySchema) : TestHttpMessageHandler.Status(HttpStatusCode.NotFound));
+                : count == 1 ? TestHttpMessageHandler.Ok(OutdatedSchema) : TestHttpMessageHandler.Status(HttpStatusCode.NotFound));
 
             await repository.VerifySchema();
 
