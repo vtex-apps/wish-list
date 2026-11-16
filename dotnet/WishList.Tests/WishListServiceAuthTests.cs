@@ -44,7 +44,7 @@ namespace WishList.Tests
                 string url = req.RequestUri?.ToString() ?? string.Empty;
                 if (url.Contains("credential/validate", StringComparison.Ordinal))
                 {
-                    scenario.ValidateCalls++;
+                    System.Threading.Interlocked.Increment(ref scenario.ValidateCalls);
                     string body = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     var token = JsonConvert.DeserializeObject<ValidateToken>(body)?.Token;
                     if (token != null && scenario.Tokens.TryGetValue(token, out var user))
@@ -58,7 +58,7 @@ namespace WishList.Tests
                 if (url.Contains("/logins/", StringComparison.Ordinal) && url.Contains("/granted", StringComparison.Ordinal))
                 {
                     scenario.LastGrantedRequest = req;
-                    scenario.GrantedCalls++;
+                    System.Threading.Interlocked.Increment(ref scenario.GrantedCalls);
                     bool isGrantedLogin = scenario.GrantedLogins.Any(login => url.Contains($"/logins/{login}/", StringComparison.Ordinal));
                     return TestHttpMessageHandler.Status(scenario.GrantedStatus, isGrantedLogin ? scenario.GrantedBody : "false");
                 }
@@ -67,7 +67,8 @@ namespace WishList.Tests
             });
 
             var clientFactory = new Mock<IHttpClientFactory>();
-            clientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(() => new HttpClient(handler));
+            // Only the named auth client (short timeout) answers; the default client would hang for 100 s in production
+            clientFactory.Setup(f => f.CreateClient(WishListConstants.AUTH_HTTP_CLIENT)).Returns(() => new HttpClient(handler));
 
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME] = Account;
@@ -145,8 +146,8 @@ namespace WishList.Tests
             var requester = await service.GetRequesterAsync();
 
             Assert.False(requester.IsAdmin);
-            Assert.NotEqual(HttpStatusCode.OK, await service.EnsureCanAccessShopper("someone@else.com"));
-            Assert.NotEqual(HttpStatusCode.OK, await service.EnsureAdmin());
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("someone@else.com"));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureAdmin());
         }
 
         [Fact]
@@ -157,6 +158,7 @@ namespace WishList.Tests
             var service = CreateService(scenario, AdminToken, null);
 
             Assert.False((await service.GetRequesterAsync()).IsAdmin);
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureAdmin());
         }
 
         [Fact]
@@ -167,6 +169,7 @@ namespace WishList.Tests
             var service = CreateService(scenario, AdminToken, null);
 
             Assert.False((await service.GetRequesterAsync()).IsAdmin);
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureAdmin());
         }
 
         [Fact]
@@ -185,8 +188,8 @@ namespace WishList.Tests
             var service = CreateService(ShopperScenario(), null, null, StoreToken);
 
             Assert.False((await service.GetRequesterAsync()).IsAdmin);
-            Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureCanAccessShopper("victim@test.com"));
-            Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureAdmin());
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("victim@test.com"));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureAdmin());
         }
 
         [Fact]
@@ -273,6 +276,7 @@ namespace WishList.Tests
             var service = CreateService(new Scenario(), "bad-admin", "bad-store");
 
             Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureCanAccessShopper(ShopperEmail));
+            Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureAdmin());
         }
 
         [Fact]
@@ -286,9 +290,85 @@ namespace WishList.Tests
             var requester = await service.GetRequesterAsync();
 
             Assert.False(requester.IsAdmin);
-            Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureCanAccessShopper("victim@test.com"));
-            Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureCanAccessShopper(ShopperEmail));
-            Assert.Equal(HttpStatusCode.Unauthorized, await service.EnsureAdmin());
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("victim@test.com"));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper(ShopperEmail));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureAdmin());
+        }
+
+        [Fact]
+        public async Task Owner_IsValidatedOncePerRequest()
+        {
+            // e.g. a GraphQL query with several aliases of the same field
+            var scenario = ShopperScenario();
+            var service = CreateService(scenario, null, StoreToken);
+
+            for (int i = 0; i < 5; i++)
+            {
+                Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperEmail));
+            }
+
+            Assert.Equal(1, scenario.ValidateCalls);
+            Assert.Equal(0, scenario.GrantedCalls);
+        }
+
+        [Fact]
+        public async Task NonOwner_WithHeaderToken_ResolvesIdentityAndAdminOncePerRequest()
+        {
+            var scenario = ShopperScenario();
+            scenario.Tokens["header-token"] = Valid("other-login", "other@test.com");
+            var service = CreateService(scenario, null, StoreToken, "header-token");
+
+            for (int i = 0; i < 5; i++)
+            {
+                Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("victim@test.com"));
+            }
+
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureAdmin());
+            // shopper token + header token, once each; one License Manager check
+            Assert.Equal(2, scenario.ValidateCalls);
+            Assert.Equal(1, scenario.GrantedCalls);
+        }
+
+        [Fact]
+        public async Task ParallelResolvers_ShareTheSameValidation()
+        {
+            var scenario = ShopperScenario();
+            var service = CreateService(scenario, null, StoreToken);
+
+            HttpStatusCode[] results = await Task.WhenAll(Enumerable.Range(0, 20)
+                .Select(_ => service.EnsureCanAccessShopper(ShopperEmail)));
+
+            Assert.All(results, r => Assert.Equal(HttpStatusCode.OK, r));
+            Assert.Equal(1, scenario.ValidateCalls);
+        }
+
+        [Fact]
+        public async Task CachedIdentity_IsNotChangedByAdminDecisions()
+        {
+            // Owner check for one id, admin decision for another, in the same request
+            var scenario = AdminScenario();
+            scenario.Tokens[StoreToken] = Valid(ShopperId, ShopperEmail);
+            var service = CreateService(scenario, AdminToken, StoreToken);
+
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("someone@else.com"));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperEmail));
+
+            RequesterContext requester = await service.GetRequesterAsync();
+            Assert.True(requester.IsAdmin);
+            Assert.Equal(ShopperEmail, requester.Email);
+            Assert.Equal(2, scenario.ValidateCalls);
+            Assert.Equal(1, scenario.GrantedCalls);
+        }
+
+        [Fact]
+        public async Task EachRequest_ResolvesItsOwnIdentity()
+        {
+            var scenario = ShopperScenario();
+
+            await CreateService(scenario, null, StoreToken).EnsureCanAccessShopper(ShopperEmail);
+            await CreateService(scenario, null, StoreToken).EnsureCanAccessShopper(ShopperEmail);
+
+            Assert.Equal(2, scenario.ValidateCalls);
         }
     }
 }

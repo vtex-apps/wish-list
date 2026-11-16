@@ -107,10 +107,60 @@ namespace WishList.Tests
             service.Verify(s => s.ExportAllWishListsPaged(It.IsAny<int>()), Times.Never);
         }
 
+        /// <summary>
+        /// The data method each field resolves through, called once with the authorized shopper id.
+        /// </summary>
+        private static void VerifyDataAccessedOnce(Mock<IWishListService> service, string field)
+        {
+            switch (field)
+            {
+                case "viewList":
+                    service.Verify(s => s.GetList(ShopperId, It.IsAny<string>()), Times.Once);
+                    break;
+                case "viewLists":
+                case "checkList":
+                case "listNames":
+                    service.Verify(s => s.GetLists(ShopperId), Times.Once);
+                    break;
+                case "addToList":
+                    service.Verify(s => s.SaveItem(It.IsAny<ListItem>(), ShopperId, It.IsAny<string>(), It.IsAny<bool?>()), Times.Once);
+                    break;
+                case "removeFromList":
+                    service.Verify(s => s.RemoveItem(It.IsAny<int>(), ShopperId, It.IsAny<string>()), Times.Once);
+                    break;
+                case "listSize":
+                    service.Verify(s => s.GetListSizeBase(), Times.Once);
+                    break;
+                case "exportList":
+                    service.Verify(s => s.ExportAllWishLists(), Times.Once);
+                    break;
+                case "exportListPaged":
+                    service.Verify(s => s.ExportAllWishListsPaged(It.IsAny<int>()), Times.Once);
+                    break;
+                default:
+                    throw new ArgumentException($"No data method mapped for {field}");
+            }
+        }
+
         private static object FieldValue(ExecutionResult result, string field)
         {
             var data = Assert.IsType<Dictionary<string, object>>(result.Data);
             return data[field];
+        }
+
+        [Fact]
+        public void EveryGraphQLField_IsCoveredByAnAccessCheckList()
+        {
+            // A new field must be added to ShopperFields or AdminFields (and gated), otherwise this fails
+            IWishListService service = CreateService(HttpStatusCode.OK, HttpStatusCode.OK).Object;
+            IEnumerable<string> schemaFields = new Query(service).Fields.Select(f => f.Name)
+                .Concat(new Mutation(service).Fields.Select(f => f.Name))
+                .OrderBy(n => n, StringComparer.Ordinal);
+            IEnumerable<string> gatedFields = ShopperFields.Concat(AdminFields)
+                .Select(row => (string)row[0])
+                .OrderBy(n => n, StringComparer.Ordinal);
+
+            Assert.Equal(gatedFields, schemaFields);
         }
 
         [Theory]
@@ -144,6 +194,66 @@ namespace WishList.Tests
             Assert.True(result.Errors == null || result.Errors.Count == 0, result.Errors?.FirstOrDefault()?.Message);
             Assert.NotNull(FieldValue(result, field));
             service.Verify(s => s.EnsureCanAccessShopper(ShopperId), Times.Once);
+            VerifyDataAccessedOnce(service, field);
+        }
+
+        [Theory]
+        [MemberData(nameof(ShopperFields))]
+        public async Task ShopperField_TrimsShopperId_SoTheAuthorizedIdIsTheOneUsedForData(string field, string query)
+        {
+            var service = CreateService(HttpStatusCode.OK, HttpStatusCode.Forbidden);
+
+            ExecutionResult result = await Execute(service.Object, query.Replace($"\"{ShopperId}\"", $"\"  {ShopperId} \""));
+
+            Assert.True(result.Errors == null || result.Errors.Count == 0, result.Errors?.FirstOrDefault()?.Message);
+            service.Verify(s => s.EnsureCanAccessShopper(ShopperId), Times.Once);
+            VerifyDataAccessedOnce(service, field);
+        }
+
+        [Fact]
+        public async Task ListNamesAndViewLists_WhenShopperHasNoList_ReturnEmpty()
+        {
+            // Master Data returns no document for a shopper who never used the wishlist
+            foreach (ResponseListWrapper noList in new[] { new ResponseListWrapper(), null })
+            {
+                var service = CreateService(HttpStatusCode.OK, HttpStatusCode.Forbidden);
+                service.Setup(s => s.GetLists(It.IsAny<string>())).ReturnsAsync(noList);
+
+                ExecutionResult result = await Execute(service.Object, "{ listNames(shopperId: \"shopper-1\") viewLists(shopperId: \"shopper-1\") { name } }");
+
+                Assert.True(result.Errors == null || result.Errors.Count == 0, result.Errors?.FirstOrDefault()?.Message);
+                Assert.Empty(Assert.IsAssignableFrom<IEnumerable<object>>(FieldValue(result, "listNames")));
+                Assert.Empty(Assert.IsAssignableFrom<IEnumerable<object>>(FieldValue(result, "viewLists")));
+            }
+        }
+
+        [Fact]
+        public async Task ViewLists_SkipsNullListEntries()
+        {
+            var service = CreateService(HttpStatusCode.OK, HttpStatusCode.Forbidden);
+            service.Setup(s => s.GetLists(It.IsAny<string>())).ReturnsAsync(new ResponseListWrapper
+            {
+                ListItemsWrapper = new List<ListItemsWrapper> { null, new ListItemsWrapper { Name = "Wishlist" } }
+            });
+
+            ExecutionResult result = await Execute(service.Object, "{ listNames(shopperId: \"shopper-1\") viewLists(shopperId: \"shopper-1\") { name } }");
+
+            Assert.True(result.Errors == null || result.Errors.Count == 0, result.Errors?.FirstOrDefault()?.Message);
+            Assert.Single(Assert.IsAssignableFrom<IEnumerable<object>>(FieldValue(result, "listNames")));
+            Assert.Single(Assert.IsAssignableFrom<IEnumerable<object>>(FieldValue(result, "viewLists")));
+        }
+
+        [Fact]
+        public async Task ViewList_WhenListDoesNotExist_ReturnsEmptyList()
+        {
+            var service = CreateService(HttpStatusCode.OK, HttpStatusCode.Forbidden);
+            service.Setup(s => s.GetList(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new WishListWrapper { ListItemsWrapper = new List<ListItemsWrapper>() });
+
+            ExecutionResult result = await Execute(service.Object, "{ viewList(shopperId: \"shopper-1\", name: \"Wishlist\") { name public } }");
+
+            Assert.True(result.Errors == null || result.Errors.Count == 0, result.Errors?.FirstOrDefault()?.Message);
+            Assert.NotNull(FieldValue(result, "viewList"));
         }
 
         [Theory]
@@ -177,6 +287,7 @@ namespace WishList.Tests
             Assert.True(result.Errors == null || result.Errors.Count == 0, result.Errors?.FirstOrDefault()?.Message);
             Assert.NotNull(FieldValue(result, field));
             service.Verify(s => s.EnsureAdmin(), Times.Once);
+            VerifyDataAccessedOnce(service, field);
         }
 
         [Theory]

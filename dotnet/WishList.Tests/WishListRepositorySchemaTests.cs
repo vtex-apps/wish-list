@@ -42,14 +42,19 @@ namespace WishList.Tests
         private readonly List<HttpMethod> _calls = new List<HttpMethod>();
         private readonly List<string> _putBodies = new List<string>();
 
+        private readonly TimeSpan[] _originalRetryDelays;
+
         public WishListRepositorySchemaTests()
         {
             WishListRepository.ResetSchemaCache();
+            _originalRetryDelays = WishListRepository.SchemaRetryDelays;
             WishListRepository.SchemaRetryDelays = new[] { TimeSpan.Zero, TimeSpan.Zero };
         }
 
         public void Dispose()
         {
+            // Static state shared with any other test that uses the repository
+            WishListRepository.SchemaRetryDelays = _originalRetryDelays;
             WishListRepository.ResetSchemaCache();
         }
 
@@ -241,16 +246,36 @@ namespace WishList.Tests
         }
 
         [Fact]
-        public async Task NotModified_IsTreatedAsVerified()
+        public async Task NotModified_IsConfirmedWithGet()
         {
+            var repository = CreateRepository((method, count) =>
+            {
+                if (method == HttpMethod.Put)
+                {
+                    return TestHttpMessageHandler.Status(HttpStatusCode.NotModified);
+                }
+
+                return TestHttpMessageHandler.Ok(count == 1 ? LegacySchema : WishListConstants.SCHEMA_JSON);
+            });
+
+            await repository.VerifySchema();
+            await repository.VerifySchema();
+
+            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
+            Assert.InRange(CachedFor(), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+        }
+
+        [Fact]
+        public async Task NotModified_WithDifferentReadBack_IsNotVerified()
+        {
+            // A 304 while Master Data still serves another schema is not taken as proof
             var repository = CreateRepository((method, _) => method == HttpMethod.Put
                 ? TestHttpMessageHandler.Status(HttpStatusCode.NotModified)
                 : TestHttpMessageHandler.Ok(LegacySchema));
 
             await repository.VerifySchema();
-            await repository.VerifySchema();
 
-            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put }, _calls);
+            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
         }
 
         [Fact]
@@ -343,14 +368,27 @@ namespace WishList.Tests
             Assert.InRange(CachedFor(), TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }
 
-        [Fact]
-        public async Task GetFailure_IsRetriedSoonOnlyWhenRetryable()
+        [Theory]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.TooManyRequests)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.Forbidden)]
+        public async Task GetFailure_IsRetriedSoon(HttpStatusCode status)
         {
-            await CreateRepository((method, _) => TestHttpMessageHandler.Status(HttpStatusCode.InternalServerError), "account-500").VerifySchema();
-            await CreateRepository((method, _) => TestHttpMessageHandler.Status(HttpStatusCode.Forbidden), "account-403").VerifySchema();
+            // 401/403 on the read can be a policy still propagating after install
+            await CreateRepository((method, _) => TestHttpMessageHandler.Status(status)).VerifySchema();
 
-            Assert.InRange(CachedFor("account-500"), TimeSpan.Zero, TimeSpan.FromMinutes(1));
-            Assert.InRange(CachedFor("account-403"), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
+            Assert.Equal(new[] { HttpMethod.Get }, _calls);
+            Assert.InRange(CachedFor(), TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
+        public async Task GetFailure_OtherClientError_IsNotRetriedForAnHour()
+        {
+            await CreateRepository((method, _) => TestHttpMessageHandler.Status(HttpStatusCode.BadRequest)).VerifySchema();
+
+            Assert.Equal(new[] { HttpMethod.Get }, _calls);
+            Assert.InRange(CachedFor(), TimeSpan.FromMinutes(59), TimeSpan.FromHours(1));
         }
 
         [Fact]

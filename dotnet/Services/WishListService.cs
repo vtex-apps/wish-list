@@ -23,6 +23,11 @@ namespace WishList.Services
 
         private const int MaximumReturnedRecords = 999;
 
+        // Per-request cache keys (HttpContext.Items). A GraphQL request with several fields or aliases
+        // resolves the caller once instead of once per field.
+        private const string ShopperItemKey = "WishList.Requester.Shopper";
+        private const string AdminItemKey = "WishList.Requester.Admin";
+
         public WishListService(IWishListRepository wishListRepository, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context)
         {
             this._wishListRepository = wishListRepository ??
@@ -221,7 +226,7 @@ namespace WishList.Services
                 request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
             }
 
-            var client = _clientFactory.CreateClient();
+            var client = _clientFactory.CreateClient(WishListConstants.AUTH_HTTP_CLIENT);
 
             try
             {
@@ -278,7 +283,7 @@ namespace WishList.Services
 
             try
             {
-                var client = _clientFactory.CreateClient();
+                var client = _clientFactory.CreateClient(WishListConstants.AUTH_HTTP_CLIENT);
                 var grantedResponse = await client.SendAsync(grantedRequest);
                 string body = (await grantedResponse.Content.ReadAsStringAsync()).Trim();
 
@@ -315,35 +320,55 @@ namespace WishList.Services
             }
         }
 
-        private async Task<bool> IsAdminAsync()
+        /// <summary>
+        /// Checks the admin candidates: the admin cookie and the VtexIdclientAutCookie header (REST integrations).
+        /// A token is only accepted after VTEX ID validation and the License Manager grant check.
+        /// Validated is true when any candidate is a valid VTEX ID token, granted or not, so an ungranted
+        /// caller gets Forbidden instead of Unauthorized.
+        /// </summary>
+        private Task<(bool Validated, bool Granted)> CheckAdminAsync()
         {
-            // Admin candidates: the admin cookie and the VtexIdclientAutCookie header (REST integrations).
-            // Each one is only accepted after VTEX ID validation and the License Manager grant check.
+            return MemoizePerRequest(AdminItemKey, ResolveAdminAsync);
+        }
+
+        private async Task<(bool Validated, bool Granted)> ResolveAdminAsync()
+        {
             string headerToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VtexIdCookie];
             string[] candidateTokens = { _context.Vtex.AdminUserAuthToken, headerToken };
 
+            bool validated = false;
             foreach (string token in candidateTokens.Where(t => !string.IsNullOrWhiteSpace(t)).Distinct())
             {
-                if (await IsAdminTokenAsync(token))
+                (bool tokenValidated, bool tokenGranted) = await CheckAdminTokenAsync(token);
+                validated = validated || tokenValidated;
+                if (tokenGranted)
                 {
-                    return true;
+                    return (true, true);
                 }
             }
 
-            return false;
+            return (validated, false);
         }
 
-        private async Task<bool> IsAdminTokenAsync(string token)
+        private async Task<(bool Validated, bool Granted)> CheckAdminTokenAsync(string token)
         {
             ValidatedUser admin = await ValidateUserToken(token);
             if (admin == null
                 || !"Success".Equals(admin.AuthStatus, StringComparison.OrdinalIgnoreCase)
                 || string.IsNullOrWhiteSpace(admin.Id))
             {
-                return false;
+                return (false, false);
             }
 
-            return await IsUserLoginGrantedInLicenseManagerAsync(this.GetAccount(), admin.Id, token);
+            bool granted = await IsUserLoginGrantedInLicenseManagerAsync(this.GetAccount(), admin.Id, token);
+
+            return (true, granted);
+        }
+
+        private static void ApplyAdminCheck(RequesterContext requester, (bool Validated, bool Granted) admin)
+        {
+            requester.IsAdmin = admin.Granted;
+            requester.IsAuthenticated = requester.IsAuthenticated || admin.Validated || admin.Granted;
         }
 
         public async Task<RequesterContext> GetRequesterAsync()
@@ -351,8 +376,7 @@ namespace WishList.Services
             try
             {
                 RequesterContext requester = await GetShopperAsync();
-                requester.IsAdmin = await IsAdminAsync();
-                requester.IsAuthenticated = requester.IsAuthenticated || requester.IsAdmin;
+                ApplyAdminCheck(requester, await CheckAdminAsync());
 
                 return requester;
             }
@@ -394,7 +418,7 @@ namespace WishList.Services
                     return HttpStatusCode.OK;
                 }
 
-                requester.IsAdmin = await IsAdminAsync();
+                ApplyAdminCheck(requester, await CheckAdminAsync());
             }
             catch (Exception ex)
             {
@@ -422,6 +446,19 @@ namespace WishList.Services
         /// </summary>
         private async Task<RequesterContext> GetShopperAsync()
         {
+            RequesterContext cached = await MemoizePerRequest(ShopperItemKey, ResolveShopperAsync);
+
+            // Callers change IsAdmin/IsAuthenticated on the result, so each one gets its own copy
+            return new RequesterContext
+            {
+                IsAuthenticated = cached.IsAuthenticated,
+                UserId = cached.UserId,
+                Email = cached.Email
+            };
+        }
+
+        private async Task<RequesterContext> ResolveShopperAsync()
+        {
             RequesterContext shopper = new RequesterContext();
 
             string storeToken = _context.Vtex.StoreUserAuthToken;
@@ -438,6 +475,36 @@ namespace WishList.Services
             shopper.IsAuthenticated = shopper.UserId != null || shopper.Email != null;
 
             return shopper;
+        }
+
+        /// <summary>
+        /// Runs the factory once per HTTP request and shares the same Task with every caller in that request,
+        /// including resolvers running in parallel. HttpContext.Items lives only for the request, so nothing is
+        /// shared between requests or users. Only the caller's identity is cached, never an access decision.
+        /// </summary>
+        private Task<T> MemoizePerRequest<T>(string key, Func<Task<T>> factory)
+        {
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return factory();
+            }
+
+            Lazy<Task<T>> lazy;
+            lock (httpContext.Items)
+            {
+                if (httpContext.Items.TryGetValue(key, out object cached) && cached is Lazy<Task<T>> existing)
+                {
+                    lazy = existing;
+                }
+                else
+                {
+                    lazy = new Lazy<Task<T>>(factory);
+                    httpContext.Items[key] = lazy;
+                }
+            }
+
+            return lazy.Value;
         }
 
         private static bool IsOwner(RequesterContext requester, string shopperId)

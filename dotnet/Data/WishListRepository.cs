@@ -303,7 +303,12 @@
             else if (response.StatusCode != HttpStatusCode.NotFound)
             {
                 _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Verifying Schema [{response.StatusCode}]");
-                return IsRetryableStatus(response.StatusCode) ? SchemaCheckResult.TransientFailure : SchemaCheckResult.PermanentFailure;
+                // 401/403 on the read is retried soon too: right after install the policy may still be propagating,
+                // and the public schema would stay active for the full TTL otherwise.
+                bool retryRead = IsRetryableStatus(response.StatusCode)
+                    || response.StatusCode == HttpStatusCode.Unauthorized
+                    || response.StatusCode == HttpStatusCode.Forbidden;
+                return retryRead ? SchemaCheckResult.TransientFailure : SchemaCheckResult.PermanentFailure;
             }
 
             _context.Vtex.Logger.Info("VerifySchema", null, $"Applying schema [{response.StatusCode}]");
@@ -325,12 +330,10 @@
 
             if (putStatusCode == HttpStatusCode.NotModified)
             {
-                // Master Data already holds this exact schema
+                // The first GET did not match, so a 304 is not taken as proof: it goes through the same read back
                 _context.Vtex.Logger.Debug("VerifySchema", null, "Schema not modified.");
-                return SchemaCheckResult.Verified;
             }
-
-            if ((int)putStatusCode < 200 || (int)putStatusCode > 299)
+            else if ((int)putStatusCode < 200 || (int)putStatusCode > 299)
             {
                 _context.Vtex.Logger.Warn("VerifySchema", null, $"Failed to Apply Schema [{putStatusCode}]");
                 return IsRetryableStatus(putStatusCode) ? SchemaCheckResult.TransientFailure : SchemaCheckResult.PermanentFailure;
