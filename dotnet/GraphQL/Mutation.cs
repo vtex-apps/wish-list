@@ -25,7 +25,7 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    string shopperId = context.GetArgument<string>("shopperId");
+                    string shopperId = context.GetArgument<string>("shopperId")?.Trim();
                     HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
                     if (accessStatus != HttpStatusCode.OK)
                     {
@@ -53,7 +53,7 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    string shopperId = context.GetArgument<string>("shopperId");
+                    string shopperId = context.GetArgument<string>("shopperId")?.Trim();
                     HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
                     if (accessStatus != HttpStatusCode.OK)
                     {
