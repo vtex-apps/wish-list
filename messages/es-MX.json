@@ -1,0 +1,14 @@
+{
+  "store/wishlist.addButton": "Agregar a la lista",
+  "store/wishlist-see-lists": "Ver listas",
+  "store/wishlist-product-added-to-list": "Producto agregado a la lista",
+  "store/wishlist-add-product-fail": "No se pudo agregar el producto a la lista",
+  "store/wishlist-default-list-name": "Lista de deseos",
+  "store/myaccount-menu": "Lista de deseos",
+  "store/myaccount-empty-list": "Esta lista está vacía",
+  "store/wishlist-login": "Iniciar sesión",
+  "store/wishlist-not-logged": "Tienes que iniciar sesión antes de agregar un producto a la lista",
+  "admin/wishlist.menu.label": "Lista de deseos",
+  "admin/settings.title": "Exportar lista de deseos",
+  "admin/settings.download": "Descargar listas de deseos"
+}
