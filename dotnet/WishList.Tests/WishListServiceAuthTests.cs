@@ -237,43 +237,58 @@ namespace WishList.Tests
             Assert.Equal(0, scenario.GrantedCalls);
         }
 
-        public static IEnumerable<object[]> DelegatedTokens()
+        [Fact]
+        public async Task Representative_ContractCustomerId_IsNotAcceptedAsOwner()
         {
-            yield return new object[] { new ValidatedUser { IsRepresentative = true } };
-            yield return new object[] { new ValidatedUser { Act = JObject.Parse("{\"sub\":\"rep@test.com\"}") } };
-            yield return new object[] { new ValidatedUser { DelegationChain = new[] { "rep-guid" } } };
-            yield return new object[] { new ValidatedUser { DelegationId = "delegation-1" } };
-        }
-
-        [Theory]
-        [MemberData(nameof(DelegatedTokens))]
-        public async Task Representative_DelegatedToken_CannotAccessByCustomerId(ValidatedUser delegation)
-        {
-            // A delegated token may carry the represented customer's id: it must not make the representative the owner
-            delegation.AuthStatus = "Success";
-            delegation.Id = "rep-guid";
-            delegation.User = "rep@test.com";
-            delegation.CustomerId = "customer-guid-1";
+            // On a B2B representative token the customerId is the contract id shared by the organization unit
             var scenario = new Scenario();
-            scenario.Tokens[StoreToken] = delegation;
+            scenario.Tokens[StoreToken] = new ValidatedUser
+            {
+                AuthStatus = "Success", Id = "rep-guid", User = "rep@test.com", CustomerId = "contract-1", IsRepresentative = true
+            };
             var service = CreateService(scenario, null, StoreToken);
 
-            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("customer-guid-1"));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("contract-1"));
             Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("rep@test.com"));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("rep-guid"));
         }
 
         [Fact]
-        public void ValidateResponse_DelegationFields_AreRead()
+        public async Task OnBehalfOfToken_ActsAsTheCustomer()
         {
-            var user = JsonConvert.DeserializeObject<ValidatedUser>(
-                "{\"authStatus\":\"Success\",\"id\":\"u\",\"user\":\"e\",\"customerId\":\"c\",\"isRepresentative\":false}");
-            Assert.Equal("c", user.CustomerId);
-            Assert.False(user.IsDelegated());
+            // An assisted-sales token is issued for the customer: user, id and customerId are the customer's and
+            // the operator only appears in act (ImpersonateAccessTokenIssuer in vtex/authenticator)
+            var scenario = new Scenario();
+            scenario.Tokens[StoreToken] = new ValidatedUser
+            {
+                AuthStatus = "Success", Id = ShopperId, User = ShopperEmail, CustomerId = "customer-guid-1", IsRepresentative = false
+            };
+            var service = CreateService(scenario, null, StoreToken);
 
-            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"isRepresentative\":true}").IsDelegated());
-            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"act\":{\"sub\":\"x\"}}").IsDelegated());
-            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"delegationChain\":[\"x\"]}").IsDelegated());
-            Assert.False(JsonConvert.DeserializeObject<ValidatedUser>("{\"act\":null,\"delegationChain\":[]}").IsDelegated());
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("customer-guid-1"));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperEmail));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("operator@test.com"));
+        }
+
+        [Fact]
+        public void ValidateResponse_WithDelegationClaims_IsRead()
+        {
+            // Shapes of the VTEX ID credential/validate success response (ValidationSuccessResponse and
+            // DelegationActClaim in vtex-id-critical). Only isRepresentative is used; the other delegation
+            // claims must not break deserialization, whatever their shape.
+            const string onBehalfOf = "{\"authStatus\":\"Success\",\"id\":\"u\",\"user\":\"e\",\"account\":\"a\","
+                + "\"audience\":\"webstore\",\"tokenType\":\"user\",\"customerId\":\"c\",\"unitId\":null,"
+                + "\"isRepresentative\":false,\"act\":{\"clientId\":\"x\",\"sub\":\"op\",\"type\":\"user\",\"userId\":\"op-id\"},"
+                + "\"delegationChain\":[\"op-id\"],\"delegationId\":\"d\",\"sessionId\":\"s\"}";
+            ValidatedUser user = JsonConvert.DeserializeObject<ValidatedUser>(onBehalfOf);
+            Assert.Equal("u", user.Id);
+            Assert.Equal("c", user.CustomerId);
+            Assert.False(user.IsRepresentative);
+
+            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"isRepresentative\":true}").IsRepresentative);
+            Assert.Null(JsonConvert.DeserializeObject<ValidatedUser>("{\"isRepresentative\":null}").IsRepresentative);
+            Assert.Null(JsonConvert.DeserializeObject<ValidatedUser>(
+                "{\"act\":\"op\",\"delegationChain\":[{\"sub\":\"op\"}]}").IsRepresentative);
         }
 
         [Fact]
