@@ -431,9 +431,9 @@ namespace WishList.Services
                     shopper.Email = string.IsNullOrWhiteSpace(user.User) ? null : user.User.Trim();
                     // With email rectification the Profile System id (session profile.id, which the front sends
                     // as shopperId on PII accounts) is the token's customerId, not the VTEX ID user id.
-                    // A delegated token (B2B representative) may carry the represented customer's id, so its
-                    // customerId is ignored and the representative only reaches other lists as an admin.
-                    shopper.CustomerId = user.IsDelegated() || string.IsNullOrWhiteSpace(user.CustomerId)
+                    // On a B2B representative token the customerId is the contract id shared by the whole
+                    // organization unit, so it is not accepted as the shopper's identity.
+                    shopper.CustomerId = user.IsRepresentative == true || string.IsNullOrWhiteSpace(user.CustomerId)
                         ? null
                         : user.CustomerId.Trim();
                 }
