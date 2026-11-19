@@ -412,7 +412,8 @@ namespace WishList.Services
             {
                 IsAuthenticated = cached.IsAuthenticated,
                 UserId = cached.UserId,
-                Email = cached.Email
+                Email = cached.Email,
+                CustomerId = cached.CustomerId
             };
         }
 
@@ -428,6 +429,13 @@ namespace WishList.Services
                 {
                     shopper.UserId = string.IsNullOrWhiteSpace(user.Id) ? null : user.Id.Trim();
                     shopper.Email = string.IsNullOrWhiteSpace(user.User) ? null : user.User.Trim();
+                    // With email rectification the Profile System id (session profile.id, which the front sends
+                    // as shopperId on PII accounts) is the token's customerId, not the VTEX ID user id.
+                    // A delegated token (B2B representative) may carry the represented customer's id, so its
+                    // customerId is ignored and the representative only reaches other lists as an admin.
+                    shopper.CustomerId = user.IsDelegated() || string.IsNullOrWhiteSpace(user.CustomerId)
+                        ? null
+                        : user.CustomerId.Trim();
                 }
             }
 
@@ -472,7 +480,8 @@ namespace WishList.Services
 
             return !string.IsNullOrEmpty(requested)
                 && ((requester.Email != null && requested.Equals(requester.Email, StringComparison.OrdinalIgnoreCase))
-                    || (requester.UserId != null && requested.Equals(requester.UserId, StringComparison.OrdinalIgnoreCase)));
+                    || (requester.UserId != null && requested.Equals(requester.UserId, StringComparison.OrdinalIgnoreCase))
+                    || (requester.CustomerId != null && requested.Equals(requester.CustomerId, StringComparison.OrdinalIgnoreCase)));
         }
     }
 }

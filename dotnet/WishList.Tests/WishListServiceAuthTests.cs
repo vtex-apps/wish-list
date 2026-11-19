@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -214,6 +215,70 @@ namespace WishList.Tests
             var service = CreateService(ShopperScenario(), null, StoreToken);
 
             Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperId));
+        }
+
+        [Fact]
+        public async Task Shopper_WithEmailRectification_CanAccessOwnListByCustomerId()
+        {
+            // With email rectification the session profile.id (sent by the front on PII accounts) is the
+            // token's customerId, which differs from the VTEX ID user id
+            var scenario = new Scenario();
+            scenario.Tokens[StoreToken] = new ValidatedUser { AuthStatus = "Success", Id = ShopperId, User = ShopperEmail, CustomerId = "customer-guid-1" };
+            var service = CreateService(scenario, null, StoreToken);
+
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("customer-guid-1"));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(" CUSTOMER-GUID-1 "));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperId));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper(ShopperEmail));
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("customer-guid-2"));
+            Assert.Equal(0, scenario.GrantedCalls);
+        }
+
+        public static IEnumerable<object[]> DelegatedTokens()
+        {
+            yield return new object[] { new ValidatedUser { IsRepresentative = true } };
+            yield return new object[] { new ValidatedUser { Act = JObject.Parse("{\"sub\":\"rep@test.com\"}") } };
+            yield return new object[] { new ValidatedUser { DelegationChain = new[] { "rep-guid" } } };
+            yield return new object[] { new ValidatedUser { DelegationId = "delegation-1" } };
+        }
+
+        [Theory]
+        [MemberData(nameof(DelegatedTokens))]
+        public async Task Representative_DelegatedToken_CannotAccessByCustomerId(ValidatedUser delegation)
+        {
+            // A delegated token may carry the represented customer's id: it must not make the representative the owner
+            delegation.AuthStatus = "Success";
+            delegation.Id = "rep-guid";
+            delegation.User = "rep@test.com";
+            delegation.CustomerId = "customer-guid-1";
+            var scenario = new Scenario();
+            scenario.Tokens[StoreToken] = delegation;
+            var service = CreateService(scenario, null, StoreToken);
+
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("customer-guid-1"));
+            Assert.Equal(HttpStatusCode.OK, await service.EnsureCanAccessShopper("rep@test.com"));
+        }
+
+        [Fact]
+        public void ValidateResponse_DelegationFields_AreRead()
+        {
+            var user = JsonConvert.DeserializeObject<ValidatedUser>(
+                "{\"authStatus\":\"Success\",\"id\":\"u\",\"user\":\"e\",\"customerId\":\"c\",\"isRepresentative\":false}");
+            Assert.Equal("c", user.CustomerId);
+            Assert.False(user.IsDelegated());
+
+            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"isRepresentative\":true}").IsDelegated());
+            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"act\":{\"sub\":\"x\"}}").IsDelegated());
+            Assert.True(JsonConvert.DeserializeObject<ValidatedUser>("{\"delegationChain\":[\"x\"]}").IsDelegated());
+            Assert.False(JsonConvert.DeserializeObject<ValidatedUser>("{\"act\":null,\"delegationChain\":[]}").IsDelegated());
+        }
+
+        [Fact]
+        public async Task Shopper_WithoutCustomerId_CannotAccessByAnotherCustomerId()
+        {
+            var service = CreateService(ShopperScenario(), null, StoreToken);
+
+            Assert.Equal(HttpStatusCode.Forbidden, await service.EnsureCanAccessShopper("customer-guid-1"));
         }
 
         [Fact]

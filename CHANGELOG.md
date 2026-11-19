@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 - Fix broken access control (VSC-1265312) on the GraphQL queries and mutations. Callers are now identified from their VTEX ID token and authorized per request.
-  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email or user id of the shopper token) or an admin (token validated in VTEX ID and granted in License Manager) may access them.
+  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email, the user id or the customer id of the shopper token) or an admin (token validated in VTEX ID and granted in License Manager) may access them. The customer id covers accounts with email rectification, where the Profile System id of the shopper is the token's customer id instead of the VTEX ID user id. The customer id of a delegated token (B2B representative: `isRepresentative`, `act`, `delegationChain` or `delegationId` present) is ignored, so a representative reaches another shopper's list only as an admin.
   - Personal data (shopper ids and emails) and Master Data response bodies are no longer written to logs.
 
 ### Fixed
