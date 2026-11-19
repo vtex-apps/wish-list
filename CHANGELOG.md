@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Security
+
+- Fix broken access control (VSC-1265312) on GraphQL queries, mutations and the `export-lists` route. Callers are now identified from their VTEX ID token and authorized per request.
+  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email, the user id or the customer id of the shopper token) or an admin may access them. The customer id covers accounts with email rectification, where the session `profile.id` that the store sends as `shopperId` is the token's customer id instead of the VTEX ID user id. On a B2B representative token (`isRepresentative: true`) the customer id is the contract id shared by the organization unit, so it is not accepted. A token issued on behalf of a customer (assisted sales, with an `act` claim) carries the customer's own email, user id and customer id, so it acts as that customer.
+  - `exportList`, `exportListPaged`, `listSize` and the `/_v/wishlist/export-lists` route are now restricted to admin users (admin token validated in VTEX ID and granted in License Manager).
+  - Personal data (shopper ids and emails) is no longer written to logs.
+
+### Fixed
+
+- Schema verification (reworked in 1.19.2) now compares only what the app depends on (field names, `v-indexed`, and a `v-security` that must be at least as private as the app's), creates a missing schema, retries the schema PUT on `429`/`423`/`5xx` and reads the schema back to confirm it, also after a `304` from the PUT. A transient failure (`429`/`423`/`5xx`, a network error, a `401`/`403` on the read, or a failed read back after a successful PUT) is retried after one minute; a schema the app cannot change (PUT rejected, or read back with different content) is left alone for one hour. The schema content is unchanged (making it private is tracked in STR-1393); the app never makes a field public again on an account where it is already more private, for example after the Master Data PII campaign.
+- The admin export page no longer breaks when `listSize` is denied.
+- A shopper accessing their own list is authorized with a single VTEX ID call; the admin check (VTEX ID + License Manager) only runs when the caller is not the owner of the list.
+- `listNames` is marked as private in the GraphQL cache, like the other shopper queries.
+- The caller's identity (VTEX ID) and the admin check (VTEX ID + License Manager) are resolved once per HTTP request and shared by every GraphQL field in it, so a query with several fields or aliases does not repeat these calls.
+- `viewList` no longer throws when the requested list does not exist, and `listNames` no longer throws for a shopper who never used the wishlist.
+- Calls to VTEX ID and License Manager time out after 6 seconds (instead of the 100 s HttpClient default, above the 60 s route timeout) and the request is denied, so a slow dependency does not hold the request until the route times out.
+- The `shopperId` argument is trimmed once, so the value that is authorized is the same value used to read and write the list.
+
+### Changed
+
+- **Breaking behaviour:** the `VtexIdclientAutCookie` request header is only accepted for admin access (token validated in VTEX ID and granted in License Manager); it is no longer accepted as a shopper identity.
+- **Breaking behaviour:** non-admin users can only access their own lists. Call-center/impersonation operators that use their own token can no longer manage a customer's list unless they are admins (an assisted-sales token issued on behalf of the customer acts as that customer).
+- **Breaking behaviour:** export queries and `listSize` now require an admin; other authenticated users receive `Forbidden`.
+- A denied call returns `Unauthorized` when no valid VTEX ID token is present, and `Forbidden` when the token is valid but does not own the list or is not granted in License Manager.
+- The Master Data schema is account-wide: the first authorized request that reaches Master Data through this version on any workspace, including a non-master one, creates the schema when it is missing and applies the app's schema when the stored one is more public than the app's (each pod verifies once per hour). The schema content is the same as in 1.19.3; making it private is tracked in STR-1393. Rolling back to 1.19.3 or older removes the authorization checks again, so a problem after the upgrade must be handled with a forward fix, not a rollback. Before the rollout, check which versions are installed or linked on each target account, do not keep older versions on any workspace after the upgrade, and run pilots per account, not per workspace.
+- A list saved with `public: true` is not readable by other shoppers through the API; `public` is kept as data only.
+
 ## [1.19.4] - 2026-11-16
 
 ### Changed
