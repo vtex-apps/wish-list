@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 - Fix broken access control (VSC-1265312) on GraphQL queries, mutations and the `export-lists` route. Callers are now identified from their VTEX ID token and authorized per request.
-  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email or user id of the shopper token) or an admin may access them.
+  - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email, the user id or the customer id of the shopper token) or an admin may access them. The customer id covers accounts with email rectification, where the session `profile.id` that the store sends as `shopperId` is the token's customer id instead of the VTEX ID user id. The customer id of a delegated token (B2B representative: `isRepresentative`, `act`, `delegationChain` or `delegationId` present) is ignored, so a representative reaches another shopper's list only as an admin.
   - `exportList`, `exportListPaged`, `listSize` and the `/_v/wishlist/export-lists` route are now restricted to admin users (admin token validated in VTEX ID and granted in License Manager).
   - Personal data (shopper ids and emails) is no longer written to logs.
 
