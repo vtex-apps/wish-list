@@ -152,6 +152,8 @@ If you want to configure the layout without the `slider-layout` dependency, you 
 
 There are a couple of URLs to read, search, and change data for the app:
 
+> ⚠️ The `wishlist` Master Data entity has no public fields. Direct requests to `/api/dataentities/wishlist` must authenticate with an app key/token or a user token that has Master Data permissions. Requests without authentication or with a shopper (storefront) token receive `403`. Storefronts, mobile apps and integrations that act for a shopper must use this app's GraphQL API instead.
+
 To read the schema of the Wishlist app:
 
 ```
