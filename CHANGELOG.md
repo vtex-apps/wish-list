@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Set `maxReplicas` to 100 in `dotnet/service.json` to give the HPA headroom for Black Friday 2026.
+
 ## [1.20.0] - 2026-11-24
 
 ### Security
