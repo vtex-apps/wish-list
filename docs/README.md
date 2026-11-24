@@ -95,6 +95,10 @@ If you want to make any changes to the `/wishlist` layout, feel free to change i
 
 As said previously, after configured the user will be able to see a Heart icon to the shelf and product page, you'll also be able to access the Wishlisted items at `/wishlist`
 
+## Master Data access
+
+> ⚠️ The `wishlist` Master Data entity has no public fields. Direct requests to `/api/dataentities/wishlist` must authenticate with an app key/token or a user token that has Master Data permissions. Requests without authentication or with a shopper (storefront) token receive `403`. Storefronts, mobile apps and integrations that act for a shopper must use this app's GraphQL API instead.
+
 
 
 ## Customization

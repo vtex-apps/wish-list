@@ -17,7 +17,7 @@ namespace WishList.Tests
 {
     public class WishListRepositorySchemaTests : IDisposable
     {
-        // Schema written by v1.19.x (public `email`): the same security as the app's schema
+        // Schema written by previous versions, with public fields
         private const string LegacySchema = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]},\"v-immediate-indexing\":true}";
 
         // Shape returned by Master Data after the PII campaign: indented, with only `email` made private
@@ -123,22 +123,33 @@ namespace WishList.Tests
         {
             Assert.True(WishListRepository.IsSchemaUpToDate(WishListConstants.SCHEMA_JSON));
             Assert.True(WishListRepository.IsSchemaUpToDate(ReformattedCurrentSchema()));
-            Assert.True(WishListRepository.IsSchemaUpToDate(LegacySchema));
+            Assert.False(WishListRepository.IsSchemaUpToDate(LegacySchema));
             Assert.False(WishListRepository.IsSchemaUpToDate(OutdatedSchema));
             Assert.False(WishListRepository.IsSchemaUpToDate("not json"));
             Assert.False(WishListRepository.IsSchemaUpToDate("[]"));
         }
 
         [Fact]
-        public void IsSchemaUpToDate_AcceptsAMorePrivateSchema()
+        public void SchemaJson_HasNoPublicField()
         {
-            // A schema with fewer public fields (the Master Data PII campaign, or one made private by hand) is never made public again
-            Assert.True(WishListRepository.IsSchemaUpToDate(CampaignSchema));
-            Assert.True(WishListRepository.IsSchemaUpToDate(PrivateSchema));
-            Assert.True(WishListRepository.IsSchemaUpToDate(WithSecurity(
-                "{\"allowGetAll\":false,\"publicRead\":[\"id\"],\"publicWrite\":[],\"publicFilter\":[]}")));
+            JObject security = (JObject)JObject.Parse(WishListConstants.SCHEMA_JSON)["v-security"];
 
-            // Any list public beyond the app's, or allowGetAll, is not up to date
+            Assert.False(security.Value<bool>("allowGetAll"));
+            Assert.Empty((JArray)security["publicRead"]);
+            Assert.Empty((JArray)security["publicWrite"]);
+            Assert.Empty((JArray)security["publicFilter"]);
+        }
+
+        [Fact]
+        public void IsSchemaUpToDate_RequiresNoPublicField()
+        {
+            Assert.True(WishListRepository.IsSchemaUpToDate(PrivateSchema));
+
+            // Any public field or allowGetAll is not up to date
+            Assert.False(WishListRepository.IsSchemaUpToDate(LegacySchema));
+            Assert.False(WishListRepository.IsSchemaUpToDate(CampaignSchema));
+            Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity(
+                "{\"allowGetAll\":false,\"publicRead\":[\"id\"],\"publicWrite\":[],\"publicFilter\":[]}")));
             Assert.False(WishListRepository.IsSchemaUpToDate(OutdatedSchema));
             Assert.False(WishListRepository.IsSchemaUpToDate(WithSecurity(
                 "{\"allowGetAll\":true,\"publicRead\":[],\"publicWrite\":[],\"publicFilter\":[]}")));
@@ -188,25 +199,32 @@ namespace WishList.Tests
             Assert.Equal(WishListConstants.SCHEMA_JSON, _putBodies.Single());
         }
 
-        [Fact]
-        public async Task SchemaWrittenByThisAndPreviousVersions_IsNotChanged()
+        [Theory]
+        [InlineData("legacy")]
+        [InlineData("campaign")]
+        public async Task PublicSchema_IsReplacedWithPrivateSchema(string kind)
         {
-            // The app's schema content is the same as 1.19.x, so nothing is rewritten on accounts that already have it
-            var repository = CreateRepository((method, _) => TestHttpMessageHandler.Ok(LegacySchema));
+            string remote = kind == "legacy" ? LegacySchema : CampaignSchema;
+            var repository = CreateRepository((method, count) =>
+            {
+                if (method == HttpMethod.Put)
+                {
+                    return TestHttpMessageHandler.Ok();
+                }
+
+                return TestHttpMessageHandler.Ok(count == 1 ? remote : WishListConstants.SCHEMA_JSON);
+            });
 
             await repository.VerifySchema();
 
-            Assert.Equal(new[] { HttpMethod.Get }, _calls);
-            Assert.Empty(_putBodies);
+            Assert.Equal(new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Get }, _calls);
+            Assert.Equal(WishListConstants.SCHEMA_JSON, _putBodies.Single());
         }
 
-        [Theory]
-        [InlineData("campaign")]
-        [InlineData("private")]
-        public async Task MorePrivateSchema_IsNotMadePublicAgain(string kind)
+        [Fact]
+        public async Task PrivateSchema_IsNotChanged()
         {
-            string remote = kind == "campaign" ? CampaignSchema : PrivateSchema;
-            var repository = CreateRepository((method, _) => TestHttpMessageHandler.Ok(remote));
+            var repository = CreateRepository((method, _) => TestHttpMessageHandler.Ok(PrivateSchema));
 
             await repository.VerifySchema();
 
