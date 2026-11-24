@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-24
+
 ### Security
 
 - Fix broken access control (VSC-1265312) on the GraphQL queries and mutations. Callers are now identified from their VTEX ID token and authorized per request.
