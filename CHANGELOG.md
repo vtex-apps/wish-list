@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - Set `maxReplicas` to 100 in `dotnet/service.json` to give the HPA headroom for Black Friday 2026.
+- Raise `memory` from 1024 to 2048 (request 2048 MB, limit ~4.4 GB). Current usage reaches ~2.4 GB per pod, above the 2.2 GB limit that 1024 produces.
+- Set the CPU request explicitly to 250m (`cpu.type: shared`, `value: 25`, `scalingPercentage: 95`). Without a `cpu` block the platform derives CPU from `memory`, so raising memory alone would silently move the HPA target from ~0.15 to ~0.28 core.
 
 ## [1.19.4] - 2026-11-16
 
