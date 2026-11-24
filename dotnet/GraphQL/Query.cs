@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using WishList.GraphQL.Types;
 using WishList.Models;
 using WishList.Services;
@@ -27,15 +28,25 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ViewList [-]");
-                    string shopperId = context.GetArgument<string>("shopperId");
+                    string shopperId = context.GetArgument<string>("shopperId")?.Trim();
+                    HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
+                    if (accessStatus != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(accessStatus.ToString())
+                        {
+                            Code = accessStatus.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
                     IList<ListItem> resultList = new List<ListItem>();
                     int totalCount = 0;
                     var resultListsWrapper = await wishListService.GetList(shopperId, name);
-                    var resultListWrapper = resultListsWrapper.ListItemsWrapper.FirstOrDefault();
+                    var resultListWrapper = resultListsWrapper?.ListItemsWrapper?.FirstOrDefault();
                     if (resultListWrapper != null)
                     {
                         if (resultListWrapper.ListItems != null)
@@ -46,7 +57,6 @@ namespace WishList.GraphQL
                             if (from > 0 && to > 0)
                             {
                                 resultList = await wishListService.LimitList(resultList, from, to);
-                                Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
                             }
                         }
                         else
@@ -59,8 +69,8 @@ namespace WishList.GraphQL
                     {
                         Data = new DataElement { data = resultList },
                         Range = new ResultRange { From = from, To = to, Total = totalCount },
-                        Public = resultListWrapper.IsPublic ?? false,
-                        Name = resultListWrapper.Name
+                        Public = resultListWrapper?.IsPublic ?? false,
+                        Name = resultListWrapper?.Name
                     };
 
                     return listResponse;
@@ -76,16 +86,32 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ViewLists [-]");
-                    string shopperId = context.GetArgument<string>("shopperId");
+                    string shopperId = context.GetArgument<string>("shopperId")?.Trim();
+                    HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
+                    if (accessStatus != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(accessStatus.ToString())
+                        {
+                            Code = accessStatus.ToString()
+                        });
+
+                        return null;
+                    }
+
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
                     IList<ListItem> resultList = new List<ListItem>();
                     IList<ListResponse> resultLists = new List<ListResponse>();
                     int totalCount = 0;
                     var resultListsWrapper = await wishListService.GetLists(shopperId);
-                    foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper.ListItemsWrapper)
+                    // A shopper who never used the wishlist has no document, so there is no list to read
+                    foreach (ListItemsWrapper listItemsWrapper in resultListsWrapper?.ListItemsWrapper ?? new List<ListItemsWrapper>())
                     {
+                        if (listItemsWrapper == null)
+                        {
+                            continue;
+                        }
+
                         if (listItemsWrapper != null)
                         {
                             if (listItemsWrapper.ListItems != null)
@@ -96,7 +122,6 @@ namespace WishList.GraphQL
                                 if (from > 0 && to > 0)
                                 {
                                     resultList = await wishListService.LimitList(resultList, from, to);
-                                    Console.WriteLine($"totalCount = {totalCount} : Filtered to {resultList.Count}");
                                 }
                             }
                             else
@@ -129,8 +154,18 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] CheckList [-]");
-                    string shopperId = context.GetArgument<string>("shopperId");
+                    string shopperId = context.GetArgument<string>("shopperId")?.Trim();
+                    HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
+                    if (accessStatus != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(accessStatus.ToString())
+                        {
+                            Code = accessStatus.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
                     ResponseListWrapper resultListWrapper = await wishListService.GetLists(shopperId);
@@ -201,11 +236,22 @@ namespace WishList.GraphQL
                 ),
                 resolve: async context =>
                 {
-                    Console.WriteLine("[-] ListNames [-]");
-                    string shopperId = context.GetArgument<string>("shopperId");
+                    string shopperId = context.GetArgument<string>("shopperId")?.Trim();
+                    HttpStatusCode accessStatus = await wishListService.EnsureCanAccessShopper(shopperId);
+                    if (accessStatus != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(accessStatus.ToString())
+                        {
+                            Code = accessStatus.ToString()
+                        });
+
+                        return null;
+                    }
+
                     ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
-                    IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;
-                    var distinctListNames = listItemsWrappers.GroupBy(elem => elem.Name).Select(group => group.First());
+                    // A shopper who never used the wishlist has no document, so there is no list to read
+                    IList<ListItemsWrapper> listItemsWrappers = allLists?.ListItemsWrapper ?? new List<ListItemsWrapper>();
+                    var distinctListNames = listItemsWrappers.Where(elem => elem != null).GroupBy(elem => elem.Name).Select(group => group.First());
                     var listName = distinctListNames.Select(n => n.Name);
 
                     return listName.ToArray();

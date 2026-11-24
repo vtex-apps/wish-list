@@ -6,6 +6,10 @@
         public const string AppKey = "X-VTEX-API-AppKey";
         public const string IsProduction = "X-Vtex-Workspace-Is-Production";
         public const string VtexIdCookie = "VtexIdclientAutCookie";
+        // Named HttpClient for VTEX ID and License Manager. The authorization gate runs on every request, so a slow
+        // dependency must fail (and deny) in a few seconds instead of holding the request for the 100 s HttpClient default.
+        public const string AUTH_HTTP_CLIENT = "vtex-auth";
+        public static readonly System.TimeSpan AuthHttpClientTimeout = System.TimeSpan.FromSeconds(6);
 
         public const string FORWARDED_HEADER = "X-Forwarded-For";
         public const string FORWARDED_HOST = "X-Forwarded-Host";
@@ -20,6 +24,6 @@
         public const string DATA_ENTITY = "wishlist";
         public const string SCHEMA = "wishlist";
 
-        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]}}";
+        public const string SCHEMA_JSON = "{\"name\":\"wishlist\",\"properties\":{\"email\":{\"type\":\"string\",\"title\":\"Shopper ID\",\"description\":\"\"},\"ListItemsWrapper\":{\"type\":\"array\",\"title\":\"The ListItemsWrapper schema\",\"description\":\"An explanation about the purpose of this instance.\"}},\"v-indexed\":[\"email\"],\"v-default-fields\":[\"email\",\"ListItemsWrapper\"],\"v-cache\":false,\"v-security\":{\"allowGetAll\":false,\"publicRead\":[\"email\",\"ListItemsWrapper\",\"id\"],\"publicWrite\":[\"email\",\"ListItemsWrapper\"],\"publicFilter\":[\"email\",\"ListItemsWrapper\"]},\"v-immediate-indexing\":true}";
     }
 }

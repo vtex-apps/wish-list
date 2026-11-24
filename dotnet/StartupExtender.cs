@@ -21,6 +21,7 @@ namespace Vtex
             services.AddTransient<IWishListService, WishListService>();
             services.AddHttpContextAccessor();
             services.AddHttpClient();
+            services.AddHttpClient(WishListConstants.AUTH_HTTP_CLIENT, client => client.Timeout = WishListConstants.AuthHttpClientTimeout);
         }
 
         // This method is called inside Startup.Configure() before calling app.UseRouting()

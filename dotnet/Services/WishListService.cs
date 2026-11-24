@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Vtex.Api.Context;
 using WishList.Data;
 using WishList.Models;
 
@@ -15,10 +18,16 @@ namespace WishList.Services
         private readonly IWishListRepository _wishListRepository;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IIOServiceContext _context;
 
         private const int MaximumReturnedRecords = 999;
 
-        public WishListService(IWishListRepository wishListRepository, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory)
+        // Per-request cache keys (HttpContext.Items). A GraphQL request with several fields or aliases
+        // resolves the caller once instead of once per field.
+        private const string ShopperItemKey = "WishList.Requester.Shopper";
+        private const string AdminItemKey = "WishList.Requester.Admin";
+
+        public WishListService(IWishListRepository wishListRepository, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory, IIOServiceContext context)
         {
             this._wishListRepository = wishListRepository ??
                                             throw new ArgumentNullException(nameof(wishListRepository));
@@ -28,6 +37,9 @@ namespace WishList.Services
 
             this._clientFactory = clientFactory ??
                                   throw new ArgumentNullException(nameof(clientFactory));
+
+            this._context = context ??
+                               throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<WishListWrapper> GetList(string shopperId, string listName)
@@ -46,7 +58,7 @@ namespace WishList.Services
             }
             else
             {
-                Console.WriteLine("GetList Null/Empty");
+                _context.Vtex.Logger.Debug("GetList", null, "Null/Empty");
             }
 
             wishListWrapper.ListItemsWrapper = new List<ListItemsWrapper> { listItemsWrapper };
@@ -128,7 +140,6 @@ namespace WishList.Services
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
-            Console.WriteLine(" REMOVE");
             bool wasRemoved = false;
             IList<ListItem> listItemsToSave = null;
             WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
@@ -161,6 +172,316 @@ namespace WishList.Services
             listItems = listItems.Skip(from - 1).Take(take).ToList();
 
             return listItems;
+        }
+
+        public async Task<ValidatedUser> ValidateUserToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return null;
+            }
+
+            ValidatedUser validatedUser = null;
+            ValidateToken validateToken = new ValidateToken
+            {
+                Token = token
+            };
+
+            var jsonSerializedToken = JsonConvert.SerializeObject(validateToken);
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"http://{this.GetAccount()}.vtexcommercestable.com.br/api/vtexid/credential/validate"),
+                Content = new StringContent(jsonSerializedToken, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
+            };
+
+            string authToken = this.GetCredentialHeader();
+
+            if (authToken != null)
+            {
+                request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+            }
+
+            var client = _clientFactory.CreateClient(WishListConstants.AUTH_HTTP_CLIENT);
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    validatedUser = JsonConvert.DeserializeObject<ValidatedUser>(responseContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("ValidateUserToken", null, $"Error validating user token", ex);
+            }
+
+            return validatedUser;
+        }
+
+        private string GetAccount()
+        {
+            return this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME].ToString();
+        }
+
+        private string GetCredentialHeader()
+        {
+            string credential = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+            return string.IsNullOrEmpty(credential) ? null : credential;
+        }
+
+        private async Task<bool> IsUserLoginGrantedInLicenseManagerAsync(string account, string userId, string userToken)
+        {
+            if (string.IsNullOrWhiteSpace(account) || string.IsNullOrWhiteSpace(userId))
+            {
+                return false;
+            }
+
+            var grantedRequest = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://{account}.vtexcommercestable.com.br/api/pvt/accounts/{account}/logins/{Uri.EscapeDataString(userId)}/granted")
+            };
+
+            // Proxy-Authorization carries the app credential, which the IO outbound proxy authorizes the call against.
+            // VtexIdclientAutCookie carries the user's own token. The app credential is not sent as Authorization,
+            // otherwise the router resolves the app as the current user.
+            grantedRequest.Headers.Add(WishListConstants.USE_HTTPS_HEADER_NAME, "true");
+            grantedRequest.Headers.Add(WishListConstants.VtexIdCookie, userToken);
+            string credentialHeader = this.GetCredentialHeader();
+            if (credentialHeader != null)
+            {
+                grantedRequest.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, credentialHeader);
+            }
+
+            try
+            {
+                var client = _clientFactory.CreateClient(WishListConstants.AUTH_HTTP_CLIENT);
+                var grantedResponse = await client.SendAsync(grantedRequest);
+                string body = (await grantedResponse.Content.ReadAsStringAsync()).Trim();
+
+                if (!grantedResponse.IsSuccessStatusCode)
+                {
+                    _context.Vtex.Logger.Warn("IsUserLoginGrantedInLicenseManagerAsync", null, $"License Manager grant check failed [{(int)grantedResponse.StatusCode}]");
+                    return false;
+                }
+
+                if (string.Equals(body, "true", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                if (string.Equals(body, "false", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                try
+                {
+                    return JsonConvert.DeserializeObject<bool>(body);
+                }
+                catch (JsonException)
+                {
+                    _context.Vtex.Logger.Warn("IsUserLoginGrantedInLicenseManagerAsync", null, "Unexpected License Manager granted response body.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("IsUserLoginGrantedInLicenseManagerAsync", null, "Error checking License Manager grant", ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks the admin candidates: the admin cookie and the VtexIdclientAutCookie header (REST integrations).
+        /// A token is only accepted after VTEX ID validation and the License Manager grant check.
+        /// Validated is true when any candidate is a valid VTEX ID token, granted or not, so an ungranted
+        /// caller gets Forbidden instead of Unauthorized.
+        /// </summary>
+        private Task<(bool Validated, bool Granted)> CheckAdminAsync()
+        {
+            return MemoizePerRequest(AdminItemKey, ResolveAdminAsync);
+        }
+
+        private async Task<(bool Validated, bool Granted)> ResolveAdminAsync()
+        {
+            string headerToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VtexIdCookie];
+            string[] candidateTokens = { _context.Vtex.AdminUserAuthToken, headerToken };
+
+            bool validated = false;
+            foreach (string token in candidateTokens.Where(t => !string.IsNullOrWhiteSpace(t)).Distinct())
+            {
+                (bool tokenValidated, bool tokenGranted) = await CheckAdminTokenAsync(token);
+                validated = validated || tokenValidated;
+                if (tokenGranted)
+                {
+                    return (true, true);
+                }
+            }
+
+            return (validated, false);
+        }
+
+        private async Task<(bool Validated, bool Granted)> CheckAdminTokenAsync(string token)
+        {
+            ValidatedUser admin = await ValidateUserToken(token);
+            if (admin == null
+                || !"Success".Equals(admin.AuthStatus, StringComparison.OrdinalIgnoreCase)
+                || string.IsNullOrWhiteSpace(admin.Id))
+            {
+                return (false, false);
+            }
+
+            bool granted = await IsUserLoginGrantedInLicenseManagerAsync(this.GetAccount(), admin.Id, token);
+
+            return (true, granted);
+        }
+
+        private static void ApplyAdminCheck(RequesterContext requester, (bool Validated, bool Granted) admin)
+        {
+            requester.IsAdmin = admin.Granted;
+            requester.IsAuthenticated = requester.IsAuthenticated || admin.Validated || admin.Granted;
+        }
+
+        public async Task<RequesterContext> GetRequesterAsync()
+        {
+            try
+            {
+                RequesterContext requester = await GetShopperAsync();
+                ApplyAdminCheck(requester, await CheckAdminAsync());
+
+                return requester;
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("GetRequesterAsync", null, "Error resolving requester", ex);
+                return new RequesterContext();
+            }
+        }
+
+        public async Task<HttpStatusCode> EnsureCanAccessShopper(string shopperId)
+        {
+            RequesterContext requester;
+            try
+            {
+                // The owner check costs one VTEX ID call. The admin check (VTEX ID + License Manager)
+                // only runs when the caller is not the owner, so shopper requests never reach License Manager.
+                requester = await GetShopperAsync();
+                if (IsOwner(requester, shopperId))
+                {
+                    return HttpStatusCode.OK;
+                }
+
+                ApplyAdminCheck(requester, await CheckAdminAsync());
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("EnsureCanAccessShopper", null, "Error resolving requester", ex);
+                return HttpStatusCode.Unauthorized;
+            }
+
+            if (requester.IsAdmin)
+            {
+                return HttpStatusCode.OK;
+            }
+
+            if (!requester.IsAuthenticated)
+            {
+                return HttpStatusCode.Unauthorized;
+            }
+
+            _context.Vtex.Logger.Warn("EnsureCanAccessShopper", null, "Access denied: token does not match requested shopperId.");
+
+            return HttpStatusCode.Forbidden;
+        }
+
+        /// <summary>
+        /// Identity of the shopper token (StoreUserAuthToken) validated in VTEX ID. Does not check admin.
+        /// </summary>
+        private async Task<RequesterContext> GetShopperAsync()
+        {
+            RequesterContext cached = await MemoizePerRequest(ShopperItemKey, ResolveShopperAsync);
+
+            // Callers change IsAdmin/IsAuthenticated on the result, so each one gets its own copy
+            return new RequesterContext
+            {
+                IsAuthenticated = cached.IsAuthenticated,
+                UserId = cached.UserId,
+                Email = cached.Email,
+                CustomerId = cached.CustomerId
+            };
+        }
+
+        private async Task<RequesterContext> ResolveShopperAsync()
+        {
+            RequesterContext shopper = new RequesterContext();
+
+            string storeToken = _context.Vtex.StoreUserAuthToken;
+            if (!string.IsNullOrWhiteSpace(storeToken))
+            {
+                ValidatedUser user = await ValidateUserToken(storeToken);
+                if (user != null && "Success".Equals(user.AuthStatus, StringComparison.OrdinalIgnoreCase))
+                {
+                    shopper.UserId = string.IsNullOrWhiteSpace(user.Id) ? null : user.Id.Trim();
+                    shopper.Email = string.IsNullOrWhiteSpace(user.User) ? null : user.User.Trim();
+                    // With email rectification the Profile System id (session profile.id, which the front sends
+                    // as shopperId on PII accounts) is the token's customerId, not the VTEX ID user id.
+                    // On a B2B representative token the customerId is the contract id shared by the whole
+                    // organization unit, so it is not accepted as the shopper's identity.
+                    shopper.CustomerId = user.IsRepresentative == true || string.IsNullOrWhiteSpace(user.CustomerId)
+                        ? null
+                        : user.CustomerId.Trim();
+                }
+            }
+
+            shopper.IsAuthenticated = shopper.UserId != null || shopper.Email != null;
+
+            return shopper;
+        }
+
+        /// <summary>
+        /// Runs the factory once per HTTP request and shares the same Task with every caller in that request,
+        /// including resolvers running in parallel. HttpContext.Items lives only for the request, so nothing is
+        /// shared between requests or users. Only the caller's identity is cached, never an access decision.
+        /// </summary>
+        private Task<T> MemoizePerRequest<T>(string key, Func<Task<T>> factory)
+        {
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return factory();
+            }
+
+            Lazy<Task<T>> lazy;
+            lock (httpContext.Items)
+            {
+                if (httpContext.Items.TryGetValue(key, out object cached) && cached is Lazy<Task<T>> existing)
+                {
+                    lazy = existing;
+                }
+                else
+                {
+                    lazy = new Lazy<Task<T>>(factory);
+                    httpContext.Items[key] = lazy;
+                }
+            }
+
+            return lazy.Value;
+        }
+
+        private static bool IsOwner(RequesterContext requester, string shopperId)
+        {
+            string requested = shopperId == null ? null : shopperId.Trim();
+
+            return !string.IsNullOrEmpty(requested)
+                && ((requester.Email != null && requested.Equals(requester.Email, StringComparison.OrdinalIgnoreCase))
+                    || (requester.UserId != null && requested.Equals(requester.UserId, StringComparison.OrdinalIgnoreCase))
+                    || (requester.CustomerId != null && requested.Equals(requester.CustomerId, StringComparison.OrdinalIgnoreCase)));
         }
     }
 }
