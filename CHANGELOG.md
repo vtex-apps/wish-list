@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Raise `memory` from 1024 to 2048 (request 2048 MB, limit ~4.4 GB). Current usage reaches ~2.4 GB per pod, above the 2.2 GB limit that 1024 produces.
 - Set the CPU request explicitly to 250m (`cpu.type: shared`, `value: 25`, `scalingPercentage: 95`). Without a `cpu` block the platform derives CPU from `memory`, so raising memory alone would silently move the HPA target from ~0.15 to ~0.28 core.
 
+## [1.20.1] - 2026-11-24
+
+### Changed
+
+- Published from `release/1.19.x` (the 1.19.4 code plus the Black Friday 2026 scaling config: `cpu` 250m, `memory` 2048, `minReplicas` 10, `maxReplicas` 100). It was released as 1.20.1 because the registry does not accept a version lower than 1.20.0. It does not include the 1.20.0 changes below.
+
 ## [1.20.0] - 2026-11-24
 
 ### Security
