@@ -1,8 +1,15 @@
 {
   "stack": "dotnet",
-  "memory": 1024,
+  "cpu": {
+    "type": "shared",
+    "value": 25,
+    "scalingPercentage": 95
+  },
+  "memory": 2048,
   "timeout": 60,
   "ttl": 60,
+  "minReplicas": 10,
+  "maxReplicas": 100,
   "runtimeArgs": [
   ],
   "routes": {
