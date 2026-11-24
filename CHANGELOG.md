@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security
 
+- The `wishlist` Master Data schema has no public fields: `publicRead`, `publicWrite` and `publicFilter` are empty and `allowGetAll` is off. The app reads and writes the entity with its own token, so the storefront does not need anonymous access. The app applies this schema on the first request that reaches Master Data (each pod verifies once per hour), and creates it with no public fields when it is missing.
 - Fix broken access control (VSC-1265312) on GraphQL queries, mutations and the `export-lists` route. Callers are now identified from their VTEX ID token and authorized per request.
   - `viewList`, `viewLists`, `checkList`, `listNames`, `addToList` and `removeFromList`: only the owner of the list (the `shopperId` must match the email, the user id or the customer id of the shopper token) or an admin may access them. The customer id covers accounts with email rectification, where the session `profile.id` that the store sends as `shopperId` is the token's customer id instead of the VTEX ID user id. On a B2B representative token (`isRepresentative: true`) the customer id is the contract id shared by the organization unit, so it is not accepted. A token issued on behalf of a customer (assisted sales, with an `act` claim) carries the customer's own email, user id and customer id, so it acts as that customer.
   - `exportList`, `exportListPaged`, `listSize` and the `/_v/wishlist/export-lists` route are now restricted to admin users (admin token validated in VTEX ID and granted in License Manager).
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- **Breaking behaviour:** themes, mobile apps, scripts or other apps that read or write the `wishlist` Master Data entity directly with `_schema=wishlist`, without authentication or with a shopper (storefront) token, receive `403`. They must use this app's GraphQL API, or call Master Data from a backend with an app key/token that has Master Data permissions. The app's own reads and writes are not affected.
+- Rollback after the private schema: roll back only to a release with the authorization fix, whose schema verification leaves a more private schema as is. 1.19.4 and older apply their public schema whenever the stored schema differs, which makes `email`, `ListItemsWrapper` and `id` public again if Master Data accepts the PUT.
 - **Breaking behaviour:** the `VtexIdclientAutCookie` request header is only accepted for admin access (token validated in VTEX ID and granted in License Manager); it is no longer accepted as a shopper identity.
 - **Breaking behaviour:** non-admin users can only access their own lists. Call-center/impersonation operators that use their own token can no longer manage a customer's list unless they are admins (an assisted-sales token issued on behalf of the customer acts as that customer).
 - **Breaking behaviour:** export queries and `listSize` now require an admin; other authenticated users receive `Forbidden`.
